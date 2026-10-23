@@ -45,7 +45,7 @@ All preferences live in `data/config.json`, written by `/setup` (or by hand) and
 - `name`: how Claude addresses you. `language`: for Claude's replies, the handoff, the lessons and the reminders (reminder texts exist in `en` and `it`, other languages fall back to English).
 - `channels`:
   - `mac`: an alert on the Mac that records your answer (used by `/how-did-it-go`). If the Mac is asleep at reminder time, the alert shows up on wake while it still makes sense (morning: up to 3 hours later; evening: from 1 hour before to 4 hours after); if the Mac is off, it is skipped.
-  - `calendar`: `install.sh` writes `data/deskmate-reminders.ics` with two recurring events and a notification. Open it once to import it into Apple Calendar, Google Calendar or Outlook; it reaches your phone and works with the Mac off, but records nothing. Import it again after changing times or days.
+  - `calendar` (not tested with a real calendar yet, see [ROADMAP.md](ROADMAP.md)): `install.sh` writes `data/deskmate-reminders.ics` with two recurring events and a notification. Open it once to import it into Apple Calendar, Google Calendar or Outlook; it reaches your phone and works with the Mac off, but records nothing. Import it again after changing times or days.
   - `slack`: planned, see [ROADMAP.md](ROADMAP.md).
 
 ## What gets installed
