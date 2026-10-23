@@ -1,5 +1,6 @@
 #!/bin/zsh
-# Installs deskmate on this Mac: skills, Claude Code hooks, 9:00 and 17:00 reminders.
+# Installs deskmate on this Mac: skills, Claude Code hooks, morning and evening reminders.
+# Preferences (name, language, reminders) live in data/config.json; this script applies them.
 # Safe to run again at any time: it only redoes what is missing or changed. Files in data/ are never overwritten.
 #
 # Usage: ./install.sh [--name <name>] [--language <en|it>]   install or update
@@ -91,6 +92,9 @@ if [[ -n $name || -n $language || ! -f $config ]]; then
     '.name = (if $n != "" then $n else (.name // $dn) end) | .language = (if $l != "" then $l else (.language // "en") end)' \
     $config > $config.tmp && mv $config.tmp $config
 fi
+jq '.reminders = ({morning: "09:00", evening: "17:00", days: ["mon","tue","wed","thu","fri"], channels: ["mac"]} + (.reminders // {}))' \
+  $config > $config.tmp && mv $config.tmp $config
+problems=$(python3 -I $root/tools/reminders.py check) || { print "  ✗ data/config.json:\n$problems" | sed '2,$s/^/      /'; exit 1 }
 ok "data/ ready, name: $(jq -r .name $config), language: $(jq -r .language $config)"
 
 print "Skills"
@@ -111,24 +115,38 @@ edit_settings --arg l "\"$root/tools/hook_log.sh\"" --arg t "\"$root/tools/hook_
 ok "UserPromptSubmit → log of skill runs"
 ok "Stop → tokens used (in the background)"
 
-print "Reminders"
+print "Reminders: $(jq -r '.reminders | "\(.morning) and \(.evening), \(.days | join(" ")), via \(.channels | join(" + "))"' $config)"
+channels=$(jq -r '.reminders.channels | join(" ")' $config)
 mkdir -p $agents
-for label in com.bottega.buongiorno com.bottega.promemoria; do
-  if [[ -f $agents/$label.plist ]]; then
-    launchctl bootout $domain/$label 2>/dev/null || true
-    rm -f $agents/$label.plist && ok "old reminder $label removed"
-  fi
-done
-for p in $root/launchd/*.plist; do
-  dest=$agents/${p:t}
-  new=$(sed "s|__ROOT__|$root|g" $p)
-  if [[ -f $dest && $(<$dest) == $new ]] && launchctl print $domain/${p:t:r} >/dev/null 2>&1; then
-    ok "${p:t:r} already active"
+if [[ " $channels " == *" mac "* ]]; then
+  for label in com.bottega.buongiorno com.bottega.promemoria; do
+    if [[ -f $agents/$label.plist ]]; then
+      launchctl bootout $domain/$label 2>/dev/null || true
+      rm -f $agents/$label.plist && ok "old reminder $label removed"
+    fi
+  done
+  for kind in morning evening; do
+    label=com.deskmate.$kind dest=$agents/com.deskmate.$kind.plist
+    new=$(python3 -I $root/tools/reminders.py plist $kind)
+    if [[ -f $dest && $(<$dest) == $new ]] && launchctl print $domain/$label >/dev/null 2>&1; then
+      ok "mac: $kind alert already active"
+    else
+      launchctl bootout $domain/$label 2>/dev/null || true
+      print -r -- $new > $dest
+      launchctl bootstrap $domain $dest && ok "mac: $kind alert active"
+    fi
+  done
+else
+  remove_agents
+  ok "mac: alerts off"
+fi
+if [[ " $channels " == *" calendar "* ]]; then
+  if [[ $(python3 -I $root/tools/reminders.py ics) == changed ]]; then
+    warn "calendar: new events in data/deskmate-reminders.ics, open it to import them (open data/deskmate-reminders.ics)"
   else
-    launchctl bootout $domain/${p:t:r} 2>/dev/null || true
-    print -r -- $new > $dest
-    launchctl bootstrap $domain $dest && ok "${p:t:r} active"
+    ok "calendar: events unchanged"
   fi
-done
+fi
+[[ " $channels " == *" slack "* ]] && warn "slack: not available yet, see ROADMAP.md"
 
 print "\nDeskmate is ready. Claude Code sessions already running see the hooks after a restart (or after opening /hooks)."

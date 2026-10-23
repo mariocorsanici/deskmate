@@ -1,15 +1,15 @@
 # deskmate
 
-Claude Code skills to run your working day: open it in the morning, close it around 17:00, and every other day take stock of how you work. Claude acts as the colleague at the next desk who keeps track of where everything stands.
+Claude Code skills to run your working day: open it in the morning, close it in the late afternoon, and every other day take stock of how you work. Claude acts as the colleague at the next desk who keeps track of where everything stands.
 
 ## A typical day
 
 | When | Skill | What it does |
 |---|---|---|
-| 9:00 (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day and opens the sessions in iTerm |
+| morning (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day and opens the sessions in iTerm |
 | during the day | `/study-later <topic>` | notes a topic to study later |
 | Mon, Wed, Fri before closing | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md` |
-| 17:00 (reminder) | `/call-it-a-day` | snapshots the open sessions and writes `data/handoff.md` for tomorrow |
+| evening (reminder) | `/call-it-a-day` | snapshots the open sessions and writes `data/handoff.md` for tomorrow |
 
 After closing: study the topics you set aside, or admin work.
 
@@ -21,13 +21,32 @@ Clone the repo into `~/Dev/deskmate` (the skills look for their files there), th
 cd ~/Dev/deskmate && claude
 ```
 
-and run `/setup`: it asks your name and language, checks the prerequisites, runs `install.sh` and verifies that everything responds. Without Claude: `./install.sh --name <name> --language <en|it>`. To remove everything: `./install.sh --remove` (data stays).
+and run `/setup`: it asks your preferences, checks the prerequisites, runs `install.sh` and verifies that everything responds. Run `/setup` again whenever you want to change a preference. Without Claude: edit `data/config.json` and run `./install.sh`. To remove everything: `./install.sh --remove` (data stays).
 
 Requires macOS with `jq` and `python3`; iTerm to open sessions in tabs.
 
-## Name and language
+## Configuration
 
-`data/config.json` holds `name` (how Claude addresses you) and `language` (for Claude's replies, the handoff, the lessons and the reminders). The skills are written in English and answer in your language; the reminders support `en` and `it` and fall back to English. Change them by running `install.sh` again with `--name` / `--language`.
+All preferences live in `data/config.json`, written by `/setup` (or by hand) and applied by `install.sh`:
+
+```json
+{
+  "name": "Mario",
+  "language": "it",
+  "reminders": {
+    "morning": "09:00",
+    "evening": "17:00",
+    "days": ["mon", "tue", "wed", "thu", "fri"],
+    "channels": ["mac", "calendar"]
+  }
+}
+```
+
+- `name`: how Claude addresses you. `language`: for Claude's replies, the handoff, the lessons and the reminders (reminder texts exist in `en` and `it`, other languages fall back to English).
+- `channels`:
+  - `mac`: an alert on the Mac that records your answer (used by `/how-did-it-go`). If the Mac is asleep at reminder time, the alert shows up on wake while it still makes sense (morning: up to 3 hours later; evening: from 1 hour before to 4 hours after); if the Mac is off, it is skipped.
+  - `calendar`: `install.sh` writes `data/deskmate-reminders.ics` with two recurring events and a notification. Open it once to import it into Apple Calendar, Google Calendar or Outlook; it reaches your phone and works with the Mac off, but records nothing. Import it again after changing times or days.
+  - `slack`: planned, see [ROADMAP.md](ROADMAP.md).
 
 ## What gets installed
 
@@ -35,7 +54,7 @@ Requires macOS with `jq` and `python3`; iTerm to open sessions in tabs.
 - **Hooks** in `~/.claude/settings.json`:
   - `UserPromptSubmit` → `tools/hook_log.sh`: logs every skill run in `data/log.csv`;
   - `Stop` → `tools/hook_tokens.sh`: fills in the tokens used by each run (in the background).
-- **Reminders** (`launchd/`, installed in `~/Library/LaunchAgents`): 9:00 and 17:00, Monday to Friday. If the Mac is asleep at reminder time, the alert shows up on wake while it is still in its window (morning until 12:00, evening 16:00–21:00); if the Mac is off, the alert is skipped.
+- **Reminders:** with the `mac` channel, two LaunchAgents generated from the config in `~/Library/LaunchAgents` (`com.deskmate.morning`, `com.deskmate.evening`); with `calendar`, the `.ics` file in `data/`.
 
 ## Layout
 
@@ -48,16 +67,17 @@ tools/
   token_usage.py         computes the tokens of each run from the transcripts
   hook_log.sh            UserPromptSubmit hook
   hook_tokens.sh         Stop hook
-  morning_reminder.sh    9:00 alert
-  evening_reminder.sh    17:00 alert
-launchd/                 LaunchAgent templates (__ROOT__ = repo path)
+  reminders.py           reminder texts, time windows, LaunchAgents and calendar file, from the config
+  morning_reminder.sh    morning alert on the Mac
+  evening_reminder.sh    evening alert on the Mac
 install.sh               install, update, remove
 data/                    personal files, not in git
 ```
 
 ## Data (`data/`, not versioned)
 
-- `config.json`: name and language.
+- `config.json`: preferences (see Configuration).
+- `deskmate-reminders.ics`: calendar events, with the `calendar` channel.
 - `handoff.md`: state of the sessions and things to do, rewritten every evening; the previous version goes to `archive/`.
 - `lessons.md`: log of the retrospectives, with the running method experiments.
 - `study-later.md`: topics to study.
