@@ -1,59 +1,64 @@
-# Bottega
+# deskmate
 
-Skill di Claude Code per organizzare la giornata di lavoro: si apre al mattino, si chiude verso le 17, ogni due giorni si fa il punto sul metodo.
+Claude Code skills to run your working day: open it in the morning, close it around 17:00, and every other day take stock of how you work. Claude acts as the colleague at the next desk who keeps track of where everything stands.
 
-## Il giorno tipo
+## A typical day
 
-| Quando | Skill | Cosa fa |
+| When | Skill | What it does |
 |---|---|---|
-| 9:00 (promemoria) | `/che-si-fa-oggi` | rilegge le consegne, controlla cosa è cambiato, segnala passaggi saltati, propone l'ordine della giornata e apre le sessioni in iTerm |
-| durante il giorno | `/da-approfondire <argomento>` | segna un argomento da studiare dopo |
-| lun, mer, ven prima di chiudere | `/com-e-andata` | retrospettiva su organizzazione e metodo, aggiorna `dati/lezioni.md` |
-| 17:00 (promemoria) | `/chiudi-bottega` | fotografa le sessioni aperte e scrive `dati/consegne.md` per domani |
+| 9:00 (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day and opens the sessions in iTerm |
+| during the day | `/study-later <topic>` | notes a topic to study later |
+| Mon, Wed, Fri before closing | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md` |
+| 17:00 (reminder) | `/call-it-a-day` | snapshots the open sessions and writes `data/handoff.md` for tomorrow |
 
-Dopo la chiusura: studio degli argomenti da approfondire o amministrazione.
+After closing: study the topics you set aside, or admin work.
 
-## Installazione
+## Installation
 
-La repo va clonata in `~/Dev/bottega` (le skill cercano lì i file). Poi:
+Clone the repo into `~/Dev/deskmate` (the skills look for their files there), then:
 
 ```bash
-cd ~/Dev/bottega && claude
+cd ~/Dev/deskmate && claude
 ```
 
-e lancia `/apri-bottega`: controlla i prerequisiti, esegue `installa.sh` e verifica che tutto risponda. Senza Claude: `./installa.sh`. Per togliere tutto: `./installa.sh --rimuovi` (i dati restano).
+and run `/setup`: it asks your name and language, checks the prerequisites, runs `install.sh` and verifies that everything responds. Without Claude: `./install.sh --name <name> --language <en|it>`. To remove everything: `./install.sh --remove` (data stays).
 
-Serve macOS con `jq` e `python3`; iTerm per aprire le sessioni nelle tab.
+Requires macOS with `jq` and `python3`; iTerm to open sessions in tabs.
 
-## Cosa installa
+## Name and language
 
-- **Skill:** collegamenti da `~/.claude/skills/<nome>` a `skills/<nome>`, quindi le modifiche in repo valgono subito.
-- **Hook** in `~/.claude/settings.json`:
-  - `UserPromptSubmit` → `strumenti/hook_registro.sh`: scrive in `dati/registro.csv` ogni lancio delle skill;
-  - `Stop` → `strumenti/hook_consumi.sh`: riempie i token consumati da ogni lancio (in background).
-- **Promemoria** (`launchd/`, installati in `~/Library/LaunchAgents`): 9:00 e 17:00 dal lunedì al venerdì. Se il Mac è in stop all'ora dell'avviso, compare al risveglio se è ancora nella sua fascia (mattina entro le 12, sera 16–21); se è spento, l'avviso salta.
+`data/config.json` holds `name` (how Claude addresses you) and `language` (for Claude's replies, the handoff, the lessons and the reminders). The skills are written in English and answer in your language; the reminders support `en` and `it` and fall back to English. Change them by running `install.sh` again with `--name` / `--language`.
 
-## Struttura
+## What gets installed
+
+- **Skills:** links from `~/.claude/skills/<name>` to `skills/<name>`, so changes in the repo apply immediately.
+- **Hooks** in `~/.claude/settings.json`:
+  - `UserPromptSubmit` → `tools/hook_log.sh`: logs every skill run in `data/log.csv`;
+  - `Stop` → `tools/hook_tokens.sh`: fills in the tokens used by each run (in the background).
+- **Reminders** (`launchd/`, installed in `~/Library/LaunchAgents`): 9:00 and 17:00, Monday to Friday. If the Mac is asleep at reminder time, the alert shows up on wake while it is still in its window (morning until 12:00, evening 16:00–21:00); if the Mac is off, the alert is skipped.
+
+## Layout
 
 ```
-skills/                  le skill della giornata
-.claude/skills/          /apri-bottega, disponibile lanciando claude nella repo
-strumenti/
-  sessioni.py            riassunto delle sessioni Claude Code di un periodo
-  registra.sh            aggiunge una riga al registro
-  consumi.py             calcola i token di ogni lancio dai transcript
-  hook_registro.sh       hook UserPromptSubmit
-  hook_consumi.sh        hook Stop
-  buongiorno.sh          avviso delle 9
-  promemoria.sh          avviso delle 17
-launchd/                 modelli dei LaunchAgent (__RADICE__ = percorso della repo)
-installa.sh              installazione, aggiornamento, rimozione
-dati/                    file personali, fuori da git
+skills/                  the skills of the day
+.claude/skills/setup/    /setup, available when running claude inside the repo
+tools/
+  sessions.py            summary of the Claude Code sessions in a period
+  log_event.sh           appends a row to the log
+  token_usage.py         computes the tokens of each run from the transcripts
+  hook_log.sh            UserPromptSubmit hook
+  hook_tokens.sh         Stop hook
+  morning_reminder.sh    9:00 alert
+  evening_reminder.sh    17:00 alert
+launchd/                 LaunchAgent templates (__ROOT__ = repo path)
+install.sh               install, update, remove
+data/                    personal files, not in git
 ```
 
-## I dati (`dati/`, non versionati)
+## Data (`data/`, not versioned)
 
-- `consegne.md`: stato delle sessioni e cose da fare, riscritto ogni sera; la versione precedente va in `archivio/`.
-- `lezioni.md`: registro delle retrospettive, con gli esperimenti di metodo in corso.
-- `da-approfondire.md`: argomenti da studiare.
-- `registro.csv`: un lancio di skill o un promemoria per riga. Colonne: `data, ora, giorno, evento, dettaglio, sessione, cartella, turni, token_input, token_cache, token_output`. Un lancio va dal comando al `/comando` successivo della stessa sessione, o alla fine della sessione: per conteggi puliti lancia le skill in una sessione dedicata o chiudi con `/clear`.
+- `config.json`: name and language.
+- `handoff.md`: state of the sessions and things to do, rewritten every evening; the previous version goes to `archive/`.
+- `lessons.md`: log of the retrospectives, with the running method experiments.
+- `study-later.md`: topics to study.
+- `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens`. A run lasts from its command to the next `/command` of the same session, or to the end of the session: for clean numbers, run the skills in a dedicated session or finish with `/clear`.
