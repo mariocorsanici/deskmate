@@ -10,7 +10,7 @@ Prepares the Mac for the deskmate skills, or runs a health check if it is alread
 
 ## Steps
 
-1. **Location.** The repo must live in `~/Dev/deskmate`: the skills look for data and scripts there. If the current folder is elsewhere, offer to move it and stop until it is in place.
+1. **Location.** The repo must live in `~/Dev/mc_dev/deskmate`: the skills look for data and scripts there. If the current folder is elsewhere, offer to move it and stop until it is in place.
 
 2. **Preferences.** `data/config.json` is the single source of truth; this step only edits it. If it exists, show the current values in a short table and ask what to change; otherwise ask for each one:
    - `name`: how Claude addresses the user;

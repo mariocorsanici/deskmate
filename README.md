@@ -15,10 +15,10 @@ After closing: study the topics you set aside, or admin work.
 
 ## Installation
 
-Clone the repo into `~/Dev/deskmate` (the skills look for their files there), then:
+Clone the repo into `~/Dev/mc_dev/deskmate` (the skills look for their files there), then:
 
 ```bash
-cd ~/Dev/deskmate && claude
+cd ~/Dev/mc_dev/deskmate && claude
 ```
 
 and run `/setup`: it asks your preferences, checks the prerequisites, runs `install.sh` and verifies that everything responds. Run `/setup` again whenever you want to change a preference. Without Claude: edit `data/config.json` and run `./install.sh`. To remove everything: `./install.sh --remove` (data stays).

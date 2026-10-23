@@ -77,7 +77,7 @@ for c in jq python3 osascript launchctl; do
   command -v $c >/dev/null && ok $c || { print "  ✗ $c is missing"; exit 1 }
 done
 [[ -d /Applications/iTerm.app ]] && ok iTerm || warn "iTerm not found: /whats-on-today won't be able to open sessions in tabs"
-[[ $root == $HOME/Dev/deskmate ]] || warn "the skills look for files in ~/Dev/deskmate, but the repo is in $root: move it there"
+[[ $root == $HOME/Dev/mc_dev/deskmate ]] || warn "the skills look for files in ~/Dev/mc_dev/deskmate, but the repo is in $root: move it there"
 
 print "Data"
 mkdir -p $root/data/archive

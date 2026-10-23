@@ -1,15 +1,15 @@
 ---
 name: study-later
-description: Adds a topic to study later to ~/Dev/deskmate/data/study-later.md.
+description: Adds a topic to study later to ~/Dev/mc_dev/deskmate/data/study-later.md.
 disable-model-invocation: true
 argument-hint: <topic>
 ---
 
 # Study later
 
-First read `~/Dev/deskmate/data/config.json` and write the reason and your reply in `language`.
+First read `~/Dev/mc_dev/deskmate/data/config.json` and write the reason and your reply in `language`.
 
-Append to `~/Dev/deskmate/data/study-later.md` one line per topic:
+Append to `~/Dev/mc_dev/deskmate/data/study-later.md` one line per topic:
 
 ```markdown
 - [ ] YYYY-MM-DD — **<topic>** — <why it came up: project and situation, one sentence>
