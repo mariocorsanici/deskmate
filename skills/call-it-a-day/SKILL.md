@@ -17,7 +17,7 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
    - If the last messages are not enough to understand the state, run it again with `--messages 40` or read the transcript.
    Done when every session is classified as **open** (something left to do or to wait for) or **closed** (finished, goes only in the summary).
 
-3. **Check live state.** The handoff is a snapshot: where an item depends on state you can check with a command (PR, CI, branch, remote service), check it now and write the result with the time. Done when no item reports a state taken only from the transcript that could have been checked.
+3. **Check live state.** The handoff is a snapshot: where an item depends on state you can check with a command (PR, CI, branch, remote service), check it now and write the result with the time. Do not use Slack (no searches, no channel or DM reads): Slack messages go in the handoff only if they appear in the session transcripts. Done when no item reports a state taken only from the transcript that could have been checked.
 
 4. **Write.** Move the old `handoff.md` to `archive/YYYY-MM-DD.md` (the date in its title), then write the new one in this shape, with the headings translated into `language`:
 

@@ -14,7 +14,7 @@ Get the user back on track in a few minutes, starting from the handoff written b
 
 2. **Missed steps.** In `~/Dev/mc_dev/deskmate/data/log.csv`, check the previous working day: is there a `call-it-a-day`? If it was Monday, Wednesday or Friday, is there a `how-did-it-go`? The `morning-reminder` and `evening-reminder` rows tell whether the alert arrived and how the user answered. Report only what is missing, in one line.
 
-3. **Refresh.** The handoff is a snapshot of last evening. For every item that depends on other people or on external state (approvals, PRs, CI, pending replies), check its current state with a command. Done when every "Waiting on" has a state from this morning.
+3. **Refresh.** The handoff is a snapshot of last evening. For every item that depends on other people or on external state (approvals, PRs, CI, pending replies), check its current state with a command. Done when every "Waiting on" has a state from this morning. Do not use Slack (no searches, no channel or DM reads): for replies awaited on Slack, report the state written in the handoff and let the user check.
 
 4. **Propose the day.** In chat, short:
    - **Before you start:** the preparation steps from the handoff.
