@@ -70,6 +70,7 @@ tools/
   reminders.py           reminder texts, time windows, LaunchAgents and calendar file, from the config
   morning_reminder.sh    morning alert on the Mac
   evening_reminder.sh    evening alert on the Mac
+  open_tab.sh            opens a session in a titled iTerm tab (/whats-on-today)
 install.sh               install, update, remove
 data/                    personal files, not in git
 ```

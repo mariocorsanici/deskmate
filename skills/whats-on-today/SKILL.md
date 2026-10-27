@@ -22,19 +22,12 @@ Get the user back on track in a few minutes, starting from the handoff written b
    - **Method:** the running experiments from `lessons.md`, one line each, to keep them in mind.
    - The number of open items in `study-later.md`, without listing them: they are for after closing time.
 
-5. **Open the sessions.** Ask which ones to open and open them in separate iTerm tabs:
+5. **Open the sessions.** Ask which ones to open, proposing a tab title for each, and open each one in its own iTerm tab:
 
    ```bash
-   osascript <<'EOF'
-   tell application "iTerm"
-     activate
-     if (count of windows) = 0 then create window with default profile
-     tell current window
-       set t to (create tab with default profile)
-       tell current session of t to write text "cd <folder> && claude --resume <id>"
-     end tell
-   end tell
-   EOF
+   ~/Dev/mc_dev/deskmate/tools/open_tab.sh "<title>" <folder> <id>
    ```
 
-   Repeat the `create tab` block for each session. If an ID does not open, suggest `claude --resume` from the session's folder to pick it from the list.
+   The title is `<project> <ticket> · <what to do>`: the short project name and ticket from the handoff heading, then the first "To do" in 2–3 words, in `language` (e.g. `Basler CAT-207 · test camera`, `vlm WRKR-347 · fix review`). Without a ticket, leave it out (`Artisan · grilling`).
+
+   If an ID does not open, suggest `claude --resume` from the session's folder to pick it from the list.
