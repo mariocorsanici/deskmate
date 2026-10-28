@@ -31,6 +31,7 @@ TEXTS = {
                     "Do the «Before you start» steps it lists.",
                     "During the day: /study-later <topic> for anything you want to study later."],
         "evening_title": "Time to call it a day",
+        "checkpoint": "/checkpoint in each work session: saves where the project stands in its project card.",
         "retro": "/how-did-it-go: retrospective on how the last few days went, updates the lessons.",
         "retro_days": "(Mon, Wed, Fri) ",
         "close": "/call-it-a-day: snapshots the open sessions, writes tomorrow's handoff and suggests topics to study.",
@@ -44,6 +45,7 @@ TEXTS = {
                     "Fai i passi «Prima di iniziare» che ti indica.",
                     "Durante il giorno: /study-later <argomento> per ciò che vuoi studiare dopo."],
         "evening_title": "È ora di chiudere",
+        "checkpoint": "/checkpoint in ogni sessione di lavoro: salva lo stato del progetto nella sua scheda.",
         "retro": "/how-did-it-go: retrospettiva sul metodo degli ultimi giorni, aggiorna le lezioni.",
         "retro_days": "(lun, mer, ven) ",
         "close": "/call-it-a-day: fotografa le sessioni aperte, scrive le consegne per domani e propone argomenti da approfondire.",
@@ -81,9 +83,9 @@ def lines(kind, t, static=False):
         pass
     after = t["after_static"] if static else t["after"].format(n=open_topics)
     if static:
-        return [t["retro_days"] + t["retro"], t["close"], after]
+        return [t["checkpoint"], t["retro_days"] + t["retro"], t["close"], after]
     today = DAYS[dt.date.today().weekday()]
-    return ([t["retro"]] if today in RETRO_DAYS else []) + [t["close"], after]
+    return [t["checkpoint"]] + ([t["retro"]] if today in RETRO_DAYS else []) + [t["close"], after]
 
 
 def numbered(items, sep):

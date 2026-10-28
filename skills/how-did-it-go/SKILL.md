@@ -22,6 +22,7 @@ A **retrospective** on *how* the work went over the last few days, not on its te
    - **Context switches:** parallel sessions, interruptions, work resumed several times.
    - **Use of Claude:** vague requests that needed clarification, things Claude could have done alone or that were better done by hand.
    - **What worked:** to repeat.
+   - **Data experiment:** if `config.json` has `experiments.fresh_sessions`, run `python3 -I ~/Dev/mc_dev/deskmate/tools/session_stats.py` and report the "per mode" lines. When both modes have at least `target_days` session-days, compare them (context at start, tokens per answer, compactions, rating, corrections like "that's old" in the transcripts) and propose a decision: then the experiment ends, and you remove `experiments.fresh_sessions` from `config.json` once the user agrees.
    Done when every lens has at least one observation with evidence, or a line saying "nothing to report".
 
 4. **Previous experiments.** For each experiment in the latest entry: did it happen? Did it help? Decide whether to keep, change or drop it. Compare with older entries too: a problem seen two or more times is **recurring**.

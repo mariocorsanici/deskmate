@@ -6,12 +6,26 @@ Claude Code skills to run your working day: open it in the morning, close it in 
 
 | When | Skill | What it does |
 |---|---|---|
-| morning (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day and opens the sessions in iTerm |
+| morning (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day, lists the commands you can use and opens the sessions in titled iTerm tabs |
 | during the day | `/study-later <topic>` | notes a topic to study later |
+| end of each work session | `/checkpoint` | writes where the project stands in its project card |
 | Mon, Wed, Fri before closing | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md` |
-| evening (reminder) | `/call-it-a-day` | snapshots the open sessions and writes `data/handoff.md` for tomorrow |
+| evening (reminder) | `/call-it-a-day` | collects the project cards, checks the live state and writes `data/handoff.md` for tomorrow |
 
 After closing: study the topics you set aside, or admin work.
+
+## Project cards
+
+Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md`: a Claude Code memory file, so every session started in that folder reads it automatically. `/checkpoint`, run inside the project's session, keeps two sections of it up to date:
+
+- `## Status`: state (`active`, `paused`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
+- `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `tools/check.py` runs them for `/whats-on-today` and `/call-it-a-day`.
+
+`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint.
+
+## Experiments
+
+`data/config.json` can hold a running experiment on the way of working, which the skills remind you of every morning. Today there is one, `experiments.fresh_sessions`: is it better to resume yesterday's session (`claude --resume`) or to start a new one that picks up from the project card? On the weekdays in `new_days`, `/whats-on-today` opens a new session (`open_tab.sh --new`), on the others it resumes; `/checkpoint` asks how the restart went (1–3); `tools/session_stats.py` measures each session-day from the transcripts (context at the first answer, tokens, compactions) and `/how-did-it-go` proposes a decision once both modes have `target_days` days.
 
 ## Installation
 
@@ -70,7 +84,9 @@ tools/
   reminders.py           reminder texts, time windows, LaunchAgents and calendar file, from the config
   morning_reminder.sh    morning alert on the Mac
   evening_reminder.sh    evening alert on the Mac
-  open_tab.sh            opens a session in a titled iTerm tab (/whats-on-today)
+  check.py               runs the checks listed in the project cards
+  session_stats.py       data for the resume-or-new-session experiment
+  open_tab.sh            opens a session in a titled iTerm tab, or brings it to the front if already running
 install.sh               install, update, remove
 data/                    personal files, not in git
 ```
