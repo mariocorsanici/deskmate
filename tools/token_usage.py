@@ -22,7 +22,8 @@ LOG = DATA / "log.csv"
 PROJECTS = pathlib.Path.home() / ".claude" / "projects"
 COLUMNS = ["date", "time", "weekday", "event", "detail", "session", "cwd",
            "turns", "input_tokens", "cache_tokens", "output_tokens"]
-COMMAND = re.compile(r"^\s*<command-name>/?([^<]+)</command-name>")
+# the transcript stores a typed command as "<command-message>…</command-message>\n<command-name>/name</command-name>"
+COMMAND = re.compile(r"^\s*(?:<command-message>[^<]*</command-message>\s*)?<command-name>/?([^<]+)</command-name>")
 
 
 def read_transcript(path):
@@ -39,7 +40,11 @@ def read_transcript(path):
             m = COMMAND.match(msg["content"])
             if m:
                 commands.append((ts, m.group(1).strip()))
-        elif r.get("type") == "assistant" and msg.get("usage") and msg.get("id") not in seen:
+        if r.get("type") == "assistant" and isinstance(msg.get("content"), list):
+            # a skill started by Claude through the Skill tool, e.g. a command inside a sentence
+            commands += [(ts, b["input"]["skill"]) for b in msg["content"]
+                         if b.get("type") == "tool_use" and b.get("name") == "Skill" and b.get("input", {}).get("skill")]
+        if r.get("type") == "assistant" and msg.get("usage") and msg.get("id") not in seen:
             seen.add(msg.get("id"))
             u = msg["usage"]
             usage.append((ts, u.get("input_tokens", 0) + u.get("cache_creation_input_tokens", 0),

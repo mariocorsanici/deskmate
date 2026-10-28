@@ -111,8 +111,9 @@ print "Claude Code hooks"
 edit_settings --arg l "\"$root/tools/hook_log.sh\"" --arg t "\"$root/tools/hook_tokens.sh\"" "
   $remove_hooks
   | .hooks.UserPromptSubmit += [{hooks: [{type: \"command\", command: \$l, timeout: 10}]}]
+  | .hooks.PreToolUse += [{matcher: \"Skill\", hooks: [{type: \"command\", command: \$l, timeout: 10}]}]
   | .hooks.Stop += [{hooks: [{type: \"command\", command: \$t, timeout: 30, async: true}]}]"
-ok "UserPromptSubmit → log of skill runs"
+ok "UserPromptSubmit and PreToolUse (Skill) → log of skill runs"
 ok "Stop → tokens used (in the background)"
 
 print "Reminders: $(jq -r '.reminders | "\(.morning) and \(.evening), \(.days | join(" ")), via \(.channels | join(" + "))"' $config)"
