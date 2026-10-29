@@ -23,7 +23,7 @@ Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md
 
 `paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `check.py` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
 
-`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint.
+`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint. Skills call the stable `bin/deskmate` command for Checks, session summaries, statistics, logging and session launch rather than depending on the individual tools that implement them.
 
 ## Experiments
 
@@ -77,6 +77,7 @@ All preferences live in `data/config.json`, written by `/setup` (or by hand) and
 ```
 skills/                  the skills of the day
 .claude/skills/setup/    /setup, available when running claude inside the repo
+bin/deskmate             stable command used by skills and automation
 tools/
   sessions.py            summary of the Claude Code sessions in a period
   log_event.sh           appends a row to the log

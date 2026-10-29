@@ -39,8 +39,8 @@ Run inside a project's work session, when you stop working on it (at the end of 
    - advrob01: `ssh -o ConnectTimeout=5 -o BatchMode=yes advrob01-ubuntu true`
    ```
 
-   Only commands that change nothing: no fetch with side effects beyond refs, no writes, no Slack. Run `python3 -I ~/Dev/mc_dev/deskmate/tools/check.py <card>` to confirm they work, and fix the ones that fail for the wrong reason.
+   Only commands that change nothing: no fetch with side effects beyond refs, no writes, no Slack. Run `~/Dev/mc_dev/deskmate/bin/deskmate check <card>` to confirm they work, and fix the ones that fail for the wrong reason.
 
-6. **Resume rating.** If `config.json` has `experiments.fresh_sessions` and this is the first checkpoint of the day for this session, ask one question: "How did the restart go this morning? **1** picked up straight away · **2** I had to explain something again · **3** it worked on stale or wrong context". Record the answer with `~/Dev/mc_dev/deskmate/tools/log_event.sh resume-rating <1|2|3> <session-id> <folder>`. Skip it if the user does not want to answer.
+6. **Resume rating.** If `config.json` has `experiments.fresh_sessions` and this is the first checkpoint of the day for this session, ask one question: "How did the restart go this morning? **1** picked up straight away · **2** I had to explain something again · **3** it worked on stale or wrong context". Record the answer with `~/Dev/mc_dev/deskmate/bin/deskmate log-event resume-rating <1|2|3> <session-id> <folder>`. Skip it if the user does not want to answer.
 
 7. **Reply.** In chat, the status as written (translated into `language`) and one line: "Saved in the project card, `/call-it-a-day` will use it."

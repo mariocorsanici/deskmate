@@ -12,7 +12,7 @@ A **retrospective** on *how* the work went over the last few days, not on its te
 
 1. **Period.** From the day after the latest entry in `~/Dev/mc_dev/deskmate/data/lessons.md` until today; if `lessons.md` has no entries yet, the last 3 days.
 
-2. **Collect.** Run `python3 -I ~/Dev/mc_dev/deskmate/tools/sessions.py --since <start> --messages 60 --cut 400` and read the handoffs of the period in `~/Dev/mc_dev/deskmate/data/archive/` and `handoff.md`: they are the plan, the transcripts are what happened. `~/Dev/mc_dev/deskmate/data/log.csv` tells when the skills ran, how the user answered the reminders and how many tokens each run used.
+2. **Collect.** Run `~/Dev/mc_dev/deskmate/bin/deskmate sessions --since <start> --messages 60 --cut 400` and read the handoffs of the period in `~/Dev/mc_dev/deskmate/data/archive/` and `handoff.md`: they are the plan, the transcripts are what happened. `~/Dev/mc_dev/deskmate/data/log.csv` tells when the skills ran, how the user answered the reminders and how many tokens each run used.
 
 3. **Analyse** through these lenses. Every observation cites its evidence: session, time, what happened.
    - **Rhythm:** from the log, days without opening or closing, skipped retrospectives, reminders snoozed or ignored.
@@ -22,7 +22,7 @@ A **retrospective** on *how* the work went over the last few days, not on its te
    - **Context switches:** parallel sessions, interruptions, work resumed several times.
    - **Use of Claude:** vague requests that needed clarification, things Claude could have done alone or that were better done by hand.
    - **What worked:** to repeat.
-   - **Data experiment:** if `config.json` has `experiments.fresh_sessions`, run `python3 -I ~/Dev/mc_dev/deskmate/tools/session_stats.py` and report the "per mode" lines. When both modes have at least `target_days` session-days, compare them (context at start, tokens per answer, compactions, rating, corrections like "that's old" in the transcripts) and propose a decision: then the experiment ends, and you remove `experiments.fresh_sessions` from `config.json` once the user agrees.
+   - **Data experiment:** if `config.json` has `experiments.fresh_sessions`, run `~/Dev/mc_dev/deskmate/bin/deskmate session-stats` and report the "per mode" lines. When both modes have at least `target_days` session-days, compare them (context at start, tokens per answer, compactions, rating, corrections like "that's old" in the transcripts) and propose a decision: then the experiment ends, and you remove `experiments.fresh_sessions` from `config.json` once the user agrees.
    Done when every lens has at least one observation with evidence, or a line saying "nothing to report".
 
 4. **Previous experiments.** For each experiment in the latest entry: did it happen? Did it help? Decide whether to keep, change or drop it. Compare with older entries too: a problem seen two or more times is **recurring**.
