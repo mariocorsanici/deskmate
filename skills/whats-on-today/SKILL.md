@@ -24,7 +24,7 @@ Get the user back on track in a few minutes, starting from the handoff written b
    - **Experiment running:** if `config.json` has `experiments.fresh_sessions`, always add this reminder: "We are collecting data on <question>: today is a **resume** day / a **new session** day" (new on the weekdays in `new_days`, resume on the others), with the count so far from the "per mode" lines of `python3 -I ~/Dev/mc_dev/deskmate/tools/session_stats.py` (e.g. "resume 3/5, new 2/5"). When both modes reach `target_days`, say that the next `/how-did-it-go` will decide.
    - **What you can use:** one line per deskmate command, from the `description` in `~/Dev/mc_dev/deskmate/skills/*/SKILL.md`, translated into `language`, plus the line "`/checkpoint` at the end of each work session, so tonight's handoff is ready". If `git -C ~/Dev/mc_dev/deskmate log --since=<date of the previous whats-on-today in log.csv>` shows new commits, add one line "New:" with what they changed for the user.
 
-5. **Open the sessions.** Ask which ones to open, proposing a tab title for each, and open each one in its own iTerm tab:
+5. **Open the sessions.** Ask which ones to open, proposing a tab title for each, and open each one in its own iTerm tab. If a check of that project failed on something its "Before you start" asks for (an SSH key not loaded, a login expired, a service off), ask the user to do it first and open the session only after, rerunning the check:
 
    ```bash
    ~/Dev/mc_dev/deskmate/tools/open_tab.sh "<title>" <folder> <id>
