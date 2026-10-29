@@ -2,9 +2,10 @@
 # Appends a row to data/log.csv (token_usage.py fills in the tokens later).
 # Usage: log_event.sh <event> [detail] [session] [cwd]
 
-python3 -I - "${0:A:h:h}" "$@" <<'PY'
+data=${DESKMATE_DATA_DIR:-${0:A:h:h}/data}
+python3 -I - "$data" "$@" <<'PY'
 import csv, datetime as dt, fcntl, pathlib, sys
-data = pathlib.Path(sys.argv[1]) / "data"
+data = pathlib.Path(sys.argv[1])
 log = data / "log.csv"
 columns = ["date", "time", "weekday", "event", "detail", "session", "cwd",
            "turns", "input_tokens", "cache_tokens", "output_tokens"]
