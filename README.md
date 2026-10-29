@@ -21,7 +21,7 @@ Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md
 - `## Status`: state (`active`, `paused`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
 - `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `tools/check.py` runs them for `/whats-on-today` and `/call-it-a-day`.
 
-`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint.
+`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint. Skills call the stable `bin/deskmate` command for Checks, session summaries, statistics, logging and session launch rather than depending on the individual tools that implement them.
 
 ## Experiments
 
@@ -75,6 +75,7 @@ All preferences live in `data/config.json`, written by `/setup` (or by hand) and
 ```
 skills/                  the skills of the day
 .claude/skills/setup/    /setup, available when running claude inside the repo
+bin/deskmate             stable command used by skills and automation
 tools/
   sessions.py            summary of the Claude Code sessions in a period
   log_event.sh           appends a row to the log

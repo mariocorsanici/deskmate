@@ -12,14 +12,14 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 
 1. **Retrospective.** If today is Monday, Wednesday or Friday and `~/Dev/mc_dev/deskmate/data/lessons.md` has no entry for today yet, ask whether to run `/how-did-it-go` first. If yes, stop here: the user will run this skill again afterwards.
 
-2. **Collect.** The state of each project comes from its **project card**, written by `/checkpoint` in the project's own session: `~/.claude/projects/*/memory/project-card.md`, section `## Status`. Then run `python3 -I ~/Dev/mc_dev/deskmate/tools/sessions.py` (today's sessions) to see which sessions were active, and reread `~/Dev/mc_dev/deskmate/data/handoff.md`.
+2. **Collect.** The state of each project comes from its **project card**, written by `/checkpoint` in the project's own session: `~/.claude/projects/*/memory/project-card.md`, section `## Status`. Then run `~/Dev/mc_dev/deskmate/bin/deskmate sessions` (today's sessions) to see which sessions were active, and reread `~/Dev/mc_dev/deskmate/data/handoff.md`.
    - **Card with a checkpoint later than the session's last activity:** use the card as it is, without reading the transcript.
    - **Session active after its last checkpoint, or without a card:** read its last messages (`--messages 40` if needed) and suggest running `/checkpoint` there next time. List these sessions in the sign-off.
    - Skip this session and the ones that only ran deskmate skills.
    - Work in the previous handoff that was not touched today stays, marked "not touched today".
    Done when every piece of work is classified as **open** (state `active` or `paused`, or something left to do or to wait for) or **closed** (state `closed`, goes only in the summary).
 
-3. **Check live state.** Run `python3 -I ~/Dev/mc_dev/deskmate/tools/check.py`: it runs the read-only checks listed in each card and prints one line per check. Write the results in the handoff with the time, and where a check contradicts the card, trust the check and say so. For items with no check in the card, check them by hand with a command. Do not use Slack (no searches, no channel or DM reads): Slack messages go in the handoff only if they appear in the cards or in the session transcripts. Done when no item reports a state that could have been checked and was not.
+3. **Check live state.** Run `~/Dev/mc_dev/deskmate/bin/deskmate check`: it runs the read-only checks listed in each card and prints one line per check. Write the results in the handoff with the time, and where a check contradicts the card, trust the check and say so. For items with no check in the card, check them by hand with a command. Do not use Slack (no searches, no channel or DM reads): Slack messages go in the handoff only if they appear in the cards or in the session transcripts. Done when no item reports a state that could have been checked and was not.
 
 4. **Write.** Move the old `handoff.md` to `archive/YYYY-MM-DD.md` (the date in its title), then write the new one in this shape, with the headings translated into `language`:
 
