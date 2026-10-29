@@ -14,10 +14,12 @@ import argparse
 import csv
 import fcntl
 import json
+import os
 import pathlib
 import re
 
-DATA = pathlib.Path(__file__).resolve().parent.parent / "data"
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
 LOG = DATA / "log.csv"
 PROJECTS = pathlib.Path.home() / ".claude" / "projects"
 COLUMNS = ["date", "time", "weekday", "event", "detail", "session", "cwd",

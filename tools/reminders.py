@@ -10,13 +10,14 @@ Usage:
 """
 import datetime as dt
 import json
+import os
 import pathlib
 import plistlib
 import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DATA = ROOT / "data"
+DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
 ICS = DATA / "deskmate-reminders.ics"
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 RETRO_DAYS = {"mon", "wed", "fri"}
