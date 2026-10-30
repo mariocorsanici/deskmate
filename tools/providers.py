@@ -3,13 +3,21 @@
 
 from __future__ import annotations
 
+import argparse
 import dataclasses
+import json
+import os
+import pathlib
 import shutil
 import subprocess
 import sys
+import tempfile
 
 
 PROBE_TIMEOUT_SECONDS = 2
+CONFIG_SCHEMA_VERSION = 1
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
 
 
 @dataclasses.dataclass(frozen=True)
@@ -71,11 +79,96 @@ def render(detections: list[Detection]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def write_config(installed: list[str], default: str) -> None:
+    path = DATA / "config.json"
+    if path.exists():
+        config = json.loads(path.read_text(encoding="utf-8"))
+    else:
+        config = {}
+    config["schema_version"] = CONFIG_SCHEMA_VERSION
+    config["providers"] = {"installed": installed, "default": default}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", dir=path.parent, prefix=".config-", delete=False
+        ) as handle:
+            temporary = pathlib.Path(handle.name)
+            json.dump(config, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def choose_default(
+    detections: list[Detection], requested: str | None, non_interactive: bool
+) -> tuple[str | None, str | None]:
+    compatible = [item for item in detections if item.compatible]
+    if not compatible:
+        return None, "No compatible Provider found"
+    available = {item.provider.key: item for item in compatible}
+    if requested is not None:
+        if requested not in available:
+            provider = next(item for item in PROVIDERS if item.key == requested)
+            return None, f"{provider.label} is not compatible"
+        return requested, None
+    if len(compatible) == 1:
+        return compatible[0].provider.key, None
+    if non_interactive:
+        return None, "--default-provider is required when both Providers are compatible"
+    print("Choose the Default provider:")
+    for index, item in enumerate(compatible, start=1):
+        print(f"  {index}. {item.provider.label}")
+    try:
+        answer = input("Default provider: ").strip().casefold()
+    except EOFError:
+        return None, "Default provider selection required"
+    choices = {
+        str(index): item.provider.key
+        for index, item in enumerate(compatible, start=1)
+    }
+    choices.update({item.provider.key: item.provider.key for item in compatible})
+    if answer not in choices:
+        return None, f"invalid Default provider selection: {answer or 'empty'}"
+    return choices[answer], None
+
+
+def configure(args: argparse.Namespace) -> int:
+    detections = [detect(provider) for provider in PROVIDERS]
+    sys.stdout.write(render(detections))
+    default, error = choose_default(
+        detections, args.default_provider, args.non_interactive
+    )
+    if error is not None:
+        print(error, file=sys.stderr)
+        return 1 if not any(item.compatible for item in detections) else 2
+    installed = [item.provider.key for item in detections if item.compatible]
+    write_config(installed, default)
+    label = next(item.label for item in PROVIDERS if item.key == default)
+    print(f"Configured Providers: {', '.join(installed)}")
+    print(f"Default provider: {label}")
+    return 0
+
+
+def parse_args(args: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(prog="providers.py")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers.add_parser("providers", add_help=False)
+    configure_parser = subparsers.add_parser("configure", add_help=False)
+    configure_parser.add_argument("--non-interactive", action="store_true")
+    configure_parser.add_argument(
+        "--default-provider", choices=[provider.key for provider in PROVIDERS]
+    )
+    return parser.parse_args(args)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
-    if args != ["providers"]:
-        print("usage: providers.py providers", file=sys.stderr)
-        return 2
+    parsed = parse_args(args)
+    if parsed.command == "configure":
+        return configure(parsed)
     detections = [detect(provider) for provider in PROVIDERS]
     sys.stdout.write(render(detections))
     return 0 if any(item.compatible for item in detections) else 1

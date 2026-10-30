@@ -19,6 +19,7 @@ COMMANDS = {
     "log-event": ["/bin/zsh", str(ROOT / "tools" / "log_event.sh")],
     "token-usage": [sys.executable, "-I", str(ROOT / "tools" / "token_usage.py")],
     "providers": [sys.executable, "-I", str(ROOT / "tools" / "providers.py"), "providers"],
+    "configure": [sys.executable, "-I", str(ROOT / "tools" / "providers.py"), "configure"],
 }
 DESCRIPTIONS = {
     "check": "run the Checks in Project cards",
@@ -29,6 +30,7 @@ DESCRIPTIONS = {
     "log-event": "append a Daily loop event",
     "token-usage": "update usage for logged skill runs",
     "providers": "detect compatible local Providers",
+    "configure": "record installed and Default providers",
 }
 USAGE = {
     "check": "deskmate check [--all] [card ...]",
@@ -39,6 +41,7 @@ USAGE = {
     "log-event": "deskmate log-event <event> [detail] [session] [cwd]",
     "token-usage": "deskmate token-usage [--session ID] [--projects DIRECTORY]",
     "providers": "deskmate providers",
+    "configure": "deskmate configure [--non-interactive] [--default-provider claude|codex]",
 }
 
 

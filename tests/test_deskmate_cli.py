@@ -17,7 +17,7 @@ COMMAND = ROOT / "bin" / "deskmate"
 
 
 class DeskmateCliTest(unittest.TestCase):
-    def run_deskmate(self, *args, home, extra_env=None):
+    def run_deskmate(self, *args, home, extra_env=None, input_text=None):
         env = os.environ.copy()
         env["HOME"] = str(home)
         env["DESKMATE_DATA_DIR"] = str(home / "data")
@@ -28,6 +28,7 @@ class DeskmateCliTest(unittest.TestCase):
             env=env,
             capture_output=True,
             text=True,
+            input=input_text,
             check=False,
         )
 
@@ -490,6 +491,131 @@ class DeskmateCliTest(unittest.TestCase):
             "Claude Code: excluded (not found)\n"
             "Codex CLI: excluded (not found)\n",
         )
+
+    def test_configure_selects_the_only_compatible_provider(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+
+            result = self.run_deskmate(
+                "configure",
+                "--non-interactive",
+                home=home,
+                extra_env={"PATH": str(binaries)},
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = json.loads((home / "data" / "config.json").read_text())
+
+        self.assertEqual(
+            config,
+            {
+                "schema_version": 1,
+                "providers": {"installed": ["claude"], "default": "claude"},
+            },
+        )
+        self.assertIn("Default provider: Claude Code", result.stdout)
+
+    def test_configure_asks_for_a_default_when_both_are_compatible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "configure",
+                home=home,
+                extra_env={"PATH": str(binaries)},
+                input_text="2\n",
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = json.loads((home / "data" / "config.json").read_text())
+
+        self.assertIn("Choose the Default provider", result.stdout)
+        self.assertEqual(config["providers"]["installed"], ["claude", "codex"])
+        self.assertEqual(config["providers"]["default"], "codex")
+
+    def test_configure_accepts_an_explicit_default_with_both_providers(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "configure",
+                "--non-interactive",
+                "--default-provider",
+                "claude",
+                home=home,
+                extra_env={"PATH": str(binaries)},
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = json.loads((home / "data" / "config.json").read_text())
+
+        self.assertEqual(config["providers"]["default"], "claude")
+
+    def test_configure_refuses_a_hidden_default_with_both_providers(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "configure",
+                "--non-interactive",
+                home=home,
+                extra_env={"PATH": str(binaries)},
+            )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--default-provider is required", result.stderr)
+        self.assertFalse((home / "data" / "config.json").exists())
+
+    def test_configure_refuses_an_unavailable_default_without_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            data = home / "data"
+            data.mkdir()
+            config_path = data / "config.json"
+            original = '{"name": "Test"}\n'
+            config_path.write_text(original, encoding="utf-8")
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+
+            result = self.run_deskmate(
+                "configure",
+                "--default-provider",
+                "codex",
+                home=home,
+                extra_env={"PATH": str(binaries)},
+            )
+            after = config_path.read_text(encoding="utf-8")
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("Codex CLI is not compatible", result.stderr)
+        self.assertEqual(after, original)
+
+    def test_configure_refuses_when_no_provider_is_compatible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+
+            result = self.run_deskmate(
+                "configure", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("No compatible Provider found", result.stderr)
+        self.assertFalse((home / "data" / "config.json").exists())
 
 
 if __name__ == "__main__":
