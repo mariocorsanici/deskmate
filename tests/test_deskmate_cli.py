@@ -31,6 +31,12 @@ class DeskmateCliTest(unittest.TestCase):
             check=False,
         )
 
+    def write_executable(self, directory, name, body):
+        path = pathlib.Path(directory) / name
+        path.write_text(f"#!/bin/sh\n{body}\n", encoding="utf-8")
+        path.chmod(0o755)
+        return path
+
     def test_check_runs_a_project_card_with_human_readable_output(self):
         with tempfile.TemporaryDirectory() as directory:
             home = pathlib.Path(directory)
@@ -354,6 +360,136 @@ class DeskmateCliTest(unittest.TestCase):
         self.assertEqual(rows[0]["detail"], "topic")
         self.assertEqual(rows[0]["session"], "session-123")
         self.assertEqual(rows[0]["cwd"], "/tmp/demo")
+
+    def test_providers_reports_claude_only_as_compatible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo '2.1.0 (Claude Code)'")
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout,
+            "Claude Code: included (2.1.0 (Claude Code))\n"
+            "Codex CLI: excluded (not found)\n",
+        )
+
+    def test_providers_reports_codex_only_as_compatible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "codex", "echo 'codex-cli 0.55.0'")
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout,
+            "Claude Code: excluded (not found)\n"
+            "Codex CLI: included (codex-cli 0.55.0)\n",
+        )
+
+    def test_providers_reports_both_compatible_in_canonical_order(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "--json", "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["command"], "providers")
+        self.assertEqual(
+            payload["stdout"],
+            "Claude Code: included (Claude Code 2.1.0)\n"
+            "Codex CLI: included (codex 0.55.0)\n",
+        )
+
+    def test_providers_excludes_failing_provider_but_keeps_compatible_one(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo broken >&2; exit 7")
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout,
+            "Claude Code: excluded (version probe exited 7: broken)\n"
+            "Codex CLI: included (codex 0.55.0)\n",
+        )
+
+    def test_providers_excludes_unrecognized_version_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'mystery 1.0'")
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "Claude Code: excluded (unrecognized version output: mystery 1.0)",
+            result.stdout,
+        )
+        self.assertIn("Codex CLI: excluded (not found)", result.stdout)
+
+    def test_providers_times_out_a_hanging_version_probe(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(
+                binaries, "claude", "/bin/sleep 3; echo 'Claude Code 2.1.0'"
+            )
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "Claude Code: excluded (version probe timed out)", result.stdout
+        )
+
+    def test_providers_returns_failure_when_neither_provider_is_present(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(
+            result.stdout,
+            "Claude Code: excluded (not found)\n"
+            "Codex CLI: excluded (not found)\n",
+        )
 
 
 if __name__ == "__main__":
