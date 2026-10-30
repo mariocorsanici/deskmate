@@ -163,6 +163,8 @@ class DeskmateCliTest(unittest.TestCase):
     def test_help_lists_the_stable_daily_loop_operations(self):
         expected_commands = {
             "check",
+            "configure",
+            "providers",
             "sessions",
             "session-stats",
             "reminders",
@@ -206,6 +208,8 @@ class DeskmateCliTest(unittest.TestCase):
     def test_each_subcommand_help_is_safe(self):
         commands = (
             "check",
+            "configure",
+            "providers",
             "sessions",
             "session-stats",
             "reminders",
@@ -616,6 +620,124 @@ class DeskmateCliTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("No compatible Provider found", result.stderr)
         self.assertFalse((home / "data" / "config.json").exists())
+
+    def test_configure_migrates_legacy_config_and_preserves_preferences(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            data = home / "data"
+            data.mkdir()
+            config_path = data / "config.json"
+            config_path.write_text(
+                json.dumps({
+                    "name": "Test",
+                    "language": "it",
+                    "reminders": {"morning": "08:30"},
+                }),
+                encoding="utf-8",
+            )
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+
+            result = self.run_deskmate(
+                "configure", home=home, extra_env={"PATH": str(binaries)}
+            )
+            config = json.loads(config_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(config["schema_version"], 1)
+        self.assertEqual(config["name"], "Test")
+        self.assertEqual(config["language"], "it")
+        self.assertEqual(config["reminders"], {"morning": "08:30"})
+        self.assertEqual(
+            config["providers"], {"installed": ["claude"], "default": "claude"}
+        )
+
+    def test_configure_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+            environment = {"PATH": str(binaries)}
+
+            first = self.run_deskmate("configure", home=home, extra_env=environment)
+            config_path = home / "data" / "config.json"
+            first_bytes = config_path.read_bytes()
+            second = self.run_deskmate("configure", home=home, extra_env=environment)
+            second_bytes = config_path.read_bytes()
+
+        self.assertEqual(first.returncode, 0, first.stderr)
+        self.assertEqual(second.returncode, 0, second.stderr)
+        self.assertEqual(second_bytes, first_bytes)
+
+    def test_configure_rejects_malformed_config_without_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            data = home / "data"
+            data.mkdir()
+            config_path = data / "config.json"
+            original = b'{"name": "broken"'
+            config_path.write_bytes(original)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+
+            result = self.run_deskmate(
+                "configure", home=home, extra_env={"PATH": str(binaries)}
+            )
+            after = config_path.read_bytes()
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("config.json is not valid JSON", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(after, original)
+
+    def test_configure_rejects_future_schema_without_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            data = home / "data"
+            data.mkdir()
+            config_path = data / "config.json"
+            original = b'{"schema_version": 99, "name": "Future"}\n'
+            config_path.write_bytes(original)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+
+            result = self.run_deskmate(
+                "configure", home=home, extra_env={"PATH": str(binaries)}
+            )
+            after = config_path.read_bytes()
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unsupported config schema 99", result.stderr)
+        self.assertEqual(after, original)
+
+    def test_configure_invalid_interactive_selection_does_not_mutate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            data = home / "data"
+            data.mkdir()
+            config_path = data / "config.json"
+            original = b'{"name": "Test"}\n'
+            config_path.write_bytes(original)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "configure",
+                home=home,
+                extra_env={"PATH": str(binaries)},
+                input_text="neither\n",
+            )
+            after = config_path.read_bytes()
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("invalid Default provider selection", result.stderr)
+        self.assertEqual(after, original)
 
 
 if __name__ == "__main__":

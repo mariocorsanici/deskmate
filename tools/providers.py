@@ -35,6 +35,10 @@ class Detection:
     reason: str
 
 
+class ConfigError(ValueError):
+    """Configuration cannot be safely read by this Deskmate version."""
+
+
 PROVIDERS = (
     Provider("claude", "Claude Code", "claude", "claude"),
     Provider("codex", "Codex CLI", "codex", "codex"),
@@ -79,12 +83,30 @@ def render(detections: list[Detection]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_config(installed: list[str], default: str) -> None:
+def read_config() -> dict[str, object]:
     path = DATA / "config.json"
-    if path.exists():
+    if not path.exists():
+        return {}
+    try:
         config = json.loads(path.read_text(encoding="utf-8"))
-    else:
-        config = {}
+    except json.JSONDecodeError as error:
+        raise ConfigError(
+            f"config.json is not valid JSON: line {error.lineno}, column {error.colno}"
+        ) from error
+    if not isinstance(config, dict):
+        raise ConfigError("config.json must contain a JSON object")
+    schema = config.get("schema_version")
+    if schema is not None and (type(schema) is not int or schema != CONFIG_SCHEMA_VERSION):
+        raise ConfigError(
+            f"unsupported config schema {schema}; supported schema is {CONFIG_SCHEMA_VERSION}"
+        )
+    return config
+
+
+def write_config(
+    config: dict[str, object], installed: list[str], default: str
+) -> None:
+    path = DATA / "config.json"
     config["schema_version"] = CONFIG_SCHEMA_VERSION
     config["providers"] = {"installed": installed, "default": default}
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -136,6 +158,11 @@ def choose_default(
 
 
 def configure(args: argparse.Namespace) -> int:
+    try:
+        config = read_config()
+    except ConfigError as error:
+        print(error, file=sys.stderr)
+        return 2
     detections = [detect(provider) for provider in PROVIDERS]
     sys.stdout.write(render(detections))
     default, error = choose_default(
@@ -145,7 +172,7 @@ def configure(args: argparse.Namespace) -> int:
         print(error, file=sys.stderr)
         return 1 if not any(item.compatible for item in detections) else 2
     installed = [item.provider.key for item in detections if item.compatible]
-    write_config(installed, default)
+    write_config(config, installed, default)
     label = next(item.label for item in PROVIDERS if item.key == default)
     print(f"Configured Providers: {', '.join(installed)}")
     print(f"Default provider: {label}")
