@@ -461,6 +461,62 @@ class DeskmateCliTest(unittest.TestCase):
         )
         self.assertIn("Codex CLI: excluded (not found)", result.stdout)
 
+    def test_providers_rejects_name_only_output_without_a_version(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'claude is unavailable'")
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "Claude Code: excluded (unrecognized version output: claude is unavailable)",
+            result.stdout,
+        )
+
+    def test_providers_isolates_launch_failure_from_healthy_provider(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            claude = binaries / "claude"
+            claude.write_text("#!/missing/deskmate-interpreter\n", encoding="utf-8")
+            claude.chmod(0o755)
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Claude Code: excluded (version probe could not start:", result.stdout)
+        self.assertIn("Codex CLI: included (codex 0.55.0)", result.stdout)
+        self.assertNotIn("Traceback", result.stderr)
+
+    def test_providers_isolates_non_utf8_output_from_healthy_provider(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "/usr/bin/printf '\\377'")
+            self.write_executable(binaries, "codex", "echo 'codex 0.55.0'")
+
+            result = self.run_deskmate(
+                "providers", home=home, extra_env={"PATH": str(binaries)}
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(
+            "Claude Code: excluded (version probe returned non-UTF-8 output)",
+            result.stdout,
+        )
+        self.assertIn("Codex CLI: included (codex 0.55.0)", result.stdout)
+        self.assertNotIn("Traceback", result.stderr)
+
     def test_providers_times_out_a_hanging_version_probe(self):
         with tempfile.TemporaryDirectory() as directory:
             home = pathlib.Path(directory)
@@ -712,6 +768,48 @@ class DeskmateCliTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 2)
         self.assertIn("unsupported config schema 99", result.stderr)
+        self.assertEqual(after, original)
+
+    def test_configure_rejects_null_schema_without_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            data = home / "data"
+            data.mkdir()
+            config_path = data / "config.json"
+            original = b'{"schema_version": null, "name": "Test"}\n'
+            config_path.write_bytes(original)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+
+            result = self.run_deskmate(
+                "configure", home=home, extra_env={"PATH": str(binaries)}
+            )
+            after = config_path.read_bytes()
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unsupported config schema None", result.stderr)
+        self.assertEqual(after, original)
+
+    def test_configure_rejects_nonstandard_json_constants_without_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = pathlib.Path(directory)
+            data = home / "data"
+            data.mkdir()
+            config_path = data / "config.json"
+            original = b'{"name": NaN}\n'
+            config_path.write_bytes(original)
+            binaries = home / "bin"
+            binaries.mkdir()
+            self.write_executable(binaries, "claude", "echo 'Claude Code 2.1.0'")
+
+            result = self.run_deskmate(
+                "configure", home=home, extra_env={"PATH": str(binaries)}
+            )
+            after = config_path.read_bytes()
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("invalid JSON constant NaN", result.stderr)
         self.assertEqual(after, original)
 
     def test_configure_invalid_interactive_selection_does_not_mutate(self):

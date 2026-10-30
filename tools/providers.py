@@ -8,6 +8,7 @@ import dataclasses
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -16,6 +17,7 @@ import tempfile
 
 PROBE_TIMEOUT_SECONDS = 2
 CONFIG_SCHEMA_VERSION = 1
+VERSION_PATTERN = re.compile(r"(?<!\w)\d+(?:\.\d+)+(?:[-+][0-9A-Za-z.-]+)?(?!\w)")
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
 
@@ -63,13 +65,20 @@ def detect(provider: Provider) -> Detection:
         )
     except subprocess.TimeoutExpired:
         return Detection(provider, False, "version probe timed out")
+    except UnicodeDecodeError:
+        return Detection(provider, False, "version probe returned non-UTF-8 output")
+    except OSError as error:
+        return Detection(provider, False, f"version probe could not start: {error.strerror}")
     output = one_line(result.stdout or result.stderr)
     if result.returncode != 0:
         detail = f": {output}" if output else ""
         return Detection(
             provider, False, f"version probe exited {result.returncode}{detail}"
         )
-    if provider.identity not in output.casefold():
+    if (
+        provider.identity not in output.casefold()
+        or VERSION_PATTERN.search(output) is None
+    ):
         detail = output or "empty output"
         return Detection(provider, False, f"unrecognized version output: {detail}")
     return Detection(provider, True, output)
@@ -83,12 +92,18 @@ def render(detections: list[Detection]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def reject_json_constant(value: str) -> None:
+    raise ConfigError(f"config.json contains invalid JSON constant {value}")
+
+
 def read_config() -> dict[str, object]:
     path = DATA / "config.json"
     if not path.exists():
         return {}
     try:
-        config = json.loads(path.read_text(encoding="utf-8"))
+        config = json.loads(
+            path.read_text(encoding="utf-8"), parse_constant=reject_json_constant
+        )
     except json.JSONDecodeError as error:
         raise ConfigError(
             f"config.json is not valid JSON: line {error.lineno}, column {error.colno}"
@@ -96,7 +111,9 @@ def read_config() -> dict[str, object]:
     if not isinstance(config, dict):
         raise ConfigError("config.json must contain a JSON object")
     schema = config.get("schema_version")
-    if schema is not None and (type(schema) is not int or schema != CONFIG_SCHEMA_VERSION):
+    if "schema_version" in config and (
+        type(schema) is not int or schema != CONFIG_SCHEMA_VERSION
+    ):
         raise ConfigError(
             f"unsupported config schema {schema}; supported schema is {CONFIG_SCHEMA_VERSION}"
         )
