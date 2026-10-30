@@ -13,3 +13,7 @@ The tracker uses the default triage vocabulary. Read `docs/agents/triage-labels.
 ### Domain docs
 
 This is a single-context repository. Read `docs/agents/domain.md` when exploring domain concepts, updating the glossary, recording decisions, or checking a change against existing decisions.
+
+### Development workflow
+
+Read `docs/agents/development-workflow.md` before choosing branches, merging, preparing a release, tagging, or closing a multi-ticket effort.

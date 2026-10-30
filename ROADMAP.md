@@ -2,6 +2,21 @@
 
 Ideas for the next steps, roughly in order.
 
+## Repository guardrails
+
+After the provider-neutral feature reaches `develop` and the release flow has
+been exercised once:
+
+- add CI that runs the complete test suite on pushes and pull requests;
+- protect `develop` and `main` with the required test checks;
+- require pull requests for changes to the protected branches;
+- decide whether a solo-maintainer repository benefits from mandatory approval
+  or only from automated checks;
+- choose and document the release versioning and tag convention.
+
+Until then, keep these as planned guardrails rather than enabling repository
+rules prematurely.
+
 ## Calendar reminders: test the import
 The `calendar` channel is implemented (`tools/reminders.py ics`) but has not been tried with a real calendar yet.
 - Import `data/deskmate-reminders.ics` into Google Calendar (Settings → Import & export) and into Apple Calendar.
