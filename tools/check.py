@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Runs the read-only checks listed in the project cards, used by /whats-on-today and /call-it-a-day.
 
-A project card is ~/.claude/projects/<folder-key>/memory/project-card.md, written by /checkpoint.
+A shared Project card is <data>/projects/<project-key>/project-card.md, written by /checkpoint.
 Its "## Checks" section lists one command per line, as: - <label>: `<command>`
 
 Usage:
@@ -12,12 +12,13 @@ Usage:
 Standby cards are skipped (their checks can be slow, e.g. SSH to a machine that is off),
 but their titles are listed on a last line, so they stay visible.
 """
+import os
 import pathlib
 import re
 import subprocess
 import sys
 
-PROJECTS = pathlib.Path.home() / ".claude" / "projects"
+PROJECTS = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", str(pathlib.Path(__file__).resolve().parents[1] / "data"))).expanduser() / "projects"
 CHECK = re.compile(r"^- (.+?): `(.+)`\s*$")
 STATE = re.compile(r"^- \*\*State:\*\*\s*(\w+)", re.M)
 TIMEOUT = 15
@@ -30,7 +31,7 @@ def section(text, title):
 
 def title(text, path):
     m = re.search(r"^\*\*(.+?)\*\*|^# (.+)$", text, re.M)
-    return (m.group(1) or m.group(2)).strip(" .") if m else path.parent.parent.name
+    return (m.group(1) or m.group(2)).strip(" .") if m else path.parent.name
 
 
 def run(command):
@@ -44,7 +45,7 @@ def run(command):
 
 def main():
     args = [a for a in sys.argv[1:] if a != "--all"]
-    cards = [pathlib.Path(a).expanduser() for a in args] or sorted(PROJECTS.glob("*/memory/project-card.md"))
+    cards = [pathlib.Path(a).expanduser() for a in args] or sorted(PROJECTS.glob("*/project-card.md"))
     skip = not args and "--all" not in sys.argv
     standby = []
     for card in cards:

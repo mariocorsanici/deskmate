@@ -11,6 +11,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 COMMANDS = {
+    "card": [sys.executable, "-I", str(ROOT / "tools" / "project_cards.py")],
     "check": [sys.executable, "-I", str(ROOT / "tools" / "check.py")],
     "sessions": [sys.executable, "-I", str(ROOT / "tools" / "sessions.py")],
     "session-stats": [sys.executable, "-I", str(ROOT / "tools" / "session_stats.py")],
@@ -22,6 +23,7 @@ COMMANDS = {
     "configure": [sys.executable, "-I", str(ROOT / "tools" / "providers.py"), "configure"],
 }
 DESCRIPTIONS = {
+    "card": "locate, list, write or migrate shared Project cards",
     "check": "run the Checks in Project cards",
     "sessions": "summarize Claude Work sessions",
     "session-stats": "report the resume/new-session experiment",
@@ -33,6 +35,7 @@ DESCRIPTIONS = {
     "configure": "record installed and Default providers",
 }
 USAGE = {
+    "card": "deskmate card <locate|list|write|migrate> [arguments]",
     "check": "deskmate check [--all] [card ...]",
     "sessions": "deskmate sessions [--since DATE] [--messages N] [--cut N]",
     "session-stats": "deskmate session-stats [--since DATE]",

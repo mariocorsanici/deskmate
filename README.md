@@ -16,14 +16,20 @@ After closing: study the topics you set aside, or admin work.
 
 ## Project cards
 
-Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md`: a Claude Code memory file, so every session started in that folder reads it automatically. `/checkpoint`, run inside the project's session, keeps two sections of it up to date:
+Each project has one shared Markdown card at `data/projects/<slug>-<path-hash>/project-card.md`, independent of Claude or Codex. `DESKMATE_DATA_DIR` overrides the data root. Claude’s existing `~/.claude/projects/<folder-key>/memory/project-card.md` becomes a symlink to that same document. `/checkpoint`, run inside the project's session, keeps two sections of it up to date:
 
 - `## Status`: state (`active`, `paused`, `standby`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
 - `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `tools/check.py` runs them for `/whats-on-today` and `/call-it-a-day`.
 
 `paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `check.py` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
 
-`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint. Skills call the stable `bin/deskmate` command for Checks, session summaries, statistics, logging and session launch rather than depending on the individual tools that implement them.
+`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint.
+
+Use `bin/deskmate card locate <project-folder>` to get its canonical path and metadata as JSON, and `bin/deskmate card list` to discover shared cards. `bin/deskmate card migrate <project-folder>` imports an existing Claude card, preserves an exact content-addressed backup under `data/backups/project-cards/`, and installs the Claude symlink. Repeating migration is safe; differing legacy/shared content stops for explicit resolution.
+
+Writers submit a complete UTF-8 document with `bin/deskmate card write <project-folder> --expected-revision N --provider claude|codex --session-id ID --from FILE`. Use revision `0` for a new card. Updates lock the project, check the revision and atomically replace the document. Exit `3` returns the current card on stdout: reread, reconcile and retry. Invalid metadata or unsupported schemas return `2`. Direct manual edits remain possible for recovery, but bypass revision checks and locking: avoid concurrent manual and automated updates.
+
+Skills call the stable `bin/deskmate` command for Checks, session summaries, statistics, logging and session launch rather than depending on the individual tools that implement them.
 
 ## Experiments
 

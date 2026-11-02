@@ -12,7 +12,7 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 
 1. **Retrospective.** If today is Monday, Wednesday or Friday and `~/Dev/mc_dev/deskmate/data/lessons.md` has no entry for today yet, ask whether to run `/how-did-it-go` first. If yes, stop here: the user will run this skill again afterwards.
 
-2. **Collect.** The state of each project comes from its **project card**, written by `/checkpoint` in the project's own session: `~/.claude/projects/*/memory/project-card.md`, section `## Status`. Then run `~/Dev/mc_dev/deskmate/bin/deskmate sessions` (today's sessions) to see which sessions were active, and reread `~/Dev/mc_dev/deskmate/data/handoff.md`.
+2. **Collect.** The state of each project comes from its **project card**, written by `/checkpoint` in the project's own session: run `~/Dev/mc_dev/deskmate/bin/deskmate card list` and read section `## Status` from each returned shared card. Report discovery errors before composing the handoff. Then run `~/Dev/mc_dev/deskmate/bin/deskmate sessions` (today's sessions) to see which sessions were active, and reread `~/Dev/mc_dev/deskmate/data/handoff.md`.
    - **Card with a checkpoint later than the session's last activity:** use the card as it is, without reading the transcript.
    - **Session active after its last checkpoint, or without a card:** read its last messages (`--messages 40` if needed) and suggest running `/checkpoint` there next time. List these sessions in the sign-off.
    - Skip this session and the ones that only ran deskmate skills.
