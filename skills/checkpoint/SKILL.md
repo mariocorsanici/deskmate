@@ -21,14 +21,14 @@ Run inside a project's work session, when you stop working on it (at the end of 
    ```markdown
    ## Status
    Checkpoint <YYYY-MM-DD HH:MM>, session `<session-id>`, folder `<folder>`.
-   - **State:** active | paused | closed
+   - **State:** active | paused | standby | closed
    - **Where you are:** facts, with numbers (tests, PRs, commits, what is not committed or not pushed)
    - **To do:** concrete actions in order, the first in bold
    - **Waiting on:** who or what, or "nothing"
    - **Before you start:** preparation steps (SSH keys, VPN, services), or "nothing"
    ```
 
-   `paused` means the work waits for a decision about priorities; `closed` means nothing is left to do, and `/call-it-a-day` will list it only among the work closed today. If the card has an older progress paragraph that this section now covers, remove it: the status lives in one place.
+   `paused` means the work waits for a decision about priorities, and is still proposed every morning; `standby` means leave it alone until the user asks for it: its checks are not run and the handoff names it in one line only; `closed` means nothing is left to do, and `/call-it-a-day` will list it only among the work closed today. If the card has an older progress paragraph that this section now covers, remove it: the status lives in one place.
 
 5. **Checks.** Make sure the card has a `## Checks` section listing the read-only commands that tell, in a few seconds, whether the state above is still true. One per line, as `- <label>: \`<command>\``, for example:
 

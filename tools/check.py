@@ -5,9 +5,12 @@ A project card is ~/.claude/projects/<folder-key>/memory/project-card.md, writte
 Its "## Checks" section lists one command per line, as: - <label>: `<command>`
 
 Usage:
-  check.py                 every card whose state is not closed
-  check.py <card> ...      only these cards
-  check.py --all           closed cards too
+  check.py                 every card whose state is not closed or standby
+  check.py <card> ...      only these cards, whatever their state
+  check.py --all           closed and standby cards too
+
+Standby cards are skipped (their checks can be slow, e.g. SSH to a machine that is off),
+but their titles are listed on a last line, so they stay visible.
 """
 import pathlib
 import re
@@ -42,10 +45,15 @@ def run(command):
 def main():
     args = [a for a in sys.argv[1:] if a != "--all"]
     cards = [pathlib.Path(a).expanduser() for a in args] or sorted(PROJECTS.glob("*/memory/project-card.md"))
+    skip = not args and "--all" not in sys.argv
+    standby = []
     for card in cards:
         text = card.read_text(encoding="utf-8")
         state = STATE.search(section(text, "Status"))
-        if not args and "--all" not in sys.argv and state and state.group(1) == "closed":
+        if skip and state and state.group(1) == "closed":
+            continue
+        if skip and state and state.group(1) == "standby":
+            standby.append(title(text, card))
             continue
         print(f"== {title(text, card)}  ({state.group(1) if state else 'no status'})")
         checks = [CHECK.match(line) for line in section(text, "Checks").splitlines()]
@@ -55,6 +63,8 @@ def main():
         for c in checks:
             result, first = run(c.group(2))
             print(f"   {c.group(1)}: {result}" + (f"  {first[:160]}" if first else ""))
+    if standby:
+        print(f"In stand-by: {', '.join(standby)}")
 
 
 if __name__ == "__main__":
