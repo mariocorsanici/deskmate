@@ -18,8 +18,10 @@ After closing: study the topics you set aside, or admin work.
 
 Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md`: a Claude Code memory file, so every session started in that folder reads it automatically. `/checkpoint`, run inside the project's session, keeps two sections of it up to date:
 
-- `## Status`: state (`active`, `paused`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
+- `## Status`: state (`active`, `paused`, `standby`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
 - `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `tools/check.py` runs them for `/whats-on-today` and `/call-it-a-day`.
+
+`paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `check.py` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
 
 `/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint.
 
