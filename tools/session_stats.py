@@ -63,7 +63,7 @@ def read(path):
 def ratings():
     try:
         with (DATA / "log.csv").open(newline="") as f:
-            return {(r["date"], r["session"]): r["detail"] for r in csv.DictReader(f) if r["event"] == "resume-rating"}
+            return {(r["date"], r["session"]): r["detail"] for r in csv.DictReader(f) if r["event"] == "resume-rating" and r.get("provider", "claude") == "claude"}
     except FileNotFoundError:
         return {}
 
@@ -93,6 +93,7 @@ def main():
             mode = "resume" if first < day else "new"
             rows.append((day, mode, f.stem, pathlib.Path(cwd).name, d, rated.get((day.isoformat(), f.stem), "")))
 
+    print("Claude Code session statistics (native measurements)")
     print(f"{'day':<10} {'mode':<6} {'session':<8} {'project':<24} {'ctx@start':>9} {'turns':>5} {'tokens':>7} {'compact':>7} {'rating':>6}")
     for day, mode, sid, project, d, rating in sorted(rows):
         print(f"{day.strftime('%d/%m %a'):<10} {mode:<6} {sid[:8]:<8} {project[:24]:<24} {d['first_context'] // 1000:>8}k "
