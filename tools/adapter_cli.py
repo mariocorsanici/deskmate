@@ -45,8 +45,10 @@ def print_sessions(records, count, cut):
 
 def verify_logging(provider):
     """Run the installed prompt hook in disposable state and inspect its event."""
-    relative = '.claude/settings.json' if provider == 'claude' else '.codex/hooks.json'
-    settings = json.loads((pathlib.Path.home() / relative).read_text(encoding='utf-8'))
+    settings_path = pathlib.Path.home() / '.claude/settings.json'
+    if provider == 'codex':
+        settings_path = pathlib.Path(os.environ.get('CODEX_HOME', pathlib.Path.home() / '.codex')).expanduser() / 'hooks.json'
+    settings = json.loads(settings_path.read_text(encoding='utf-8'))
     root = pathlib.Path(__file__).resolve().parent.parent
     expected = [str(root / 'bin/deskmate'), 'hook-event', '--provider', provider]
     installed = False
@@ -64,7 +66,8 @@ def verify_logging(provider):
         prefix = '/' if provider == 'claude' else '$'
         payload = {'hook_event_name': 'UserPromptSubmit', 'session_id': native,
                    'cwd': directory, 'prompt': prefix + 'checkpoint integration verification'}
-        environment = {**os.environ, 'HOME': directory, 'DESKMATE_DATA_DIR': str(data)}
+        environment = {**os.environ, 'HOME': directory, 'DESKMATE_DATA_DIR': str(data),
+                       'CODEX_HOME': str(home / '.codex')}
         checked = subprocess.run([sys.executable, *expected], input=json.dumps(payload),
                                  capture_output=True, text=True, env=environment,
                                  cwd=directory, timeout=10, check=False)

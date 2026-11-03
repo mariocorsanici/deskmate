@@ -127,10 +127,22 @@ class ClaudeAdapterTest(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertEqual(json.loads(envelope['stdout'])['status'], 'error')
 
+    def test_malformed_index_metadata_degrades_without_stopping_session_listing(self):
+        (self.projects / 'sessions-index.json').write_text(json.dumps({'entries': [{
+            'sessionId': 'native-123', 'projectPath': {'unexpected': 'object'},
+            'created': ['bad timestamp'], 'modified': self.timestamp,
+        }]}))
+        code, envelope = self.run_cli('sessions', '--provider', 'claude', '--messages', '0')
+        self.assertEqual(code, 0, envelope)
+        records = self.record('sessions', '--provider', 'claude', '--messages', '0', '--format', 'json')
+        self.assertEqual(records[0]['status'], 'degraded')
+        self.assertIsNone(records[0]['cwd'])
+
     def test_integration_preserves_unrelated_hooks_and_installs_shared_slash_skills(self):
         settings = self.home / '.claude/settings.json'
         unrelated = {'type': 'command', 'command': 'echo keep deskmate hook-event'}
-        settings.write_text(json.dumps({'theme': 'dark', 'hooks': {'UserPromptSubmit': [{
+        settings.write_text(json.dumps({'theme': 'dark', 'hooks': {'SessionStart': [],
+            'SessionEnd': [{'hooks': [], 'matcher': 'untouched'}], 'UserPromptSubmit': [{
             'matcher': '', 'hooks': [unrelated, {'type': 'command',
                                                'command': str(ROOT / 'tools/hook_log.sh')}]}]}}))
         configured = self.record('integration', '--provider', 'claude')
@@ -140,6 +152,8 @@ class ClaudeAdapterTest(unittest.TestCase):
         self.assertEqual(settings.read_bytes(), first)
         data = json.loads(first)
         self.assertEqual(data['theme'], 'dark')
+        self.assertEqual(data['hooks']['SessionStart'], [])
+        self.assertEqual(data['hooks']['SessionEnd'], [{'hooks': [], 'matcher': 'untouched'}])
         self.assertIn(unrelated, data['hooks']['UserPromptSubmit'][0]['hooks'])
         hooks = [hook['command'] for entries in data['hooks'].values()
                  for entry in entries for hook in entry['hooks']]
@@ -152,7 +166,8 @@ class ClaudeAdapterTest(unittest.TestCase):
             self.assertTrue((installed / 'SKILL.md').is_file())
         self.record('integration', '--provider', 'claude', '--remove')
         self.assertEqual(json.loads(settings.read_text()), {
-            'theme': 'dark', 'hooks': {'UserPromptSubmit': [{'matcher': '', 'hooks': [unrelated]}]}})
+            'theme': 'dark', 'hooks': {'SessionStart': [], 'SessionEnd': [{'hooks': [], 'matcher': 'untouched'}],
+                                     'UserPromptSubmit': [{'matcher': '', 'hooks': [unrelated]}]}})
         self.assertFalse((self.home / '.claude/skills/checkpoint').exists())
 
     def test_integration_invalid_settings_fails_without_replacing_personal_data(self):
@@ -203,6 +218,58 @@ class ClaudeAdapterTest(unittest.TestCase):
         records = self.record('sessions', '--provider', 'claude', '--since', '2026-01-01',
                               '--messages', '0', '--format', 'json')
         self.assertEqual([record['id'] for record in records], ['current-session'])
+
+    def test_claude_daily_loop_uses_shared_cards_checks_sessions_and_slash_hooks(self):
+        self.record('integration', '--provider', 'claude', '--verify')
+        folder = str(self.home.resolve())
+        self.transcript([
+            {'type': 'user', 'cwd': folder, 'timestamp': self.timestamp,
+             'message': {'content': 'Continue the project'}},
+            {'type': 'assistant', 'timestamp': self.timestamp,
+             'message': {'content': 'Checks pass; next step is documented.'}},
+        ])
+
+        def invoke(skill):
+            code, envelope = self.run_cli('hook-event', '--provider', 'claude', input_text=json.dumps({
+                'hook_event_name': 'UserPromptSubmit', 'session_id': 'native-123',
+                'cwd': folder, 'prompt': '/' + skill}))
+            self.assertEqual(code, 0, envelope)
+
+        invoke('whats-on-today')
+        plan = self.record('provider-launch', '--provider', 'claude', '--folder', folder,
+                           '--prompt', 'Continue from the Project card', '--dry-run')
+        self.assertEqual(plan['mode'], 'new')
+        source = self.home / 'checkpoint.md'
+        source.write_text('# Demo\n\n## Status\n- **State:** active\n\n## Checks\n- ready: `printf ready`\n')
+        code, envelope = self.run_cli('card', 'write', folder, '--provider', 'claude',
+                                     '--session-id', 'native-123', '--expected-revision', '0',
+                                     '--from', str(source))
+        self.assertEqual(code, 0, envelope)
+        invoke('checkpoint')
+        card = self.record('card', 'locate', folder)
+        self.assertEqual(card['metadata']['provider'], 'claude')
+        self.assertEqual(card['metadata']['session_id'], 'native-123')
+        code, checks = self.run_cli('check', card['path'])
+        self.assertEqual(code, 0, checks)
+        self.assertIn('ready: ok  ready', checks['stdout'])
+        invoke('how-did-it-go')
+        candidates = self.record('sessions', '--provider', 'claude', '--messages', '0', '--format', 'json')
+        self.assertEqual([candidate['id'] for candidate in candidates], ['native-123'])
+        conversation = self.record('session', '--provider', 'claude', '--session-id', 'native-123')
+        self.assertEqual(len(conversation['messages']), 2)
+        invoke('call-it-a-day')
+        report = self.record('metrics', '--provider', 'claude')
+        self.assertEqual(report['providers']['claude']['events'], {
+            'whats-on-today': 1, 'checkpoint': 1, 'how-did-it-go': 1, 'call-it-a-day': 1})
+        continuation = self.record('provider-launch', '--provider', 'claude', '--folder', folder,
+                                   '--session-id', card['metadata']['session_id'], '--dry-run')
+        self.assertEqual(continuation['mode'], 'resume')
+
+    def test_resume_refuses_an_option_disguised_as_a_native_session_id(self):
+        code, envelope = self.run_cli('provider-launch', '--provider', 'claude', '--folder', str(self.home),
+                                      '--session-id=--dangerously-skip-permissions', '--dry-run')
+        self.assertNotEqual(code, 0)
+        self.assertEqual(json.loads(envelope['stdout'])['status'], 'error')
 
 
 if __name__ == '__main__':

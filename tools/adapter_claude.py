@@ -52,9 +52,17 @@ def discover(since: str) -> list[dict]:
             indexed.add(session)
             if timestamp(end) < threshold:
                 continue
+            cwd = entry.get('projectPath')
+            start = entry.get('created')
+            warnings = []
+            if not isinstance(cwd, str) or timestamp(start) is None:
+                warnings.append('Malformed session index metadata omitted.')
+                cwd = cwd if isinstance(cwd, str) else None
+                start = start if timestamp(start) is not None else None
             records[session] = {'provider': 'claude', 'id': session,
-                                'cwd': entry.get('projectPath'), 'start': entry.get('created'),
-                                'end': end, 'usage': {}, 'status': 'ok', 'warnings': []}
+                                'cwd': cwd, 'start': start,
+                                'end': end, 'usage': {}, 'status': 'degraded' if warnings else 'ok',
+                                'warnings': warnings}
     for path in sorted(projects().glob('*/*.jsonl')):
         if path.stem in indexed or not path.is_file():
             continue
@@ -93,7 +101,7 @@ def _read_transcript(session_id: str, *, include_messages: bool) -> dict:
             session['warnings'].append(message)
 
     # Native IDs are filenames, never paths or glob expressions.
-    if not re.fullmatch(r'[A-Za-z0-9_-]+', session_id):
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', session_id):
         warn('Invalid Claude session ID.')
         return session
     paths = list(projects().glob(f'*/{session_id}.jsonl'))
@@ -175,7 +183,7 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
     try:
         if not pathlib.Path(folder).is_dir():
             raise ValueError('Project folder does not exist.')
-        if session_id is not None and not re.fullmatch(r'[A-Za-z0-9_-]+', session_id):
+        if session_id is not None and not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', session_id):
             raise ValueError('Invalid Claude session ID.')
         title = title or pathlib.Path(folder).name
         if any(ord(character) < 32 or ord(character) == 127 for character in title):
@@ -278,9 +286,11 @@ def configure_hooks(remove: bool = False) -> dict:
                     if not isinstance(entry, dict) or not isinstance(entry.get('hooks'), list):
                         raise ValueError(f'Invalid Claude {event} hook entry.')
                     remaining = [hook for hook in entry['hooks'] if not owns_hook(hook)]
-                    if remaining:
+                    if len(remaining) == len(entry['hooks']):
+                        retained.append(entry)
+                    elif remaining:
                         retained.append({**entry, 'hooks': remaining})
-                if retained:
+                if retained or not entries:
                     hooks[event] = retained
                 else:
                     hooks.pop(event)
