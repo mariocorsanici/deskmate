@@ -11,9 +11,12 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 COMMANDS = {
+    "integration": [sys.executable, "-I", str(ROOT / "tools" / "adapter_cli.py"), "integration"],
+    "provider-launch": [sys.executable, "-I", str(ROOT / "tools" / "adapter_cli.py"), "provider-launch"],
+    "session": [sys.executable, "-I", str(ROOT / "tools" / "adapter_cli.py"), "session"],
     "card": [sys.executable, "-I", str(ROOT / "tools" / "project_cards.py")],
     "check": [sys.executable, "-I", str(ROOT / "tools" / "check.py")],
-    "sessions": [sys.executable, "-I", str(ROOT / "tools" / "sessions.py")],
+    "sessions": [sys.executable, "-I", str(ROOT / "tools" / "adapter_cli.py"), "sessions"],
     "session-stats": [sys.executable, "-I", str(ROOT / "tools" / "session_stats.py")],
     "reminders": [sys.executable, "-I", str(ROOT / "tools" / "reminders.py")],
     "open-session": ["/bin/zsh", str(ROOT / "tools" / "open_tab.sh")],
@@ -26,6 +29,9 @@ COMMANDS = {
     "configure": [sys.executable, "-I", str(ROOT / "tools" / "providers.py"), "configure"],
 }
 DESCRIPTIONS = {
+    "integration": "configure Provider hooks and shared skills",
+    "provider-launch": "launch or resume a Provider Work session",
+    "session": "read one Provider Work session",
     "card": "locate, list, write or migrate shared Project cards",
     "check": "run the Checks in Project cards",
     "sessions": "summarize Claude Work sessions",
@@ -41,6 +47,9 @@ DESCRIPTIONS = {
     "configure": "record installed and Default providers",
 }
 USAGE = {
+    "integration": "deskmate integration --provider claude|codex [--remove] [--verify]",
+    "provider-launch": "deskmate provider-launch --provider claude|codex --folder PATH [--session-id ID] [--prompt TEXT] [--dry-run]",
+    "session": "deskmate session --provider claude|codex --session-id ID",
     "card": "deskmate card <locate|list|write|migrate> [arguments]",
     "check": "deskmate check [--all] [card ...]",
     "sessions": "deskmate sessions [--since DATE] [--messages N] [--cut N]",
