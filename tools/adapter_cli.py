@@ -45,30 +45,14 @@ def print_sessions(records, count, cut):
 
 def verify_logging(provider):
     """Run the installed prompt hook in disposable state and inspect its event."""
-    settings_path = pathlib.Path.home() / '.claude/settings.json'
-    if provider == 'codex':
-        settings_path = pathlib.Path(os.environ.get('CODEX_HOME', pathlib.Path.home() / '.codex')).expanduser() / 'hooks.json'
-    settings = json.loads(settings_path.read_text(encoding='utf-8'))
-    root = pathlib.Path(__file__).resolve().parent.parent
-    expected = [str(root / 'bin/deskmate'), 'hook-event', '--provider', provider]
-    installed = False
-    hooks = settings.get('hooks', {})
-    for entry in hooks.get('UserPromptSubmit', []):
-        for hook in entry.get('hooks', []):
-            if hook.get('type') == 'command' and shlex.split(hook.get('command', '')) == expected:
-                installed = True
-    if not installed:
-        raise ValueError('Deskmate UserPromptSubmit hook is not installed.')
     with tempfile.TemporaryDirectory(prefix='deskmate-hook-verification-') as directory:
         home = pathlib.Path(directory)
         data = home / 'data'
         native = 'deskmate-integration-verification'
-        prefix = '/' if provider == 'claude' else '$'
-        payload = {'hook_event_name': 'UserPromptSubmit', 'session_id': native,
-                   'cwd': directory, 'prompt': prefix + 'checkpoint integration verification'}
+        command, payload = adapter(provider).verification_hook(native, directory)
         environment = {**os.environ, 'HOME': directory, 'DESKMATE_DATA_DIR': str(data),
                        'CODEX_HOME': str(home / '.codex')}
-        checked = subprocess.run([sys.executable, *expected], input=json.dumps(payload),
+        checked = subprocess.run([sys.executable, *command], input=json.dumps(payload),
                                  capture_output=True, text=True, env=environment,
                                  cwd=directory, timeout=10, check=False)
         if checked.returncode:

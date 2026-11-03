@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** complete; awaiting parent integration review.
+**Implementation:** complete.
 
 - [x] The Codex adapter can discover Work sessions for a requested period.
 - [x] It can read usage information and bounded conversation data from synthetic Codex sessions.
@@ -29,3 +29,40 @@ Official references: [hooks and trust](https://developers.openai.com/codex/hooks
 
 Synthetic hook verification proves local logging only. After setup the user must inspect and trust new/changed hooks in Codex `/hooks`, then run a real native skill and inspect its Provider-tagged log row. This manual native delivery/Daily loop check belongs to ticket 14 and is intentionally not claimed by adapter tests.
 
+
+
+2026-11-03 review follow-up: Installed `codex-cli 0.166.0` accepted and
+canonicalized a synthetic rollout containing current native `token_usage_record`
+entries via `codex migrate-rollouts --apply --json` (exit 0, status `migrated`).
+The native output is retained as `tests/fixtures/codex-token-usage-record.jsonl`;
+its cumulative thread totals are 150 then 250, and its separate response totals
+are 150 then 100. Native migration left indexed `threads.tokens_used` at 0 even
+though the rollout retained cumulative 250. Evidence is recorded in
+`/private/tmp/deskmate-spec-run/token-usage-record-evidence.md`, with input and
+canonical output beside it; only disposable synthetic HOME/CODEX_HOME was used.
+The [native protocol source](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/protocol.rs)
+defines `TokenUsageRecord.thread_token_usage` separately from per-response and
+per-turn counters.
+
+Two public CLI regressions failed before their respective fixes: JSONL usage
+ignored the native records, and indexed usage returned only `tokens_used: 0`.
+Usage reads now retain the latest valid native `thread_token_usage` snapshot,
+omit malformed snapshots, preserve indexed counters separately, and refresh
+available indexed rollouts without decoding conversation records. Current native
+counters take precedence over legacy `token_count` totals; cumulative snapshots
+and per-response counters are never added together. Coverage verifies metadata-only
+discovery remains unchanged and Stop persists the refreshed raw counters without
+conversation content. Legacy rollout counter tests remain part of the suite.
+
+- Final review-fix validation (2026-11-03): `python3 -Werror::ResourceWarning -m unittest discover -s tests -q` passed **104 tests, no skips** in 32.185s; `git diff --check` passed. All new regressions were observed RED before their fixes. No user data or protected Git operations were touched.
+
+
+Final review regression: a valid indexed session became unresumable when a
+malformed token record correctly degraded its usage report. A public CLI test
+reproduced the failed resume before the fix. Resume eligibility now reads native
+identity and folder metadata independently of usage/message analytics; the same
+session resumes with safe argument boundaries while metrics retains its degraded
+status and warning. Unknown native IDs and malformed indexed folder metadata
+still refuse resume with no launch arguments.
+
+- Final recheck after resume eligibility fix (2026-11-03), directly in `/private/tmp/deskmate-review-0406`: `python3 -Werror::ResourceWarning -m unittest discover -s tests -q` passed **105 tests, no skips** in 30.726s; `git diff --check` passed. Public coverage retains degraded analytics warnings while allowing valid indexed native resume and rejecting unknown/invalid metadata. Protected Git operations remain parent-owned.

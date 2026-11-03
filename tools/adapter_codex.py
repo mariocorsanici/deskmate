@@ -125,9 +125,23 @@ def read_rollout(path, include_messages=False, usage_only=False):
                     if not include_messages and not usage_only:
                         session["end"] = epoch_time(path.stat().st_mtime)
                         break
+                elif entry.get("type") == "token_usage_record":
+                    # Native TokenUsageRecord.thread_token_usage is cumulative:
+                    # https://github.com/openai/codex/blob/main/codex-rs/protocol/src/protocol.rs
+                    counters = payload.get("thread_token_usage")
+                    keys = ("input_tokens", "cached_input_tokens", "output_tokens",
+                            "reasoning_output_tokens", "total_tokens")
+                    if (payload.get("thread_id") == session["id"] and isinstance(counters, dict)
+                            and all(type(counters.get(key)) is int and counters[key] >= 0 for key in keys)
+                            and type(counters.get("cache_write_input_tokens", 0)) is int
+                            and counters.get("cache_write_input_tokens", 0) >= 0):
+                        session["usage"] = {"thread_token_usage": {
+                            key: counters.get(key, 0) for key in (*keys, "cache_write_input_tokens")}}
+                    else:
+                        degraded(session, "Malformed Codex token usage records were skipped.")
                 elif entry.get("type") == "event_msg" and payload.get("type") == "token_count":
                     info = payload.get("info")
-                    if isinstance(info, dict):
+                    if isinstance(info, dict) and "thread_token_usage" not in session["usage"]:
                         session["usage"] = {key: value for key, value in info.items()
                                             if key in ("total_token_usage", "last_token_usage", "model_context_window")}
                 elif include_messages and entry.get("type") == "response_item":
@@ -221,7 +235,17 @@ def read_usage(session_id: str) -> dict:
     except (sqlite3.Error, OSError, ValueError):
         rows = []
     if rows:
-        return indexed_record(rows[0])
+        row = rows[0]
+        session = indexed_record(row)
+        if isinstance(row["rollout_path"], str) and pathlib.Path(row["rollout_path"]).is_file():
+            rollout = read_rollout(pathlib.Path(row["rollout_path"]), usage_only=True)
+            if rollout["id"] == session_id:
+                session["usage"].update(rollout["usage"])
+                for warning in rollout["warnings"]:
+                    degraded(session, warning)
+            else:
+                degraded(session, "Codex rollout identity does not match indexed Work session.")
+        return session
     for path in rollouts():
         session = read_rollout(path)
         if session["id"] == session_id:
@@ -271,6 +295,25 @@ def read_paginated(session):
     return session
 
 
+def resume_available(session_id):
+    """Native identity and folder metadata determine resume, independently of analytics."""
+    if not isinstance(session_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", session_id):
+        return False
+    try:
+        rows = metadata_rows(session_id)
+    except (sqlite3.Error, OSError, ValueError):
+        rows = []
+    if rows:
+        metadata = rows[0]
+        return (metadata["id"] == session_id and isinstance(metadata["cwd"], str)
+                and bool(metadata["cwd"].strip()))
+    for path in rollouts():
+        metadata = read_rollout(path)
+        if metadata["id"] == session_id:
+            return isinstance(metadata["cwd"], str) and bool(metadata["cwd"].strip())
+    return False
+
+
 def launch(folder: str, session_id: str | None = None, prompt: str | None = None,
            dry_run: bool = False, title: str | None = None) -> dict:
     result = {"provider": "codex", "mode": "resume" if session_id else "new", "argv": [],
@@ -286,7 +329,7 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
     if title and any(ord(char) < 32 or ord(char) == 127 for char in title):
         result.update(status="error", warnings=["Work session title must not contain control characters."])
         return result
-    if session_id and read_usage(session_id)["status"] != "ok":
+    if session_id and not resume_available(session_id):
         result.update(status="error", warnings=["Codex-owned Work session is unavailable; choose a new Work session explicitly."])
         return result
     argv = [executable, *(["resume"] if session_id else []), "--cd", result["cwd"]]
@@ -347,6 +390,34 @@ def hook_capability():
     return False, "Native Codex hooks could not be verified; update Codex CLI to a release with hooks support and rerun integration."
 
 
+def hook_argv():
+    return [str(ROOT / "bin" / "deskmate"), "hook-event", "--provider", "codex"]
+
+
+def hooks_path():
+    return codex_home() / "hooks.json"
+
+
+def owns_hook(hook):
+    if not isinstance(hook, dict) or hook.get("type") != "command":
+        return False
+    try:
+        return shlex.split(hook.get("command", "")) == hook_argv()
+    except (TypeError, ValueError):
+        return False
+
+
+def verification_hook(session_id, cwd):
+    """Resolve the installed native prompt hook and its verification payload."""
+    settings = json.loads(hooks_path().read_text(encoding="utf-8"))
+    for group in settings.get("hooks", {}).get("UserPromptSubmit", []):
+        if any(owns_hook(hook) for hook in group.get("hooks", [])):
+            return hook_argv(), {"hook_event_name": "UserPromptSubmit",
+                                 "session_id": session_id, "cwd": cwd,
+                                 "prompt": "$checkpoint integration verification"}
+    raise ValueError("Deskmate UserPromptSubmit hook is not installed.")
+
+
 def configure_hooks(remove: bool = False) -> dict:
     result = {"provider": "codex", "status": "ok", "warnings": [], "guidance": [
         "In Codex CLI, open /hooks and review and trust each Deskmate hook. New or changed definitions are skipped until trusted.",
@@ -354,9 +425,8 @@ def configure_hooks(remove: bool = False) -> dict:
         "Use native skills such as $checkpoint. User skills are linked under ~/.agents/skills; restart Codex if they are not visible.",
         "Run deskmate integration --provider codex --verify to test synthetic logging. After trusting hooks, run $checkpoint in a real Work session and check its Codex log row to verify runtime delivery.",
     ]}
-    path = codex_home() / "hooks.json"
-    command = shlex.join([str(ROOT / "bin" / "deskmate"),
-                          "hook-event", "--provider", "codex"])
+    path = hooks_path()
+    command = shlex.join(hook_argv())
     try:
         settings = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
         if not isinstance(settings, dict) or not isinstance(settings.get("hooks", {}), dict):
@@ -383,7 +453,7 @@ def configure_hooks(remove: bool = False) -> dict:
                 cleaned = []
                 for group in hooks[event]:
                     kept = [handler for handler in group["hooks"]
-                            if not (handler.get("type") == "command" and handler.get("command") == command)]
+                            if not owns_hook(handler)]
                     if kept or not group["hooks"]:
                         cleaned.append({**group, "hooks": kept})
                 if cleaned:

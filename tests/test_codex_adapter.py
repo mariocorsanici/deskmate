@@ -193,6 +193,81 @@ class CodexAdapterTest(unittest.TestCase):
         usage = self.command("session", "--provider", "codex", "--session-id", SESSION_ID, "--usage-only")
         self.assertEqual(usage["usage"]["total_token_usage"], {"total_tokens": 99})
 
+    def test_current_native_token_records_keep_latest_cumulative_usage(self):
+        # Canonicalized by installed codex-cli 0.166.0 migrate-rollouts.
+        records = [json.loads(line) for line in
+                   (ROOT / "tests/fixtures/codex-token-usage-record.jsonl").read_text().splitlines()]
+        path = self.write_rollout(records)
+        with path.open("a") as stream:
+            stream.write(json.dumps({"type": "token_usage_record", "timestamp": STAMP,
+                "payload": {"thread_id": SESSION_ID, "thread_token_usage": {"total_tokens": -1}}}) + "\n")
+            stream.write(json.dumps({"type": "event_msg", "timestamp": STAMP,
+                "payload": {"type": "token_count", "info": {
+                    "total_token_usage": {"total_tokens": 999}}}}) + "\n")
+            stream.write('{"type":"response_item","payload": INVALID_PRIVATE_CONTENT}\n')
+        usage = self.command("session", "--provider", "codex", "--session-id", SESSION_ID, "--usage-only")
+        self.assertEqual(usage["usage"], {"thread_token_usage": {
+            "input_tokens": 200, "cached_input_tokens": 30, "cache_write_input_tokens": 0,
+            "output_tokens": 50, "reasoning_output_tokens": 15, "total_tokens": 250}})
+        self.assertEqual(usage["status"], "degraded")
+        self.assertNotIn("messages", usage)
+        self.assertNotIn("PRIVATE_CONTENT", json.dumps(usage))
+        metadata = self.command("sessions", "--provider", "codex", "--messages", "0",
+                                "--since", "2026-10-01", "--format", "json")
+        self.assertEqual(metadata[0]["usage"], {})
+        self.assertEqual(metadata[0]["status"], "ok")
+
+    def test_indexed_usage_refreshes_native_token_records_and_stop_snapshot(self):
+        records = [json.loads(line) for line in
+                   (ROOT / "tests/fixtures/codex-token-usage-record.jsonl").read_text().splitlines()]
+        path = self.write_rollout(records)
+        with path.open("a") as stream:
+            stream.write('{"type":"response_item","payload": PRIVATE_CONVERSATION}\n')
+        self.write_paginated_session([])
+        with closing(sqlite3.connect(self.codex_home / "state_5.sqlite")) as db, db:
+            db.execute("UPDATE threads SET rollout_path = ?, tokens_used = 0", (str(path),))
+        usage = self.command("session", "--provider", "codex", "--session-id", SESSION_ID, "--usage-only")
+        self.assertEqual(usage["usage"], {"tokens_used": 0, "thread_token_usage": {
+            "input_tokens": 200, "cached_input_tokens": 30, "cache_write_input_tokens": 0,
+            "output_tokens": 50, "reasoning_output_tokens": 15, "total_tokens": 250}})
+        self.assertEqual(usage["status"], "ok")
+        self.assertNotIn("messages", usage)
+        self.assertNotIn("PRIVATE_CONVERSATION", json.dumps(usage))
+        stop = self.text_command("hook-event", "--provider", "codex", input_text=json.dumps({
+            "hook_event_name": "Stop", "session_id": SESSION_ID, "cwd": "/tmp/demo"}))
+        self.assertEqual(json.loads(stop), {})
+        raw = (self.home / "data/usage/codex.json").read_text()
+        self.assertEqual(json.loads(raw)["sessions"][SESSION_ID]["usage"], usage["usage"])
+        self.assertNotIn("messages", raw)
+        self.assertNotIn("PRIVATE_CONVERSATION", raw)
+
+    def test_indexed_session_resumes_when_usage_is_degraded(self):
+        executable = self.fake_codex()
+        path = self.write_rollout([self.metadata(), {
+            "type": "token_usage_record", "timestamp": STAMP, "payload": {
+                "thread_id": SESSION_ID, "thread_token_usage": {"total_tokens": -1}}}])
+        self.write_paginated_session([])
+        with closing(sqlite3.connect(self.codex_home / "state_5.sqlite")) as db, db:
+            db.execute("UPDATE threads SET rollout_path = ?, cwd = ?", (str(path), str(self.home)))
+        metrics = self.command("metrics", "--provider", "codex")
+        session = metrics["providers"]["codex"]["sessions"][0]
+        self.assertEqual(session["status"], "degraded")
+        self.assertIn("Malformed Codex token usage records were skipped.", session["warnings"])
+        resumed = self.command("provider-launch", "--provider", "codex", "--folder", str(self.home),
+                               "--session-id", SESSION_ID, "--dry-run")
+        self.assertEqual(resumed["status"], "ok")
+        self.assertEqual(resumed["argv"], [executable, "resume", "--cd", str(self.home), "--", SESSION_ID])
+        unknown = self.failed_command("provider-launch", "--provider", "codex", "--folder", str(self.home),
+                                      "--session-id", "unknown-session", "--dry-run")
+        self.assertEqual(unknown["status"], "error")
+        self.assertEqual(unknown["argv"], [])
+        with closing(sqlite3.connect(self.codex_home / "state_5.sqlite")) as db, db:
+            db.execute("UPDATE threads SET cwd = ?", (b"invalid-folder",))
+        invalid = self.failed_command("provider-launch", "--provider", "codex", "--folder", str(self.home),
+                                      "--session-id", SESSION_ID, "--dry-run")
+        self.assertEqual(invalid["status"], "error")
+        self.assertEqual(invalid["argv"], [])
+
     def test_launch_plans_use_native_new_and_resume_arguments_without_inventing_identity(self):
         executable = self.fake_codex('exit 99')
         folder = self.home / "project with 'quotes'"

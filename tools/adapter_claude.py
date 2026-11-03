@@ -250,6 +250,26 @@ end run
     return result
 
 
+def hook_argv():
+    return [str(ROOT / 'bin/deskmate'), 'hook-event', '--provider', 'claude']
+
+
+def hooks_path():
+    return pathlib.Path.home() / '.claude/settings.json'
+
+
+def verification_hook(session_id, cwd):
+    """Resolve the installed native prompt hook and its verification payload."""
+    settings = json.loads(hooks_path().read_text(encoding='utf-8'))
+    for entry in settings.get('hooks', {}).get('UserPromptSubmit', []):
+        for hook in entry.get('hooks', []):
+            if owns_hook(hook) and shlex.split(hook['command']) == hook_argv():
+                return hook_argv(), {'hook_event_name': 'UserPromptSubmit',
+                                     'session_id': session_id, 'cwd': cwd,
+                                     'prompt': '/checkpoint integration verification'}
+    raise ValueError('Deskmate UserPromptSubmit hook is not installed.')
+
+
 def owns_hook(hook):
     if not isinstance(hook, dict) or hook.get('type') != 'command':
         return False
@@ -259,7 +279,7 @@ def owns_hook(hook):
         return False
     if command and pathlib.Path(command[0]).is_absolute():
         command[0] = str(pathlib.Path(command[0]).resolve())
-    return command in ([str(ROOT / 'bin/deskmate'), 'hook-event', '--provider', 'claude'],
+    return command in (hook_argv(),
                        [str(ROOT / 'tools/hook_log.sh')],
                        [str(ROOT / 'tools/hook_tokens.sh')])
 
@@ -267,7 +287,7 @@ def owns_hook(hook):
 def configure_hooks(remove: bool = False) -> dict:
     result = {'provider': 'claude', 'status': 'ok', 'warnings': [],
               'guidance': ['Claude discovers shared skills with native /skill syntax.']}
-    settings = pathlib.Path.home() / '.claude/settings.json'
+    settings = hooks_path()
     temporary = None
     try:
         settings.parent.mkdir(parents=True, exist_ok=True)
@@ -295,7 +315,7 @@ def configure_hooks(remove: bool = False) -> dict:
                 else:
                     hooks.pop(event)
             if not remove:
-                command = shlex.join([str(ROOT / 'bin/deskmate'), 'hook-event', '--provider', 'claude'])
+                command = shlex.join(hook_argv())
                 for event in ['UserPromptSubmit', 'PreToolUse', 'Stop']:
                     hook = {'type': 'command', 'command': command, 'timeout': 30 if event == 'Stop' else 10}
                     if event == 'Stop':

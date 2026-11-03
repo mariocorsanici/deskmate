@@ -6,13 +6,13 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** complete (live native skill invocation requires manual validation)
+**Implementation:** complete (native discovery, slash resolution and installed-hook delivery verified; authenticated full Daily loop remains ticket 14)
 
 - [x] The Claude adapter can discover Work sessions for a requested period.
 - [x] It can read usage information and bounded conversation data from synthetic Claude sessions.
 - [x] It can launch a new Work session and resume a Claude-owned Work session.
 - [x] Hook configuration merges Deskmate entries idempotently and preserves unrelated user configuration.
-- [ ] Claude continues to discover and invoke the portable skills with its native slash syntax.
+- [x] Claude continues to discover and invoke the portable skills with its native slash syntax.
 - [x] A Claude-only Daily loop works through the provider-neutral command.
 - [x] Adapter failures return structured errors without corrupting shared state.
 
@@ -43,3 +43,33 @@
   and native slash-command logging are verified, but live Claude discovery and
   invocation remain unchecked because no real Work session was launched.
 
+
+- 2026-11-03 review follow-up: Native `Claude Code 2.1.317` in normal print
+  mode discovered all five portable skills in both its `skills` and
+  `slash_commands` catalogs. Stream-json replay resolved `/study-later` and
+  `/checkpoint` into native command markup; an unknown slash name remained a raw
+  string. After actual `deskmate integration --provider claude`, native
+  `/checkpoint` delivered the installed `UserPromptSubmit` hook, creating a
+  Claude checkpoint row with the same session ID
+  `24060dd6-dced-4ef3-8739-d376198862eb` and project cwd as native output.
+  Evidence: `/private/tmp/deskmate-spec-run/native-claude-evidence.md`, with raw
+  environment, native output/debug, integration result and log under
+  `/private/tmp/deskmate-spec-run/native-claude-standard-5t0ead3m`.
+  HOME, CLAUDE_CONFIG_DIR, project and Deskmate data were disposable; the API key
+  was a synthetic dummy, the API URL was loopback, and calls ended in deliberate
+  connection failure with zero API time/tokens/cost. No real user configuration,
+  credentials or conversations were used. The earlier `--bare` evidence was
+  insufficient because reduced mode skips filesystem skill discovery; the normal
+  mode evidence supersedes that limitation. This closes native discovery,
+  invocation parsing/resolution and hook delivery only; authenticated execution
+  of skill instructions and the full Daily loop remain manual ticket 14 work.
+- 2026-11-03 review fix: Moved native hook configuration lookup, recognition and
+  verification payload construction into each Provider adapter under ADR 0001.
+  The common facade retains isolated execution and matching activity-row checks.
+  A public integration regression reproduced failure on an unrelated malformed
+  shell command before the fix and now verifies successful logging while
+  preserving that unrelated hook. Both Provider adapter suites passed (33 tests).
+
+- Final review-fix validation (2026-11-03): `python3 -Werror::ResourceWarning -m unittest discover -s tests -q` passed **104 tests, no skips** in 32.185s; `git diff --check` passed. All new regressions were observed RED before their fixes. No user data or protected Git operations were touched.
+
+- Final recheck after resume eligibility fix (2026-11-03), directly in `/private/tmp/deskmate-review-0406`: `python3 -Werror::ResourceWarning -m unittest discover -s tests -q` passed **105 tests, no skips** in 30.726s; `git diff --check` passed. Public coverage retains degraded analytics warnings while allowing valid indexed native resume and rejecting unknown/invalid metadata. Protected Git operations remain parent-owned.

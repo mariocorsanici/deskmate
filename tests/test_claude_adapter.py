@@ -187,6 +187,16 @@ class ClaudeAdapterTest(unittest.TestCase):
         self.assertEqual(verified['verification']['event'], 'checkpoint')
         self.assertFalse((self.home / 'data/log.csv').exists())
 
+    def test_verification_ignores_unrelated_hook_with_invalid_shell_command(self):
+        settings = self.home / '.claude/settings.json'
+        unrelated = {'type': 'command', 'command': "'"}
+        settings.write_text(json.dumps({'hooks': {'UserPromptSubmit': [
+            {'hooks': [unrelated]}]}}))
+        verified = self.record('integration', '--provider', 'claude', '--verify')
+        self.assertEqual(verified['verification']['status'], 'ok')
+        self.assertIn(unrelated, json.loads(settings.read_text())['hooks']['UserPromptSubmit'][0]['hooks'])
+        self.assertFalse((self.home / 'data/log.csv').exists())
+
     def test_usage_only_reports_native_counters_without_conversation(self):
         self.transcript([
             {'type': 'user', 'cwd': '/tmp/demo', 'timestamp': self.timestamp,

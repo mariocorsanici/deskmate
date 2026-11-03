@@ -76,6 +76,13 @@ class ActivityLogTest(unittest.TestCase):
                 self.assertIn('unsupported log schema 99', result.stderr)
                 self.assertEqual(self.log.read_bytes(), original)
                 self.assertFalse((self.data / 'log.csv.bak').exists())
+        result = self.cli('hook-event', '--provider', 'claude', payload={
+            'hook_event_name': 'Stop', 'session_id': 'same'})
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn('unsupported log schema 99', result.stderr)
+        self.assertEqual(self.log.read_bytes(), original)
+        self.assertFalse((self.data / '.log.lock').exists())
+        self.assertFalse((self.data / 'usage').exists())
 
     def write_claude_skill_session(self):
         for provider in ('claude', 'codex'):
@@ -146,6 +153,46 @@ class ActivityLogTest(unittest.TestCase):
         self.assertEqual(len(self.rows()), 2)
         self.assertEqual(self.rows()[0]['input_tokens'], '12')
         self.assertEqual(self.rows()[1]['input_tokens'], '')
+
+    def test_stop_skips_malformed_claude_records_and_keeps_valid_usage(self):
+        self.write_claude_skill_session()
+        transcript = self.home / '.claude/projects/demo/same.jsonl'
+        records = [
+            ['CANARY_PRIVATE_TRANSCRIPT'], None, 7,
+            {'type': 'assistant', 'message': ['CANARY_PRIVATE_TRANSCRIPT']},
+            {'type': 'assistant', 'timestamp': ['invalid'], 'message': {
+                'id': 'bad-time', 'usage': {'input_tokens': 900}}},
+            {'type': 'assistant', 'timestamp': 'invalid', 'message': {'usage': []}},
+            {'type': 'assistant', 'timestamp': '2026-10-30T10:00:02Z', 'message': {
+                'id': 'answer-2', 'content': [None, 4, {'type': 'tool_use', 'name': 'Skill',
+                    'input': []}, {'type': 'tool_use', 'name': 'Skill', 'input': {'skill': []}}],
+                'usage': {'input_tokens': 5, 'cache_creation_input_tokens': 'bad',
+                          'cache_read_input_tokens': -4, 'output_tokens': True}}},
+            {'type': 'assistant', 'timestamp': '2026-10-30T10:00:03Z', 'message': {
+                'id': ['unhashable'], 'content': {'unexpected': 'CANARY_PRIVATE_TRANSCRIPT'},
+                'usage': {'input_tokens': 2, 'output_tokens': 1}}},
+            {'type': 'assistant', 'timestamp': '2026-10-30T10:00:04Z', 'message': {
+                'id': 'bad-usage', 'usage': ['CANARY_PRIVATE_TRANSCRIPT']}},
+        ]
+        with transcript.open('a') as stream:
+            stream.write('\n'.join(json.dumps(record) for record in records) + '\n{invalid json\n')
+        result = self.cli('hook-event', '--provider', 'claude', payload={
+            'hook_event_name': 'Stop', 'session_id': 'same', 'cwd': '/tmp/demo'})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), {})
+        self.assertIn('warning', result.stderr.lower())
+        self.assertNotIn('Traceback', result.stderr)
+        self.assertNotIn('CANARY_PRIVATE_TRANSCRIPT', result.stdout + result.stderr + self.log.read_text())
+        claude, codex = self.rows()
+        self.assertEqual((claude['turns'], claude['input_tokens'], claude['cache_tokens'], claude['output_tokens']),
+                         ('3', '19', '20', '4'))
+        self.assertEqual(codex['input_tokens'], '')
+        raw = (self.data / 'usage/claude.json').read_text()
+        self.assertNotIn('CANARY_PRIVATE_TRANSCRIPT', raw)
+        self.assertNotIn('messages', raw)
+        usage = json.loads(raw)['sessions']['same']['usage']
+        self.assertEqual(usage['input_tokens'], 917)
+        self.assertEqual(usage['output_tokens'], 4)
 
     def test_claude_session_statistics_do_not_take_codex_resume_rating(self):
         for provider, rating in [('claude', '1'), ('codex', '3')]:

@@ -21,6 +21,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import activity_log
+from adapter_claude import timestamp
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
@@ -35,26 +36,69 @@ COMMAND = re.compile(r"^\s*(?:<command-message>[^<]*</command-message>\s*)?<comm
 def read_transcript(path):
     """Returns the commands run [(ts, name)] and the usage [(ts, input, cache, output)]."""
     commands, usage, seen = [], [], set()
-    for line in path.open(encoding="utf-8", errors="replace"):
-        try:
-            r = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        ts = r.get("timestamp")
-        msg = r.get("message") or {}
-        if r.get("type") == "user" and not r.get("isMeta") and isinstance(msg.get("content"), str):
-            m = COMMAND.match(msg["content"])
-            if m:
-                commands.append((ts, m.group(1).strip()))
-        if r.get("type") == "assistant" and isinstance(msg.get("content"), list):
-            # a skill started by Claude through the Skill tool, e.g. a command inside a sentence
-            commands += [(ts, b["input"]["skill"]) for b in msg["content"]
-                         if b.get("type") == "tool_use" and b.get("name") == "Skill" and b.get("input", {}).get("skill")]
-        if r.get("type") == "assistant" and msg.get("usage") and msg.get("id") not in seen:
-            seen.add(msg.get("id"))
-            u = msg["usage"]
-            usage.append((ts, u.get("input_tokens", 0) + u.get("cache_creation_input_tokens", 0),
-                          u.get("cache_read_input_tokens", 0), u.get("output_tokens", 0)))
+    malformed = False
+    with path.open(encoding="utf-8", errors="strict") as stream:
+        for line in stream:
+            try:
+                row = json.loads(line)
+            except ValueError:
+                malformed = True
+                continue
+            if not isinstance(row, dict):
+                malformed = True
+                continue
+            if row.get("type") not in ("user", "assistant"):
+                continue
+            msg = row.get("message")
+            ts = timestamp(row.get("timestamp"))
+            if not isinstance(msg, dict) or ts is None:
+                malformed = True
+                continue
+            content = msg.get("content")
+            if content is not None and not isinstance(content, (str, list)):
+                malformed = True
+            if row["type"] == "user" and not row.get("isMeta") and isinstance(content, str):
+                matched = COMMAND.match(content)
+                if matched:
+                    commands.append((ts, matched.group(1).strip()))
+            if row["type"] != "assistant":
+                continue
+            if isinstance(content, list):
+                for block in content:
+                    if not isinstance(block, dict):
+                        malformed = True
+                        continue
+                    if block.get("type") == "tool_use" and block.get("name") == "Skill":
+                        tool_input = block.get("input")
+                        skill = tool_input.get("skill") if isinstance(tool_input, dict) else None
+                        if isinstance(skill, str) and skill:
+                            commands.append((ts, skill))
+                        else:
+                            malformed = True
+            counters = msg.get("usage")
+            if counters is None:
+                continue
+            if not isinstance(counters, dict):
+                malformed = True
+                continue
+            identity = msg.get("id")
+            if isinstance(identity, str) and identity in seen:
+                continue
+            if not counters:
+                continue
+            if isinstance(identity, str):
+                seen.add(identity)
+            values = []
+            for key in ("input_tokens", "cache_creation_input_tokens",
+                        "cache_read_input_tokens", "output_tokens"):
+                value = counters.get(key, 0)
+                if type(value) is not int or value < 0:
+                    malformed = True
+                    value = 0
+                values.append(value)
+            usage.append((ts, values[0] + values[1], values[2], values[3]))
+    if malformed:
+        print('token usage: warning: malformed transcript fields were omitted.', file=sys.stderr)
     return commands, usage
 
 
@@ -62,7 +106,11 @@ def compute(session, rows):
     found = list(PROJECTS.glob(f"*/{session}.jsonl"))
     if not found:
         return
-    commands, usage = read_transcript(found[0])
+    try:
+        commands, usage = read_transcript(found[0])
+    except (OSError, UnicodeError):
+        print('token usage: warning: transcript unavailable; per-skill attribution skipped.', file=sys.stderr)
+        return
     used = set()
     for row in rows:
         # the k-th run of a skill in the log matches the k-th one in the transcript
@@ -72,7 +120,7 @@ def compute(session, rows):
             continue
         used.add(index)
         start = commands[index][0]
-        end = commands[index + 1][0] if index + 1 < len(commands) else "9999"
+        end = commands[index + 1][0] if index + 1 < len(commands) else float("inf")
         part = [u for u in usage if start <= u[0] < end]
         row["turns"] = str(len(part))
         for name, pos in (("input_tokens", 1), ("cache_tokens", 2), ("output_tokens", 3)):
