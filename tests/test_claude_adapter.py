@@ -1,0 +1,209 @@
+import datetime as dt
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+import unittest
+
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+
+
+class ClaudeAdapterTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.home = pathlib.Path(self.temporary.name)
+        self.projects = self.home / '.claude/projects/demo'
+        self.projects.mkdir(parents=True)
+        self.timestamp = dt.datetime.now(dt.timezone.utc).isoformat()
+        self.env = {**os.environ, 'HOME': str(self.home),
+                    'DESKMATE_DATA_DIR': str(self.home / 'data')}
+
+    def run_cli(self, *args, input_text=None):
+        result = subprocess.run([sys.executable, str(ROOT / 'bin/deskmate'), '--json', *args],
+                                env=self.env, capture_output=True, text=True, input=input_text)
+        envelope = json.loads(result.stdout)
+        self.assertNotIn('Traceback', envelope['stderr'])
+        return result.returncode, envelope
+
+    def record(self, *args):
+        code, envelope = self.run_cli(*args)
+        self.assertEqual(code, 0, envelope)
+        return json.loads(envelope['stdout'])
+
+    def transcript(self, records, session='native-123'):
+        path = self.projects / (session + '.jsonl')
+        path.write_text('\n'.join(json.dumps(record) for record in records) + '\n')
+        return path
+
+    def test_discovery_is_metadata_only_even_when_transcript_is_unreadable(self):
+        transcript = self.projects / 'native-123.jsonl'
+        transcript.mkdir()  # Opening this as a transcript would fail.
+        (self.projects / 'sessions-index.json').write_text(json.dumps({'entries': [{
+            'sessionId': 'native-123', 'projectPath': '/tmp/demo',
+            'created': self.timestamp, 'modified': self.timestamp,
+            'firstPrompt': 'CANARY conversation content must stay unread',
+        }]}))
+        records = self.record('sessions', '--provider', 'claude', '--since', '2020-01-01',
+                              '--messages', '0', '--format', 'json')
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]['id'], 'native-123')
+        self.assertEqual(records[0]['cwd'], '/tmp/demo')
+        self.assertEqual(records[0]['provider'], 'claude')
+        self.assertNotIn('messages', records[0])
+        self.assertNotIn('CANARY', json.dumps(records))
+
+    def test_session_reads_conversation_and_deduplicated_usage_despite_bad_rows(self):
+        path = self.transcript([
+            {'type': 'user', 'cwd': '/tmp/demo', 'timestamp': self.timestamp,
+             'message': {'content': 'Start the work'}},
+            {'type': 'assistant', 'timestamp': self.timestamp, 'message': {
+                'id': 'message-1', 'usage': {'input_tokens': 10, 'output_tokens': 4,
+                                          'cache_read_input_tokens': 3},
+                'content': [{'type': 'text', 'text': 'Ready'},
+                            {'type': 'tool_use', 'name': 'Bash', 'input': {'command': 'CANARY'}}]}},
+            {'type': 'assistant', 'timestamp': self.timestamp, 'message': {
+                'id': 'message-1', 'usage': {'input_tokens': 10, 'output_tokens': 4}}},
+            {'type': 'user', 'isMeta': True, 'message': {'content': 'CANARY metadata'}},
+            {'type': 'user', 'message': {'content': [{'type': 'tool_result', 'content': 'CANARY'}]}},
+            ['malformed'], {'type': 'user', 'message': None},
+        ])
+        with path.open('a') as handle:
+            handle.write('{invalid json\n')
+        session = self.record('session', '--provider', 'claude', '--session-id', 'native-123')
+        self.assertEqual([message['text'] for message in session['messages']], ['Start the work', 'Ready'])
+        self.assertEqual(session['usage']['input_tokens'], 10)
+        self.assertEqual(session['usage']['output_tokens'], 4)
+        self.assertEqual(session['usage']['cache_read_input_tokens'], 3)
+        self.assertEqual(session['status'], 'degraded')
+        self.assertTrue(session['warnings'])
+        self.assertNotIn('CANARY', json.dumps(session))
+
+    def test_bounded_sessions_and_missing_session_keep_daily_loop_available(self):
+        self.transcript([{'type': 'user', 'timestamp': self.timestamp,
+                          'message': {'content': text}} for text in ['first', 'second', 'third']])
+        records = self.record('sessions', '--provider', 'claude', '--messages', '2', '--cut', '3',
+                              '--format', 'json')
+        self.assertEqual([item['text'] for item in records[0]['messages']], ['sec', 'thi'])
+        missing = self.record('session', '--provider', 'claude', '--session-id', 'absent')
+        self.assertEqual(missing['status'], 'degraded')
+        self.assertEqual(missing['messages'], [])
+
+    def test_launch_plans_preserve_arguments_and_resume_native_identity(self):
+        prompt = 'Continue "quoted" $(touch CANARY) `touch CANARY`'
+        plan = self.record('provider-launch', '--provider', 'claude', '--folder', str(self.home),
+                           '--prompt', prompt, '--title', 'Demo', '--dry-run')
+        self.assertEqual(plan['argv'], ['claude', '--', prompt])
+        self.assertEqual(plan['mode'], 'new')
+        self.assertIsNone(plan['session_id'])
+        resume = self.record('provider-launch', '--provider', 'claude', '--folder', str(self.home),
+                             '--session-id', 'native-123', '--dry-run')
+        self.assertEqual(resume['argv'], ['claude', '--resume', 'native-123'])
+        self.assertEqual(resume['session_id'], 'native-123')
+        self.assertEqual(list(self.home.glob('CANARY')), [])
+
+    def test_native_launch_uses_safe_iterm_command_and_reports_failure(self):
+        binaries = self.home / 'bin'
+        binaries.mkdir()
+        output = self.home / 'captured.json'
+        fake = binaries / 'osascript'
+        fake.write_text(f'#!{sys.executable}\nimport json, pathlib, sys\n'
+                        f'pathlib.Path({str(output)!r}).write_text(json.dumps(sys.argv[1:]))\n'
+                        'sys.stdin.read()\n')
+        fake.chmod(0o755)
+        self.env['PATH'] = str(binaries)
+        prompt = 'a; touch CANARY $(touch CANARY)'
+        plan = self.record('provider-launch', '--provider', 'claude', '--folder', str(self.home),
+                           '--prompt', prompt, '--title', 'Demo')
+        command = json.loads(output.read_text())[-1]
+        self.assertIn("claude -- 'a; touch CANARY $(touch CANARY)'", command)
+        self.assertEqual(plan['status'], 'ok')
+        self.assertFalse((self.home / 'CANARY').exists())
+        fake.write_text('#!/bin/sh\nexit 7\n')
+        code, envelope = self.run_cli('provider-launch', '--provider', 'claude', '--folder', str(self.home))
+        self.assertNotEqual(code, 0)
+        self.assertEqual(json.loads(envelope['stdout'])['status'], 'error')
+
+    def test_integration_preserves_unrelated_hooks_and_installs_shared_slash_skills(self):
+        settings = self.home / '.claude/settings.json'
+        unrelated = {'type': 'command', 'command': 'echo keep deskmate hook-event'}
+        settings.write_text(json.dumps({'theme': 'dark', 'hooks': {'UserPromptSubmit': [{
+            'matcher': '', 'hooks': [unrelated, {'type': 'command',
+                                               'command': str(ROOT / 'tools/hook_log.sh')}]}]}}))
+        configured = self.record('integration', '--provider', 'claude')
+        self.assertEqual(configured['status'], 'ok')
+        first = settings.read_bytes()
+        self.record('integration', '--provider', 'claude')
+        self.assertEqual(settings.read_bytes(), first)
+        data = json.loads(first)
+        self.assertEqual(data['theme'], 'dark')
+        self.assertIn(unrelated, data['hooks']['UserPromptSubmit'][0]['hooks'])
+        hooks = [hook['command'] for entries in data['hooks'].values()
+                 for entry in entries for hook in entry['hooks']]
+        self.assertEqual(sum('hook-event --provider claude' in hook for hook in hooks), 3)
+        self.assertNotIn(str(ROOT / 'tools/hook_log.sh'), hooks)
+        for skill in ['checkpoint', 'whats-on-today', 'how-did-it-go', 'call-it-a-day', 'study-later']:
+            installed = self.home / '.claude/skills' / skill
+            self.assertTrue(installed.is_symlink())
+            self.assertEqual(installed.resolve(), ROOT / 'skills' / skill)
+            self.assertTrue((installed / 'SKILL.md').is_file())
+        self.record('integration', '--provider', 'claude', '--remove')
+        self.assertEqual(json.loads(settings.read_text()), {
+            'theme': 'dark', 'hooks': {'UserPromptSubmit': [{'matcher': '', 'hooks': [unrelated]}]}})
+        self.assertFalse((self.home / '.claude/skills/checkpoint').exists())
+
+    def test_integration_invalid_settings_fails_without_replacing_personal_data(self):
+        settings = self.home / '.claude/settings.json'
+        original = b'{broken'
+        settings.write_bytes(original)
+        code, envelope = self.run_cli('integration', '--provider', 'claude')
+        self.assertNotEqual(code, 0)
+        self.assertEqual(json.loads(envelope['stdout'])['status'], 'error')
+        self.assertEqual(settings.read_bytes(), original)
+        self.assertFalse((self.home / '.claude/skills').exists())
+
+    def test_integration_verifies_logging_with_isolated_synthetic_hook(self):
+        verified = self.record('integration', '--provider', 'claude', '--verify')
+        self.assertEqual(verified['verification']['status'], 'ok')
+        self.assertEqual(verified['verification']['provider'], 'claude')
+        self.assertEqual(verified['verification']['event'], 'checkpoint')
+        self.assertFalse((self.home / 'data/log.csv').exists())
+
+    def test_usage_only_reports_native_counters_without_conversation(self):
+        self.transcript([
+            {'type': 'user', 'cwd': '/tmp/demo', 'timestamp': self.timestamp,
+             'message': {'content': 'CANARY secret text'}},
+            {'type': 'assistant', 'timestamp': self.timestamp, 'message': {
+                'id': 'message-1', 'content': 'CANARY assistant text', 'usage': {
+                    'input_tokens': 10, 'cache_creation_input_tokens': 7,
+                    'cache_read_input_tokens': 3, 'output_tokens': 4}}},
+            {'type': 'assistant', 'message': {'id': 'message-1', 'usage': {'output_tokens': 4}}},
+            {'type': 'assistant', 'isSidechain': True, 'message': {
+                'id': 'subagent', 'usage': {'input_tokens': 999}}},
+        ])
+        usage = self.record('session', '--provider', 'claude', '--session-id', 'native-123', '--usage-only')
+        self.assertEqual(usage['usage'], {'input_tokens': 10, 'cache_creation_input_tokens': 7,
+                                         'cache_read_input_tokens': 3, 'output_tokens': 4, 'turns': 1})
+        self.assertEqual(usage['cwd'], '/tmp/demo')
+        self.assertNotIn('messages', usage)
+        self.assertNotIn('CANARY', json.dumps(usage))
+
+    def test_requested_period_uses_index_activity_instead_of_recent_file_copy(self):
+        self.transcript([], session='old-session')
+        self.transcript([], session='current-session')
+        (self.projects / 'sessions-index.json').write_text(json.dumps({'entries': [
+            {'sessionId': 'old-session', 'created': '2020-01-01T10:00:00Z',
+             'modified': '2020-01-01T11:00:00Z', 'projectPath': '/tmp/old'},
+            {'sessionId': 'current-session', 'created': self.timestamp,
+             'modified': self.timestamp, 'projectPath': '/tmp/current'},
+        ]}))
+        records = self.record('sessions', '--provider', 'claude', '--since', '2026-01-01',
+                              '--messages', '0', '--format', 'json')
+        self.assertEqual([record['id'] for record in records], ['current-session'])
+
+
+if __name__ == '__main__':
+    unittest.main()

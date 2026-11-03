@@ -14,3 +14,17 @@
 - [ ] A Claude-only Daily loop works through the provider-neutral command.
 - [ ] Adapter failures return structured errors without corrupting shared state.
 
+## Comments
+
+- 2026-11-03: Implemented the Claude adapter and shared `sessions`, `session`,
+  `provider-launch`, and `integration` command facade. Synthetic command-boundary
+  tests cover metadata-only indexed discovery, requested periods, safe malformed
+  transcript handling, usage-only reads, bounded conversation reads, launch plans,
+  iTerm quoting/failure, and idempotent hook/skill installation and removal.
+  `integration --verify` executes the installed prompt hook under disposable
+  HOME/data and validates a Claude checkpoint event without writing user logs.
+  A temporary runtime combining this ticket with ticket 06's current hook helper
+  passed **63 tests, no skips** (53 baseline plus 10 adapter scenarios). Final
+  acceptance remains open until ticket 06 is integrated and the full suite runs
+  directly from the worktree; no real native Work session has been launched.
+
