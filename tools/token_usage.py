@@ -17,6 +17,10 @@ import json
 import os
 import pathlib
 import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import activity_log
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
@@ -75,6 +79,29 @@ def compute(session, rows):
             row[name] = str(sum(u[pos] for u in part))
 
 
+def update_usage(session_id=None):
+    if not LOG.exists():
+        return 0
+    try:
+        with activity_log.locked() as log:
+            fields, rows, _ = activity_log.migrate_locked(log)
+            by_session = {}
+            for row in rows:
+                # Legacy run attribution is Claude-specific. Never inspect a Codex
+                # session just because its native ID matches a Claude ID.
+                if (row['provider'] == 'claude' and row.get('session')
+                        and not row['event'].endswith('-reminder')):
+                    by_session.setdefault(('claude', row['session']), []).append(row)
+            for (_, session), group in by_session.items():
+                if session_id in (None, session):
+                    compute(session, group)
+            activity_log.atomic_write(log, fields, rows)
+        return 0
+    except (ValueError, OSError, csv.Error) as error:
+        print(f'token usage: {error}', file=sys.stderr)
+        return 2
+
+
 def main():
     global PROJECTS
     p = argparse.ArgumentParser()
@@ -82,24 +109,8 @@ def main():
     p.add_argument("--projects", type=pathlib.Path, help="transcripts folder (for tests)")
     a = p.parse_args()
     PROJECTS = a.projects or PROJECTS
-    if not LOG.exists():
-        return
-    with (DATA / ".log.lock").open("w") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        with LOG.open(newline="") as f:
-            rows = list(csv.DictReader(f))
-        by_session = {}
-        for r in rows:
-            if r.get("session") and not r["event"].endswith("-reminder"):
-                by_session.setdefault(r["session"], []).append(r)
-        for session, group in by_session.items():
-            if a.session in (None, session):
-                compute(session, group)
-        with LOG.open("w", newline="") as f:
-            w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="ignore")
-            w.writeheader()
-            w.writerows({k: (r.get(k) or "") for k in COLUMNS} for r in rows)
+    return update_usage(a.session)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
