@@ -41,4 +41,15 @@ was made and no personal state was read or modified. Early smoke checks and full
 native Daily-loop acceptance remain pending by the owner's request to preserve
 Claude quota. Later Provider-switch confirmation/transfer remains ticket 09.
 
-Automated validation: `python3 -Werror::ResourceWarning -m unittest discover -s tests -q` passed **128 tests, no skips**, including 23 new public routing/lifecycle tests.
+Automated validation: `python3 -Werror::ResourceWarning -m unittest discover -s tests -q` passed **132 tests, no skips**, including 27 new public routing/lifecycle tests.
+
+Independent final review found three important regressions, each reproduced
+through the public command before fixing: late native identity after terminal
+failure was dropped, Claude's lossy legacy folder key permitted a wrong-folder
+resume, and focusing an existing Claude tab created an unconfirmable attempt.
+The fixes preserve late/uncertain launch evidence without claiming ownership,
+require trustworthy indexed Claude folder identity, and report focus with the
+existing native identity while preserving the card. Matching SessionEnd closes
+all attempts for that native session. Uncertain terminal submission is separately
+tested for both Providers. All four added regression scenarios were observed RED
+before the corresponding fixes. No Critical or Minor findings were reported.

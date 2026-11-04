@@ -377,11 +377,12 @@ end run
         completed = subprocess.run(["osascript", "-", command, title or pathlib.Path(result["cwd"]).name],
                                    input=script, capture_output=True, text=True, timeout=10, check=False)
         if completed.returncode:
-            result.update(status="error", warnings=["iTerm launch failed; check iTerm installation and terminal Automation permission."])
+            result.update(status="error", submission_uncertain=True, warnings=["iTerm launch failed; check iTerm installation and terminal Automation permission."])
         else:
             result["status"] = "launched"
-    except (OSError, subprocess.TimeoutExpired):
-        result.update(status="error", warnings=["iTerm launch could not be verified; check the terminal before retrying."])
+    except (OSError, subprocess.TimeoutExpired) as error:
+        result.update(status="error", submission_uncertain=isinstance(error, subprocess.TimeoutExpired),
+                      warnings=["iTerm launch could not be verified; check the terminal before retrying."])
     return result
 
 

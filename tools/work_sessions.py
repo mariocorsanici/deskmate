@@ -18,7 +18,7 @@ import providers
 
 NATIVE_ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9_-]*')
 LAUNCH_ID = re.compile(r'[a-f0-9]{32}')
-STATES = ('prepared', 'submitted', 'confirming', 'confirmed', 'failed', 'conflict')
+STATES = ('prepared', 'submitted', 'confirming', 'confirmed', 'failed', 'uncertain', 'conflict')
 
 
 def read_journal(card):
@@ -61,9 +61,15 @@ def save_journal(card, journal):
 
 
 def overlaps(journal):
-    return [{key: attempt[key] for key in ('launch_id', 'provider', 'state', 'native_session_id')}
-            for attempt in journal['attempts'] if not attempt['ended'] and (
-                attempt['state'] != 'failed' or attempt['native_session_id'] is not None)]
+    sessions = {}
+    for attempt in journal['attempts']:
+        if attempt['ended'] or (attempt['state'] == 'failed' and attempt['native_session_id'] is None):
+            continue
+        identity = ((attempt['provider'], attempt['native_session_id']) if attempt['native_session_id']
+                    else ('launch', attempt['launch_id']))
+        sessions[identity] = {key: attempt[key] for key in (
+            'launch_id', 'provider', 'state', 'native_session_id')}
+    return list(sessions.values())
 
 
 def implementation(provider):
@@ -104,7 +110,8 @@ def plan_session(folder: str, *, new: bool = False, provider: str | None = None)
         result.update(status='refused' if owned and not new else 'error',
                       reason='provider_unavailable', warnings=[detections[selected].reason])
     elif result['mode'] == 'resume' and not implementation(selected).resume_available(result['session_id'], str(project)):
-        result.update(status='refused', reason='session_unavailable')
+        result.update(status='refused', reason='session_unavailable',
+                      warnings=['Native Work session identity or canonical folder metadata could not be verified.'])
     return result
 
 
@@ -126,10 +133,10 @@ def confirm_ownership(card, legacy, journal, attempt):
 
 
 def record_native_event(provider: str, payload: dict, launch_id: str | None) -> dict | None:
-    if not isinstance(launch_id, str) or not LAUNCH_ID.fullmatch(launch_id):
-        return None
+    valid_token = isinstance(launch_id, str) and LAUNCH_ID.fullmatch(launch_id)
     event, session, folder = (payload.get(key) for key in ('hook_event_name', 'session_id', 'cwd'))
     if (event not in ('SessionStart', 'SessionEnd', 'UserPromptSubmit')
+            or (not valid_token and event != 'SessionEnd')
             or not isinstance(session, str) or not NATIVE_ID.fullmatch(session)
             or not isinstance(folder, str) or not Path(folder).is_absolute()):
         return None
@@ -139,6 +146,20 @@ def record_native_event(provider: str, payload: dict, launch_id: str | None) -> 
         return None
     # Unrelated native sessions must not create a project directory or lock.
     journal = read_journal(card)
+    if event == 'SessionEnd':
+        # Existing tabs never receive a fresh launch token when merely focused.
+        # Exact native identity can close liveness evidence, never claim ownership.
+        matching = lambda a: a['provider'] == provider and a['native_session_id'] == session
+        if not any(matching(a) for a in journal['attempts']):
+            return None
+        cards.read_card(card)
+        with cards.locked(card):
+            journal = read_journal(card)
+            matched = [a for a in journal['attempts'] if matching(a)]
+            for attempt in matched:
+                attempt['ended'] = True
+            save_journal(card, journal)
+            return matched[-1] if matched else None
     if not any(a['launch_id'] == launch_id for a in journal['attempts']):
         return None
     cards.read_card(card)
@@ -151,12 +172,13 @@ def record_native_event(provider: str, payload: dict, launch_id: str | None) -> 
             return None
         if attempt['native_session_id'] is not None and attempt['native_session_id'] != session:
             return None
-        if event == 'SessionEnd':
-            if attempt['native_session_id'] == session:
-                attempt['ended'] = True
-                save_journal(card, journal)
+        if attempt['state'] in ('failed', 'uncertain') and not attempt['ended']:
+            # An iTerm error/timeout need not mean the native process never ran.
+            # Retain later evidence for overlap checks without claiming ownership.
+            attempt['native_session_id'] = session
+            save_journal(card, journal)
             return attempt
-        if attempt['state'] in ('confirmed', 'failed', 'conflict') or attempt['ended']:
+        if attempt['state'] in ('confirmed', 'conflict') or attempt['ended']:
             return attempt
         attempt['native_session_id'] = session
         save_journal(card, journal)
@@ -190,10 +212,24 @@ def start_session(plan: dict, *, title: str | None = None, prompt: str | None = 
         journal = read_journal(card)
         attempt = next(a for a in journal['attempts'] if a['launch_id'] == launch_id)
         if native.get('status') == 'error':
-            attempt['state'] = 'failed'
+            uncertain = bool(native.get('submission_uncertain'))
+            attempt['state'] = 'uncertain' if uncertain else 'failed'
             save_journal(card, journal)
-            return {**result, 'status': 'error', 'reason': 'launch_failed',
+            return {**result, 'status': 'error', 'reason': 'launch_uncertain' if uncertain else 'launch_failed',
                     'launch_id': launch_id, 'warnings': native.get('warnings', [])}
+        if native.get('focused'):
+            # The adapter verified a running process and selected its existing
+            # tab. No new native process will receive this attempt's token.
+            _, metadata = cards.read_card(card)
+            same_owner = (metadata is not None and metadata['provider'] == plan['provider']
+                          and metadata['session_id'] == plan['session_id'])
+            attempt.update(state='confirmed' if same_owner else 'conflict',
+                           native_session_id=plan['session_id'])
+            save_journal(card, journal)
+            return {**result, 'status': 'focused' if same_owner else 'conflict',
+                    'reason': None if same_owner else 'Project card owner changed while focusing',
+                    'launch_id': launch_id, 'card_revision': metadata['revision'] if metadata else 0,
+                    'warnings': native.get('warnings', [])}
         attempt['state'] = 'submitted'
         save_journal(card, journal)
         confirm_ownership(card, legacy, journal, attempt)

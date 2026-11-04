@@ -3,6 +3,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -207,7 +208,7 @@ class WorkSessionsTest(unittest.TestCase):
     def test_launch_failure_preserves_owner(self):
         card = self.card()
         before = card.read_bytes()
-        self.executable('osascript', 'import sys\nsys.exit(7)\n')
+        (self.binaries / 'osascript').unlink()  # Definite failure to start the terminal helper.
         result = self.route('--new', '--provider', 'codex', code=1)
         self.assertEqual(result['status'], 'error')
         self.assertEqual(card.read_bytes(), before)
@@ -290,7 +291,7 @@ class WorkSessionsTest(unittest.TestCase):
         result = self.route('--new', '--provider', 'codex', code=1)
         self.assertEqual(card.read_bytes(), before)
         record = json.loads(self.journal().read_text())['attempts'][-1]
-        self.assertEqual(record['state'], 'failed')
+        self.assertEqual(record['state'], 'uncertain')
         self.assertEqual(record['native_session_id'], 'native-codex')
         self.assertTrue(self.route('--new', '--provider', 'claude', '--dry-run')['possible_overlap'])
 
@@ -411,6 +412,71 @@ class WorkSessionsTest(unittest.TestCase):
             before = self.tree()
             self.route('--new', code=2)
             self.assertEqual(self.tree(), before)
+
+    def test_late_native_hook_after_launch_error_retains_overlap_without_ownership(self):
+        card = self.card()
+        before = card.read_bytes()
+        self.executable('osascript', 'import sys\nsys.exit(7)\n')
+        attempt = self.route('--new', '--provider', 'codex', code=1)
+        self.hook(attempt['launch_id'])
+        record = json.loads(self.journal().read_text())['attempts'][-1]
+        self.assertEqual(record['state'], 'uncertain')
+        self.assertEqual(record['native_session_id'], 'new-native-456')
+        self.assertEqual(card.read_bytes(), before)
+        self.assertTrue(self.route('--new', '--dry-run')['possible_overlap'])
+        self.hook(attempt['launch_id'], event='SessionEnd')
+        self.assertFalse(self.route('--new', '--dry-run')['possible_overlap'])
+        self.assertEqual(card.read_bytes(), before)
+
+    def test_claude_legacy_folder_encoding_cannot_prove_session_ownership(self):
+        self.project = self.home / 'a-b'
+        self.project.mkdir()
+        other = self.home / 'a_b'
+        other.mkdir()
+        encoded = re.sub(r'[^a-zA-Z0-9]', '-', str(other.resolve()))
+        self.assertEqual(encoded, re.sub(r'[^a-zA-Z0-9]', '-', str(self.project.resolve())))
+        native = self.home / '.claude/projects' / encoded / 'native-123.jsonl'
+        native.parent.mkdir(parents=True)
+        native.write_text(json.dumps({'type': 'user', 'cwd': str(other.resolve()),
+                                      'message': {'content': 'PRIVATE synthetic content'}}) + '\n')
+        self.card('claude')
+        before = self.tree()
+        result = self.route('--dry-run', code=4)
+        self.assertEqual(result['reason'], 'session_unavailable')
+        self.assertEqual(self.tree(), before)
+
+    def test_focus_confirms_existing_identity_without_changing_owner_or_phantom_launch(self):
+        card = self.card('claude')
+        before = card.read_bytes()
+        self.native('claude')
+        self.executable('ps', "print('999 ttys777 claude --resume native-123')\n")
+        self.executable('osascript', "print('focused')\n")
+        for _ in range(2):
+            result = self.route()
+            self.assertEqual(result['status'], 'focused')
+            self.assertEqual(result['session_id'], 'native-123')
+            self.assertEqual(card.read_bytes(), before)
+        attempts = json.loads(self.journal().read_text())['attempts']
+        self.assertTrue(all(a['state'] == 'confirmed' and a['native_session_id'] == 'native-123'
+                            for a in attempts))
+        self.assertEqual(len(self.route('--dry-run')['possible_overlap']), 1)
+        # The existing process never received the new correlation IDs.
+        self.hook_payload(self.env, 'claude', 'native-123', 'SessionEnd', self.project, 0)
+        self.assertFalse(self.route('--dry-run')['possible_overlap'])
+        self.assertTrue(all(a['ended'] for a in json.loads(self.journal().read_text())['attempts']))
+        self.assertEqual(card.read_bytes(), before)
+
+    def test_terminal_submission_error_keeps_uncertain_overlap_even_without_hooks(self):
+        card = self.card()
+        before = card.read_bytes()
+        self.executable('osascript', 'import sys\nsys.exit(7)\n')
+        for provider in ('claude', 'codex'):
+            result = self.route('--new', '--provider', provider, code=1)
+            self.assertEqual(result['reason'], 'launch_uncertain')
+            self.assertEqual(card.read_bytes(), before)
+        attempts = json.loads(self.journal().read_text())['attempts']
+        self.assertTrue(all(a['state'] == 'uncertain' for a in attempts))
+        self.assertEqual(len(self.route('--new', '--dry-run')['possible_overlap']), 2)
 
 
 if __name__ == '__main__':

@@ -17,9 +17,9 @@ Tickets **01–07 are complete** on the integration branch:
 
 The 01–06 automated suite passed **105 tests**, with no skips and Python `ResourceWarning`s treated as errors. Independent Standards and Spec reviews found no remaining material issues. Claude’s native skill discovery and hook delivery were also verified in a disposable configuration with a synthetic API key; no model request was made.
 
-Ticket 07 validation passed **128 tests**, including 23 new routing/lifecycle cases, with no skips and ResourceWarnings as errors.
+Ticket 07 validation passed **132 tests**, including 27 new routing/lifecycle cases, with no skips and ResourceWarnings as errors.
 
-Tickets **08–14 have not started**. Ticket 07 adds isolated public-command tests for routing, journal concurrency, early/late hooks and ownership recovery. The feature branch is local and has not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
+Tickets **08–14 have not started**. Independent ticket 07 review identified three important issues; public regressions verified their fixes (late launch evidence, legacy Claude folder-key collision, and existing-tab focus). Ticket 07 adds isolated public-command tests for routing, journal concurrency, early/late hooks and ownership recovery. The feature branch is local and has not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
 
 ## Early manual checks
 

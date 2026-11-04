@@ -34,7 +34,9 @@ Skills call the stable `bin/deskmate` command for Checks, session summaries, sta
 ## Work session routing
 
 `bin/deskmate work-session --folder /path/to/project` continues a Project with
-its recorded Provider and native Work session. Without an owned Work session,
+its recorded Provider and native Work session. Claude routing requires trustworthy
+native index metadata: an indexless transcript filename cannot prove folder
+identity, because legacy folder encoding can collide. Without an owned Work session,
 it starts with the configured Default provider. Add `--dry-run` to inspect the
 decision without opening a terminal or changing state; prefix the command with
 `--json` for a structured result inside the standard command envelope.
@@ -56,13 +58,20 @@ started. A new session therefore remains `pending` until a matching native
 SessionStart or first UserPromptSubmit hook reports its actual ID. Review/trust
 Deskmate hooks normally, and rerun `integration --provider claude` or
 `integration --provider codex` when installing the lifecycle hooks. Personal
-hook commands and matcher groups are preserved. Failed submission leaves the
+hook commands and matcher groups are preserved. Focusing an already-open Claude
+tab reports `focused`, preserves the card and records the existing identity; it
+does not wait for a new launch token. Failed submission leaves the
 Project card unchanged. Confirmed ownership updates preserve the card's Markdown
 and reject stale revisions rather than overwriting a newer Checkpoint.
 
 Per-project `work-sessions.json` journals retain launch attempts and possible
 overlap for later switch handling; they contain identity/status metadata, never
-prompts or transcript contents. `--dry-run` reports current attempt evidence.
+prompts or transcript contents. Terminal timeouts/nonzero submission outcomes
+remain `uncertain` until clarified; inspect the terminal before retrying. A late
+native hook retains identity evidence without changing ownership after a failed
+or uncertain submission. SessionEnd closes evidence for the matching Provider,
+native ID and canonical folder, including repeated focus attempts. It never
+changes ownership. `--dry-run` reports current attempt evidence.
 An attempt with `state: conflict` requires rereading the latest card and choosing
 how to continue. Interrupted confirmation can retry through the same correlated
 native hook, including a confirming write whose card was already published.

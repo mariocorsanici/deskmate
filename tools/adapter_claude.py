@@ -195,10 +195,9 @@ def resume_available(session_id: str, folder: str | None = None) -> bool:
             continue
     if matches:
         return len(matches) == 1 and (folder is None or matches[0] == pathlib.Path(folder).resolve())
-    if folder is None:
-        return len(list(projects().glob(f'*/{session_id}.jsonl'))) == 1
-    key = re.sub(r'[^a-zA-Z0-9]', '-', str(pathlib.Path(folder).resolve()))
-    return (projects() / key / (session_id + '.jsonl')).is_file()
+    # Native folder-key encoding is lossy (a-b and a_b can share a key).
+    # Without trusted index metadata, filenames cannot prove project identity.
+    return False
 
 
 def launch(folder: str, session_id: str | None = None, prompt: str | None = None,
@@ -211,6 +210,7 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
     result = {'provider': 'claude', 'mode': 'resume' if session_id else 'new',
               'argv': argv, 'cwd': folder, 'session_id': session_id,
               'status': 'ok', 'warnings': []}
+    terminal_submission = False
     try:
         if not pathlib.Path(folder).is_dir():
             raise ValueError('Project folder does not exist.')
@@ -268,11 +268,13 @@ end run
 ''', capture_output=True, text=True, timeout=10, check=True)
                 if focused.stdout.strip() != 'focused':
                     raise ValueError('Claude session is already running outside a reachable iTerm tab; close it before resuming.')
+                result['focused'] = True
                 result['warnings'].append('Existing Work session tab brought to front.')
                 return result
         command = ("printf '\\033]0;%s\\007' " + shlex.quote(title) + '; cd ' +
                    shlex.quote(folder) + ' && CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1 ' +
                    shlex.join([*context, *argv]))
+        terminal_submission = True
         subprocess.run(['osascript', '-', command], input='''on run argv
 tell application "iTerm"
 activate
@@ -286,6 +288,7 @@ end run
 ''', capture_output=True, text=True, timeout=10, check=True)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         result['status'] = 'error'
+        result['submission_uncertain'] = terminal_submission and isinstance(error, subprocess.SubprocessError)
         result['warnings'].append(f'Claude launch failed: {error}')
     return result
 

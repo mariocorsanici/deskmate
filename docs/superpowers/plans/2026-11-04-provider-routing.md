@@ -75,7 +75,7 @@ Human output states resume/new/pending/refused/error and explains recovery. JSON
 - [x] Run the focused tests and observe the expected missing-correlation failures.
 - [x] Wire token delivery, lifecycle hooks and native confirmation. Preserve personal configuration, explicit approval/trust instructions, and hook JSON output. Report pending native confirmation separately from launch submission. Include launch-attempt history in structured results where it identifies possible overlap; leave actual switch confirmation to ticket 09.
 - [x] Run `python3 -Werror::ResourceWarning -m unittest discover -s tests -q` and `git diff --check`. Expected: all tests pass, no skips introduced, no whitespace errors. Tests must use fake executables and isolated HOME/CODEX_HOME/data only.
-- [ ] Review the complete ticket diff against its seven acceptance criteria and the five Review Focus cases. Fix concrete gaps and rerun the affected checks.
+- [x] Review the complete ticket diff against its seven acceptance criteria and the five Review Focus cases. Fix concrete gaps and rerun the affected checks.
 - [x] Document command examples and recovery/pending outcomes; mark ticket implementation complete with actual automated evidence. Update the progress note to distinguish 01–07 completion from 08–14 remaining work, and record manual checks as postponed rather than passed.
 - [x] Commit the final ticket boundary if authorized; do not push or merge unless separately within the active task scope.
 
@@ -96,3 +96,23 @@ macOS temporary paths may spell the same location through /var or /private/var;
 assertions compare resolved identities, consistent with Project identity rules.
 
 Final task verification before independent review: 128 tests passed, no skips, ResourceWarnings as errors.
+
+Independent review of `75199f4..92d5341` found three Important issues and no
+Critical/Minor findings. Fix pass:
+
+- `test_late_native_hook_after_launch_error_retains_overlap_without_ownership`:
+  RED (lost native identity), then GREEN; preserve evidence without ownership.
+- `test_claude_legacy_folder_encoding_cannot_prove_session_ownership`:
+  RED (wrong folder accepted), then GREEN; require trusted native index metadata.
+- `test_focus_confirms_existing_identity_without_changing_owner_or_phantom_launch`:
+  RED (permanent pending focus), then GREEN; truthful focus and lifecycle identity.
+- `test_terminal_submission_error_keeps_uncertain_overlap_even_without_hooks`:
+  RED (definite-failure report for ambiguous submission), then GREEN for both
+  Providers; distinguish uncertain terminal outcome from failure to invoke it.
+
+Review scope rulings: authenticated native launch/resume, trust and storage
+compatibility remain unproven pending the owner's postponed manual checks.
+Context transfer, actual Provider-switch confirmation and skill migration remain
+later tickets; this ticket does not complete the 14-ticket feature. No deferred
+Minor findings. Final full-suite evidence is recorded in the ticket and progress
+note; no second reviewer pass was required after regression-tested fixes.
