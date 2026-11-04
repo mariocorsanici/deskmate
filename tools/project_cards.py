@@ -187,6 +187,33 @@ def write(card: Path, legacy: Path, args) -> int:
     return 0
 
 
+class RevisionConflict(ValueError):
+    """A pending launch cannot replace a newer Project card."""
+
+
+def claim_ownership_locked(card: Path, legacy: Path, expected_revision: int,
+                           provider: str, session_id: str, *, recovering=False):
+    """Update ownership only. The caller must hold this project's card lock."""
+    current, metadata = read_card(card)
+    revision = metadata['revision'] if metadata else 0
+    # A durable confirming journal entry permits retry after card publication.
+    if (recovering and metadata and revision == expected_revision + 1
+            and metadata['provider'] == provider and metadata['session_id'] == session_id):
+        ensure_link(legacy, card)
+        return metadata
+    if revision != expected_revision:
+        raise RevisionConflict(f'revision conflict: current revision is {revision}')
+    replacement = dict(schema_version=1, revision=revision + 1, provider=provider, session_id=session_id)
+    validate(replacement)
+    if legacy_kind(legacy, card) == 'regular':
+        raise ValueError('Legacy Project card requires migration')
+    if current is None:
+        current = '# Project card\n\n## Status\nWork session started; no Checkpoint recorded yet.\n\n## Checks\n'
+    atomic_write(card, render(current, replacement).encode('utf-8'))
+    ensure_link(legacy, card)
+    return replacement
+
+
 def backup(raw: bytes, key: str):
     path = data_root() / 'backups/project-cards' / key / (hashlib.sha256(raw).hexdigest() + '.md')
     path.parent.mkdir(parents=True, exist_ok=True)

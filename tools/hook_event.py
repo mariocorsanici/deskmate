@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 from pathlib import Path
 import re
 import sys
@@ -50,6 +51,9 @@ def handle(provider, payload):
     elif event in ('SessionStart', 'SessionEnd'):
         activity_log.append_event('session-start' if event == 'SessionStart' else 'session-end',
                                   '', session, cwd, provider)
+    if event in ('SessionStart', 'SessionEnd', 'UserPromptSubmit'):
+        import work_sessions
+        work_sessions.record_native_event(provider, payload, os.environ.get('DESKMATE_LAUNCH_ID'))
 
 
 def main():

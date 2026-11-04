@@ -202,7 +202,8 @@ def resume_available(session_id: str, folder: str | None = None) -> bool:
 
 
 def launch(folder: str, session_id: str | None = None, prompt: str | None = None,
-           dry_run: bool = False, title: str | None = None) -> dict:
+           dry_run: bool = False, title: str | None = None,
+           launch_id: str | None = None) -> dict:
     folder = str(pathlib.Path(folder).expanduser().resolve())
     argv = ['claude', '--resume', session_id] if session_id else ['claude']
     if prompt is not None:

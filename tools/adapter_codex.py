@@ -319,7 +319,8 @@ def resume_available(session_id, folder: str | None = None):
 
 
 def launch(folder: str, session_id: str | None = None, prompt: str | None = None,
-           dry_run: bool = False, title: str | None = None) -> dict:
+           dry_run: bool = False, title: str | None = None,
+           launch_id: str | None = None) -> dict:
     result = {"provider": "codex", "mode": "resume" if session_id else "new", "argv": [],
               "cwd": str(pathlib.Path(folder).expanduser().resolve()),
               "session_id": session_id, "status": "ok", "warnings": []}

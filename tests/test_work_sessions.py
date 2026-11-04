@@ -96,6 +96,26 @@ class WorkSessionsTest(unittest.TestCase):
         return {str(p.relative_to(self.data)): p.read_bytes()
                 for p in self.data.rglob('*') if p.is_file()}
 
+    def card_path(self):
+        return Path(self.command('card', 'locate', self.project)['path'])
+
+    def journal(self):
+        return self.card_path().with_name('work-sessions.json')
+
+    def hook(self, launch_id, provider='codex', session='new-native-456',
+             event='SessionStart', folder=None, code=0):
+        environment = {**self.env, 'DESKMATE_LAUNCH_ID': launch_id}
+        return self.hook_payload(environment, provider, session, event, folder, code)
+
+    def hook_payload(self, environment, provider, session, event, folder, code):
+        rc, envelope = self.cli('hook-event', '--provider', provider, env=environment,
+                               payload={'hook_event_name': event, 'session_id': session,
+                                        'cwd': str(folder or self.project), 'prompt': 'harmless turn'})
+        self.assertEqual(rc, code, envelope)
+        if code == 0:
+            self.assertEqual(json.loads(envelope['stdout']), {})
+        return envelope
+
     def test_recorded_provider_overrides_default(self):
         for provider, default in (('claude', 'codex'), ('codex', 'claude')):
             with self.subTest(provider=provider):
@@ -161,6 +181,59 @@ class WorkSessionsTest(unittest.TestCase):
             before = self.tree()
             self.route('--dry-run', code=2)
             self.assertEqual(self.tree(), before)
+
+    def test_launch_failure_preserves_owner(self):
+        card = self.card()
+        before = card.read_bytes()
+        self.executable('osascript', 'import sys\nsys.exit(7)\n')
+        result = self.route('--new', '--provider', 'codex', code=1)
+        self.assertEqual(result['status'], 'error')
+        self.assertEqual(card.read_bytes(), before)
+        attempts = json.loads(self.journal().read_text())['attempts']
+        self.assertEqual(attempts[-1]['state'], 'failed')
+
+    def test_submitted_new_session_has_no_invented_id(self):
+        result = self.route()
+        self.assertEqual(result['status'], 'pending')
+        self.assertIsNone(result['session_id'])
+        self.assertTrue(result['launch_id'])
+        self.assertFalse(self.card_path().exists())
+        attempts = json.loads(self.journal().read_text())['attempts']
+        self.assertEqual(attempts[-1]['state'], 'submitted')
+        self.assertIsNone(attempts[-1]['native_session_id'])
+
+    def test_stale_confirmation_preserves_checkpoint(self):
+        card = self.card()
+        attempt = self.route('--new', '--provider', 'codex')
+        self.card('claude', 'newer-checkpoint', revision=1)
+        newer = card.read_bytes()
+        self.hook(attempt['launch_id'])
+        self.assertEqual(card.read_bytes(), newer)
+        attempts = json.loads(self.journal().read_text())['attempts']
+        self.assertEqual(attempts[-1]['state'], 'conflict')
+
+    def test_competing_attempts_remain_visible(self):
+        first = self.route()
+        second = self.route('--new', '--provider', 'claude')
+        self.assertNotEqual(first['launch_id'], second['launch_id'])
+        self.assertTrue(second['possible_overlap'])
+        self.hook(first['launch_id'])
+        owner = self.card_path().read_bytes()
+        self.hook(second['launch_id'], provider='claude')
+        self.assertEqual(self.card_path().read_bytes(), owner)
+        attempts = json.loads(self.journal().read_text())['attempts']
+        self.assertEqual([a['state'] for a in attempts], ['confirmed', 'conflict'])
+
+    def test_future_journal_schema_stops_before_launch(self):
+        journal = self.journal()
+        journal.parent.mkdir(parents=True)
+        journal.write_text('{"schema_version":9,"attempts":[]}')
+        capture = self.home / 'terminal-called'
+        self.executable('osascript', 'from pathlib import Path\nPath(' + repr(str(capture)) + ').touch()\n')
+        before = self.tree()
+        self.route(code=2)
+        self.assertEqual(self.tree(), before)
+        self.assertFalse(capture.exists())
 
 
 if __name__ == '__main__':
