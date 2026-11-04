@@ -31,6 +31,46 @@ Writers submit a complete UTF-8 document with `bin/deskmate card write <project-
 
 Skills call the stable `bin/deskmate` command for Checks, session summaries, statistics, logging and session launch rather than depending on the individual tools that implement them.
 
+## Work session routing
+
+`bin/deskmate work-session --folder /path/to/project` continues a Project with
+its recorded Provider and native Work session. Without an owned Work session,
+it starts with the configured Default provider. Add `--dry-run` to inspect the
+decision without opening a terminal or changing state; prefix the command with
+`--json` for a structured result inside the standard command envelope.
+
+If the recorded Provider or session is unavailable, the command refuses to
+silently choose a replacement (exit 4). Make a deliberate new-session choice:
+
+```bash
+bin/deskmate work-session --folder /path/to/project --new --provider codex
+```
+
+`--provider` requires `--new`; it cannot turn a resume into a Provider switch.
+`--title` and `--prompt` supply optional terminal and initial-message text.
+This starts a new native Work session; the context-transfer and switch preview
+flow remains work for later tickets.
+
+Opening an iTerm tab submits a command; it does not prove that the native CLI
+started. A new session therefore remains `pending` until a matching native
+SessionStart or first UserPromptSubmit hook reports its actual ID. Review/trust
+Deskmate hooks normally, and rerun `integration --provider claude` or
+`integration --provider codex` when installing the lifecycle hooks. Personal
+hook commands and matcher groups are preserved. Failed submission leaves the
+Project card unchanged. Confirmed ownership updates preserve the card's Markdown
+and reject stale revisions rather than overwriting a newer Checkpoint.
+
+Per-project `work-sessions.json` journals retain launch attempts and possible
+overlap for later switch handling; they contain identity/status metadata, never
+prompts or transcript contents. `--dry-run` reports current attempt evidence.
+An attempt with `state: conflict` requires rereading the latest card and choosing
+how to continue. Interrupted confirmation can retry through the same correlated
+native hook, including a confirming write whose card was already published.
+Unknown future schemas stop before launch or durable changes. Other failure
+codes are 1 (unavailable Provider/terminal launch), 2 (invalid configuration/input)
+and 3 (card revision conflict). Existing low-level launch commands remain during
+the ongoing skill/installer migration.
+
 ## Experiments
 
 `data/config.json` can hold a running experiment on the way of working, which the skills remind you of every morning. Today there is one, `experiments.fresh_sessions`: is it better to resume yesterday's session (`claude --resume`) or to start a new one that picks up from the project card? On the weekdays in `new_days`, `/whats-on-today` opens a new session (`open_tab.sh --new`), on the others it resumes; `/checkpoint` asks how the restart went (1–3); `tools/session_stats.py` measures each session-day from the transcripts (context at the first answer, tokens, compactions) and `/how-did-it-go` proposes a decision once both modes have `target_days` days.

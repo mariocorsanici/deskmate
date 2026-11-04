@@ -1,22 +1,25 @@
 # Provider-neutral CLI — progress and early manual checks
 
-Updated: 2026-11-03  
-Integration branch: `feature/codex-cli-support`  
-Last implementation commit: `f2a7066` (`fix: harden provider hooks, usage and session resume`)
+Updated: 2026-11-04
+Integration branch: `feature/codex-cli-support`
+Latest work: ticket 07, recorded-provider routing and confirmed native ownership (2026-11-04).
 
 ## Progress
 
-Tickets **01–06 are complete** on the integration branch:
+Tickets **01–07 are complete** on the integration branch:
 
 - 01–02: provider-neutral CLI and provider detection/configuration.
 - 03: shared Project cards with revision checks and safe Claude migration.
 - 04: Claude adapter, skill discovery, hooks, sessions and launch/resume.
 - 05: Codex adapter, native skill metadata, hooks, sessions and launch/resume.
 - 06: provider-aware logs, migrations and separate usage metrics.
+- 07: recorded-provider routing, explicit lost-session recovery and revision-safe native ownership confirmation.
 
-The final automated suite passed **105 tests**, with no skips and Python `ResourceWarning`s treated as errors. Independent Standards and Spec reviews found no remaining material issues. Claude’s native skill discovery and hook delivery were also verified in a disposable configuration with a synthetic API key; no model request was made.
+The 01–06 automated suite passed **105 tests**, with no skips and Python `ResourceWarning`s treated as errors. Independent Standards and Spec reviews found no remaining material issues. Claude’s native skill discovery and hook delivery were also verified in a disposable configuration with a synthetic API key; no model request was made.
 
-Tickets **07–14 have not started**. The feature branch is local and has not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
+Ticket 07 validation passed **128 tests**, including 23 new routing/lifecycle cases, with no skips and ResourceWarnings as errors.
+
+Tickets **08–14 have not started**. Ticket 07 adds isolated public-command tests for routing, journal concurrency, early/late hooks and ownership recovery. The feature branch is local and has not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
 
 ## Early manual checks
 
@@ -50,4 +53,4 @@ Run a short, ordinary turn in each provider, then allow the normal stop hook to 
 
 Record the date, provider/CLI versions, test project path, commands used, observed log/card result, and any blocked or failed check. Remove only the disposable project and test data after confirming the paths; retain evidence without credentials or transcript contents. Report failures before continuing with tickets 07–13, since those tickets depend on the adapters, shared cards and usage data tested here.
 
-No manual checks above have been run yet. Automated tests and the prior isolated Claude discovery/hook probe are not substitutes for these user-account manual checks.
+No manual checks above have been run yet. On 2026-11-04 the owner explicitly postponed them to preserve Claude token quota; continue synthetic implementation/testing without making native model requests. Automated tests and the prior isolated Claude discovery/hook probe are not substitutes for these user-account manual checks.

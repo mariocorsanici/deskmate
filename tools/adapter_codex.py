@@ -345,9 +345,18 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
     if prompt is not None:
         argv.append(prompt)
     result["argv"] = argv
+    context = []
+    if launch_id is not None:
+        if not re.fullmatch(r'[a-f0-9]{32}', launch_id):
+            raise ValueError('Invalid Deskmate launch identity')
+        context = ['/usr/bin/env', 'DESKMATE_LAUNCH_ID=' + launch_id,
+                   'DESKMATE_DATA_DIR=' + str(pathlib.Path(os.environ.get(
+                       'DESKMATE_DATA_DIR', ROOT / 'data')).expanduser().resolve())]
+        if 'CODEX_HOME' in os.environ:
+            context.append('CODEX_HOME=' + str(pathlib.Path(os.environ['CODEX_HOME']).expanduser().resolve()))
     if dry_run:
         return result
-    command = "cd -- " + shlex.quote(result["cwd"]) + " && exec " + shlex.join(argv)
+    command = "cd -- " + shlex.quote(result["cwd"]) + " && exec " + shlex.join([*context, *argv])
     script = '''on run argv
     set launchCommand to item 1 of argv
     set tabTitle to item 2 of argv

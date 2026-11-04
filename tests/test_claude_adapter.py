@@ -152,12 +152,13 @@ class ClaudeAdapterTest(unittest.TestCase):
         self.assertEqual(settings.read_bytes(), first)
         data = json.loads(first)
         self.assertEqual(data['theme'], 'dark')
-        self.assertEqual(data['hooks']['SessionStart'], [])
-        self.assertEqual(data['hooks']['SessionEnd'], [{'hooks': [], 'matcher': 'untouched'}])
+        self.assertEqual(len(data['hooks']['SessionStart']), 1)
+        self.assertEqual(data['hooks']['SessionEnd'][0], {'hooks': [], 'matcher': 'untouched'})
+        self.assertEqual(len(data['hooks']['SessionEnd']), 2)
         self.assertIn(unrelated, data['hooks']['UserPromptSubmit'][0]['hooks'])
         hooks = [hook['command'] for entries in data['hooks'].values()
                  for entry in entries for hook in entry['hooks']]
-        self.assertEqual(sum('hook-event --provider claude' in hook for hook in hooks), 3)
+        self.assertEqual(sum('hook-event --provider claude' in hook for hook in hooks), 5)
         self.assertNotIn(str(ROOT / 'tools/hook_log.sh'), hooks)
         for skill in ['checkpoint', 'whats-on-today', 'how-did-it-go', 'call-it-a-day', 'study-later']:
             installed = self.home / '.claude/skills' / skill
@@ -166,7 +167,7 @@ class ClaudeAdapterTest(unittest.TestCase):
             self.assertTrue((installed / 'SKILL.md').is_file())
         self.record('integration', '--provider', 'claude', '--remove')
         self.assertEqual(json.loads(settings.read_text()), {
-            'theme': 'dark', 'hooks': {'SessionStart': [], 'SessionEnd': [{'hooks': [], 'matcher': 'untouched'}],
+            'theme': 'dark', 'hooks': {'SessionEnd': [{'hooks': [], 'matcher': 'untouched'}],
                                      'UserPromptSubmit': [{'matcher': '', 'hooks': [unrelated]}]}})
         self.assertFalse((self.home / '.claude/skills/checkpoint').exists())
 

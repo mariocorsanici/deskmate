@@ -1,9 +1,8 @@
 """Routing acceptance through the public command, with no native model calls."""
-from contextlib import closing
 import json
+from concurrent.futures import ThreadPoolExecutor
 import os
 from pathlib import Path
-import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -115,6 +114,29 @@ class WorkSessionsTest(unittest.TestCase):
         if code == 0:
             self.assertEqual(json.loads(envelope['stdout']), {})
         return envelope
+
+    def simulated_native(self, provider, *, fail_after=False, native_id=None):
+        """Execute only a fake native CLI; its hook may beat terminal submission."""
+        card = str(self.card_path())
+        hook_command = [sys.executable, str(ROOT / 'bin/deskmate'), 'hook-event', '--provider', provider]
+        body = ("import json,os,subprocess,sys\nfrom pathlib import Path\n"
+                "if '--version' in sys.argv:\n    print('" + provider + " 1.0.0'); sys.exit(0)\n"
+                "token=os.environ.get('DESKMATE_LAUNCH_ID')\n"
+                "if not token: sys.exit('Missing launch correlation')\n"
+                "card=Path(" + repr(card) + ")\n"
+                "before=card.read_bytes() if card.exists() else None\n"
+                "payload={'hook_event_name':'SessionStart','session_id':" + repr(native_id or 'native-' + provider) + ",'cwd':os.getcwd()}\n"
+                "result=subprocess.run(" + repr(hook_command) + ",input=json.dumps(payload),capture_output=True,text=True)\n"
+                "assert result.returncode == 0, result.stderr\n"
+                "assert (card.read_bytes() if card.exists() else None) == before, 'Premature ownership commit'\n"
+                "Path(os.environ['HOME'],'fake-native.json').write_text(json.dumps({'token':token,'argv':sys.argv[1:],"
+                "'data':os.environ.get('DESKMATE_DATA_DIR'),'codex_home':os.environ.get('CODEX_HOME')}))\n")
+        self.executable(provider, body)
+        self.executable('osascript',
+                        "import subprocess,sys\n"
+                        "result=subprocess.run(['/bin/zsh','-c',sys.argv[2]],capture_output=True,text=True)\n"
+                        "sys.stderr.write(result.stderr)\n"
+                        "sys.exit(" + ('7' if fail_after else 'result.returncode') + ")\n")
 
     def test_recorded_provider_overrides_default(self):
         for provider, default in (('claude', 'codex'), ('codex', 'claude')):
@@ -234,6 +256,161 @@ class WorkSessionsTest(unittest.TestCase):
         self.route(code=2)
         self.assertEqual(self.tree(), before)
         self.assertFalse(capture.exists())
+
+    def test_confirmed_native_identity_updates_owner(self):
+        card = self.card()
+        body = card.read_text().split('---\n', 2)[-1]
+        for provider in ('codex', 'claude'):
+            attempt = self.route('--new', '--provider', provider)
+            self.hook(attempt['launch_id'], provider=provider, session='native-' + provider)
+            metadata = self.command('card', 'locate', self.project)['metadata']
+            self.assertEqual((metadata['provider'], metadata['session_id']), (provider, 'native-' + provider))
+            self.assertEqual(card.read_text().split('---\n', 2)[-1], body)
+            self.assertIn('name: keep-me', card.read_text())
+
+    def test_early_hook_waits_for_successful_submission(self):
+        card = self.card()
+        for provider in ('claude', 'codex'):
+            with self.subTest(provider=provider):
+                self.simulated_native(provider)
+                result = self.route('--new', '--provider', provider)
+                self.assertEqual(result['status'], 'confirmed')
+                self.assertEqual(result['session_id'], 'native-' + provider)
+                evidence = json.loads((self.home / 'fake-native.json').read_text())
+                self.assertEqual(evidence['token'], result['launch_id'])
+                self.assertEqual(Path(evidence['data']).resolve(), self.data.resolve())
+                self.assertEqual(Path(evidence['codex_home']).resolve(), Path(self.env['CODEX_HOME']).resolve())
+                owner = self.command('card', 'locate', self.project)['metadata']
+                self.assertEqual(owner['session_id'], 'native-' + provider)
+
+    def test_early_hook_followed_by_launch_failure_keeps_old_owner(self):
+        card = self.card()
+        before = card.read_bytes()
+        self.simulated_native('codex', fail_after=True)
+        result = self.route('--new', '--provider', 'codex', code=1)
+        self.assertEqual(card.read_bytes(), before)
+        record = json.loads(self.journal().read_text())['attempts'][-1]
+        self.assertEqual(record['state'], 'failed')
+        self.assertEqual(record['native_session_id'], 'native-codex')
+        self.assertTrue(self.route('--new', '--provider', 'claude', '--dry-run')['possible_overlap'])
+
+    def test_unrelated_and_duplicate_hooks_cannot_steal_owner(self):
+        card = self.card()
+        attempt = self.route('--new', '--provider', 'codex')
+        before = card.read_bytes()
+        for token, provider, session, folder in (
+                ('0' * 32, 'codex', 'new-native-456', self.project),
+                (attempt['launch_id'], 'claude', 'new-native-456', self.project),
+                (attempt['launch_id'], 'codex', '--bad', self.project),
+                (attempt['launch_id'], 'codex', 'new-native-456', self.home)):
+            self.hook(token, provider=provider, session=session, folder=folder)
+            self.assertEqual(card.read_bytes(), before)
+        self.hook(attempt['launch_id'], event='UserPromptSubmit')
+        confirmed = card.read_bytes()
+        self.hook(attempt['launch_id'])
+        self.hook(attempt['launch_id'], session='different-session')
+        self.assertEqual(card.read_bytes(), confirmed)
+        self.card('claude', 'newer-owner', revision=2)
+        newer = card.read_bytes()
+        self.hook(attempt['launch_id'])
+        self.assertEqual(card.read_bytes(), newer)
+
+    def test_missing_hooks_leave_pending_status(self):
+        result = self.route()
+        code, text = self.cli('work-session', '--folder', self.project, '--new', human=True)
+        self.assertEqual(code, 0)
+        self.assertEqual(result['status'], 'pending')
+        self.assertIn('pending', text)
+        self.assertIn('hook', text)
+        self.assertFalse(self.card_path().exists())
+
+    def test_session_end_preserves_attempt_history(self):
+        attempt = self.route()
+        self.hook(attempt['launch_id'])
+        self.hook(attempt['launch_id'], event='SessionEnd')
+        record = json.loads(self.journal().read_text())['attempts'][-1]
+        self.assertTrue(record['ended'])
+        self.assertEqual(record['native_session_id'], 'new-native-456')
+        self.assertEqual(record['state'], 'confirmed')
+        self.assertFalse(self.route('--new', '--dry-run')['possible_overlap'])
+
+    def test_launch_context_preserves_literal_arguments(self):
+        self.project = self.home / "Folder ' with $literal and `text`"
+        self.project.mkdir()
+        self.data = self.home / "Data ' $literal"
+        self.env['DESKMATE_DATA_DIR'] = str(self.data)
+        self.env['CODEX_HOME'] = str(self.home / "Codex ' $literal")
+        self.configure()
+        prompt = "Continue $checkpoint; $(touch UNWANTED) `touch UNWANTED`"
+        for provider in ('claude', 'codex'):
+            self.simulated_native(provider)
+            result = self.route('--new', '--provider', provider, '--title', 'A " title', '--prompt', prompt)
+            self.assertEqual(result['status'], 'confirmed')
+            evidence = json.loads((self.home / 'fake-native.json').read_text())
+            self.assertEqual(evidence['argv'][-1], prompt)
+            self.assertEqual(Path(evidence['data']).resolve(), self.data.resolve())
+            self.assertFalse((self.project / 'UNWANTED').exists())
+
+    def test_invalid_title_and_environment_dry_run_leave_state_untouched(self):
+        before = self.tree()
+        self.route('--title', 'bad\ntitle', code=2)
+        self.assertEqual(self.tree(), before)
+        self.route(env={**self.env, 'DESKMATE_DRY_RUN': '1'})
+        self.assertEqual(self.tree(), before)
+
+    def test_recorded_resume_confirms_same_native_identity(self):
+        revision = 0
+        for provider in ('claude', 'codex'):
+            self.configure('codex' if provider == 'claude' else 'claude')
+            self.card(provider, revision=revision)
+            self.native(provider)
+            self.simulated_native(provider, native_id='native-123')
+            result = self.route()
+            self.assertEqual((result['mode'], result['provider'], result['status']),
+                             ('resume', provider, 'confirmed'))
+            self.assertEqual(result['session_id'], 'native-123')
+            evidence = json.loads((self.home / 'fake-native.json').read_text())
+            expected = ['--resume', 'native-123'] if provider == 'claude' else [
+                'resume', '--cd', str(self.project.resolve()), '--', 'native-123']
+            self.assertEqual(evidence['argv'], expected)
+            revision = result['card_revision']
+
+    def test_confirmation_recovers_partial_publication(self):
+        self.card()
+        attempt = self.route('--new', '--provider', 'codex')
+        journal = json.loads(self.journal().read_text())
+        journal['attempts'][-1].update(state='confirming', native_session_id='new-native-456')
+        self.journal().write_text(json.dumps(journal))
+        card = self.card('codex', 'new-native-456', revision=1)
+        before = card.read_bytes()
+        self.hook(attempt['launch_id'])
+        self.assertEqual(card.read_bytes(), before)
+        self.assertEqual(json.loads(self.journal().read_text())['attempts'][-1]['state'], 'confirmed')
+
+    def test_concurrent_launches_keep_both_attempts_and_one_owner(self):
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            first, second = list(pool.map(lambda _: self.route(), range(2)))
+        self.assertNotEqual(first['launch_id'], second['launch_id'])
+        self.assertEqual(len(json.loads(self.journal().read_text())['attempts']), 2)
+        self.hook(first['launch_id'], session='first-native')
+        self.hook(second['launch_id'], session='second-native')
+        owner = self.command('card', 'locate', self.project)['metadata']
+        self.assertEqual(owner['session_id'], 'first-native')
+        states = [a['state'] for a in json.loads(self.journal().read_text())['attempts']]
+        self.assertCountEqual(states, ['confirmed', 'conflict'])
+
+    def test_invalid_journal_record_fails_without_launch(self):
+        attempt = self.route()
+        path = self.journal()
+        original = json.loads(path.read_text())
+        for changes in ({'provider': []}, {'state': 'future-state'}, {'native_session_id': {}},
+                        {'requested_session_id': 'bad'}, {'expected_revision': True}):
+            journal = json.loads(json.dumps(original))
+            journal['attempts'][-1].update(changes)
+            path.write_text(json.dumps(journal))
+            before = self.tree()
+            self.route('--new', code=2)
+            self.assertEqual(self.tree(), before)
 
 
 if __name__ == '__main__':

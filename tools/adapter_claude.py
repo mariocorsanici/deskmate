@@ -221,6 +221,15 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
             raise ValueError('Terminal title must not contain control characters.')
         if any('\0' in argument for argument in argv):
             raise ValueError('Launch arguments must not contain NUL.')
+        context = []
+        if launch_id is not None:
+            if not re.fullmatch(r'[a-f0-9]{32}', launch_id):
+                raise ValueError('Invalid Deskmate launch identity')
+            context = ['/usr/bin/env', 'DESKMATE_LAUNCH_ID=' + launch_id,
+                       'DESKMATE_DATA_DIR=' + str(pathlib.Path(os.environ.get(
+                           'DESKMATE_DATA_DIR', ROOT / 'data')).expanduser().resolve())]
+            if 'CODEX_HOME' in os.environ:
+                context.append('CODEX_HOME=' + str(pathlib.Path(os.environ['CODEX_HOME']).expanduser().resolve()))
         if dry_run or os.environ.get('DESKMATE_DRY_RUN'):
             return result
         if session_id:
@@ -263,7 +272,7 @@ end run
                 return result
         command = ("printf '\\033]0;%s\\007' " + shlex.quote(title) + '; cd ' +
                    shlex.quote(folder) + ' && CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1 ' +
-                   shlex.join(argv))
+                   shlex.join([*context, *argv]))
         subprocess.run(['osascript', '-', command], input='''on run argv
 tell application "iTerm"
 activate
@@ -317,7 +326,8 @@ def owns_hook(hook):
 
 def configure_hooks(remove: bool = False) -> dict:
     result = {'provider': 'claude', 'status': 'ok', 'warnings': [],
-              'guidance': ['Claude discovers shared skills with native /skill syntax.']}
+              'guidance': ['Claude discovers shared skills with native /skill syntax.',
+                           'Review normal project trust and hook approvals. Native lifecycle hooks confirm Work session ownership; unconfirmed launches stay pending.']}
     settings = hooks_path()
     temporary = None
     try:
@@ -347,7 +357,7 @@ def configure_hooks(remove: bool = False) -> dict:
                     hooks.pop(event)
             if not remove:
                 command = shlex.join(hook_argv())
-                for event in ['UserPromptSubmit', 'PreToolUse', 'Stop']:
+                for event in ['SessionStart', 'SessionEnd', 'UserPromptSubmit', 'PreToolUse', 'Stop']:
                     hook = {'type': 'command', 'command': command, 'timeout': 30 if event == 'Stop' else 10}
                     if event == 'Stop':
                         hook['async'] = True

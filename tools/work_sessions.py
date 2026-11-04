@@ -236,6 +236,8 @@ def main():
     parser.add_argument('--format', choices=('text', 'json'), default='text')
     args = parser.parse_args()
     try:
+        if args.title and any(ord(c) < 32 or ord(c) == 127 for c in args.title):
+            raise ValueError('Work session title must not contain control characters')
         result = plan_session(args.folder, new=args.new, provider=args.provider)
         if not (args.dry_run or os.environ.get('DESKMATE_DRY_RUN')) and result['status'] == 'ok':
             result = start_session(result, title=args.title, prompt=args.prompt)
