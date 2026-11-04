@@ -171,6 +171,36 @@ def _read_transcript(session_id: str, *, include_messages: bool) -> dict:
     return session
 
 
+def resume_available(session_id: str, folder: str | None = None) -> bool:
+    """Read native identity metadata only, independently of transcript analytics."""
+    if not isinstance(session_id, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', session_id):
+        return False
+    matches = []
+    for index in projects().glob('*/sessions-index.json'):
+        try:
+            data = json.loads(index.read_text(encoding='utf-8'))
+            entries = data.get('entries', []) if isinstance(data, dict) else []
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                if not isinstance(entry, dict) or entry.get('isSidechain') or entry.get('sessionId') != session_id:
+                    continue
+                cwd = entry.get('projectPath')
+                if not isinstance(cwd, str) or not pathlib.Path(cwd).is_absolute():
+                    return False
+                if not (index.parent / (session_id + '.jsonl')).is_file():
+                    return False
+                matches.append(pathlib.Path(cwd).resolve())
+        except (OSError, UnicodeError, ValueError):
+            continue
+    if matches:
+        return len(matches) == 1 and (folder is None or matches[0] == pathlib.Path(folder).resolve())
+    if folder is None:
+        return len(list(projects().glob(f'*/{session_id}.jsonl'))) == 1
+    key = re.sub(r'[^a-zA-Z0-9]', '-', str(pathlib.Path(folder).resolve()))
+    return (projects() / key / (session_id + '.jsonl')).is_file()
+
+
 def launch(folder: str, session_id: str | None = None, prompt: str | None = None,
            dry_run: bool = False, title: str | None = None) -> dict:
     folder = str(pathlib.Path(folder).expanduser().resolve())

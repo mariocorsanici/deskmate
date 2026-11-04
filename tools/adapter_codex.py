@@ -295,7 +295,7 @@ def read_paginated(session):
     return session
 
 
-def resume_available(session_id):
+def resume_available(session_id, folder: str | None = None):
     """Native identity and folder metadata determine resume, independently of analytics."""
     if not isinstance(session_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", session_id):
         return False
@@ -306,11 +306,15 @@ def resume_available(session_id):
     if rows:
         metadata = rows[0]
         return (metadata["id"] == session_id and isinstance(metadata["cwd"], str)
-                and bool(metadata["cwd"].strip()))
+                and bool(metadata["cwd"].strip())
+                and (folder is None or (pathlib.Path(metadata["cwd"]).is_absolute()
+                     and pathlib.Path(metadata["cwd"]).resolve() == pathlib.Path(folder).resolve())))
     for path in rollouts():
         metadata = read_rollout(path)
         if metadata["id"] == session_id:
-            return isinstance(metadata["cwd"], str) and bool(metadata["cwd"].strip())
+            return (isinstance(metadata["cwd"], str) and bool(metadata["cwd"].strip())
+                    and (folder is None or (pathlib.Path(metadata["cwd"]).is_absolute()
+                         and pathlib.Path(metadata["cwd"]).resolve() == pathlib.Path(folder).resolve())))
     return False
 
 
