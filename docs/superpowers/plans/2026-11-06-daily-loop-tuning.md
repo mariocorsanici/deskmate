@@ -84,7 +84,7 @@
 - [x] Verify the complete ready-ticket test suite and documented local Git scenarios; inspect every acceptance item in tickets 01–04.
 - [x] Keep tickets 05–07 unchanged and record their pending retrospective decision.
 - [x] Report automated evidence separately from instruction/document review; do not claim an authenticated Daily loop was exercised.
-- [ ] Publish completed ticket checkpoints using the feature branch when workspace controls permit. Do not merge into `develop` or `main`: integration remains dependent on the Codex effort.
+- [x] Publish completed ticket checkpoints using the feature branch when workspace controls permit. Do not merge into `develop` or `main`: integration remains dependent on the Codex effort.
 
 ## Execution choice
 
@@ -108,3 +108,5 @@ confirmed/ready and ticket 08 (morning login check) has been added; none of thes
 newly ready tickets is implemented by this approved 01–04 execution. References
 to their pending triage above describe the original approved-plan snapshot.
 The required Codex-before-develop integration order remains unchanged.
+
+Publication verified: `feature/daily-loop-tuning` contains `1fbd3e3`, including the concurrent remote specifications. No develop/main merge was performed.
