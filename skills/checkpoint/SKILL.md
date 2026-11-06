@@ -34,10 +34,15 @@ Run inside a project's work session, when you stop working on it (at the end of 
 
    ```markdown
    ## Checks
-   - branch: `git -C ~/Dev/domyn-dev/vlm-demo-builder status -sb | head -1`
+   - local branch and uncommitted files: `git -C ~/Dev/domyn-dev/vlm-demo-builder status --short --branch`
+   - remote ticket: `git -C ~/Dev/domyn-dev/vlm-demo-builder show origin/develop:.scratch/example/issues/01-example.md | grep -m1 Status`
    - PR #40: `gh pr view 40 -R igeniusai/vlm-demo-builder --json state -q .state`
    - advrob01: `ssh -o ConnectTimeout=5 -o BatchMode=yes advrob01-ubuntu true`
    ```
+
+   File-reading checks for shared tickets, specifications and completed work read the **remote integration/default branch**, with `git -C <repo> show <remote>/<branch>:<path>`, after the central fetch in `check.py`. Choose the branch from the card or repository configuration; `origin/develop` above is an example, not a default for every project. A fetch refreshes refs, not working-tree files. Keep working-tree reads only for local state (uncommitted files, local branches or unpublished work), and label each check `remote` or `local` so its meaning is clear. Shell-quote paths containing spaces; use `$HOME` outside quotes or expand `~` before quoting.
+
+   If fetching fails or the remote ref/path is missing, report remote freshness/state as unavailable. A successful read of an older cached ref does not establish current remote state; preserve that limitation in the card and report.
 
    Only commands that change nothing: no fetch with side effects beyond refs, no writes, no Slack. Run `python3 -I ~/Dev/mc_dev/deskmate/tools/check.py <card>` to confirm they work, and fix the ones that fail for the wrong reason.
 

@@ -18,13 +18,13 @@ Fetch only updates remote-tracking refs: local branches and files are untouched.
 """
 import pathlib
 import re
+import shlex
 import subprocess
 import sys
 
 PROJECTS = pathlib.Path.home() / ".claude" / "projects"
 CHECK = re.compile(r"^- (.+?): `(.+)`\s*$")
 STATE = re.compile(r"^- \*\*State:\*\*\s*(\w+)", re.M)
-GIT_DIR = re.compile(r"git -C (\S+)")
 FETCH = "GIT_SSH_COMMAND='ssh -o BatchMode=yes -o ConnectTimeout=8' git -C {} fetch --quiet"
 TIMEOUT = 15
 
@@ -48,6 +48,20 @@ def run(command):
     return ("ok" if r.returncode == 0 else f"exit {r.returncode}"), (out[0] if out else "")
 
 
+def repositories(command):
+    """Read literal git -C folders, including shell-quoted paths with spaces."""
+    try:
+        lexer = shlex.shlex(command, posix=True, punctuation_chars=True)
+        lexer.whitespace_split = True
+        lexer.commenters = ""
+        tokens = list(lexer)
+    except ValueError:
+        return []
+    return [str(pathlib.Path(tokens[i + 2]).expanduser())
+            for i in range(len(tokens) - 2)
+            if tokens[i:i + 2] == ["git", "-C"]]
+
+
 def main():
     args = [a for a in sys.argv[1:] if a != "--all"]
     cards = [pathlib.Path(a).expanduser() for a in args] or sorted(PROJECTS.glob("*/memory/project-card.md"))
@@ -67,10 +81,10 @@ def main():
         checks = [c for c in checks if c]
         if not checks:
             print("   (no checks in the card)")
-        for repo in dict.fromkeys(GIT_DIR.findall("\n".join(c.group(2) for c in checks))):
+        for repo in dict.fromkeys(repo for c in checks for repo in repositories(c.group(2))):
             if repo not in fetched:
                 fetched.add(repo)
-                result, first = run(FETCH.format(repo))
+                result, first = run(FETCH.format(shlex.quote(repo)))
                 print(f"   fetch {repo}: {result}" + (f"  {first[:160]}" if first else ""))
         for c in checks:
             result, first = run(c.group(2))
