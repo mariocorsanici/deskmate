@@ -22,6 +22,7 @@ import unicodedata
 
 DATA = Path(__file__).resolve().parent.parent / 'data'
 SEP = ' · '
+LINE_BREAKS = '\r\n\v\f\x1c\x1d\x1e\x85\u2028\u2029'
 WORDS = {
     'en': {'days': 'Days', 'tasks': 'Tasks', 'day': 'day', 'morning': 'morning',
            'afternoon': 'afternoon', 'when': 'when', 'due': 'due', 'done': 'done',
@@ -61,7 +62,7 @@ def cli_date(value):
 
 
 def description(value):
-    if not value.strip() or SEP in value or any(c in value for c in '\r\n\x85\u2028\u2029'):
+    if not value.strip() or SEP in value or any(c in value for c in LINE_BREAKS):
         raise argparse.ArgumentTypeError('use a non-empty, single-line description without " · "')
     return value.strip()
 

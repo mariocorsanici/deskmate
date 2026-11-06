@@ -17,3 +17,5 @@ Implement `tools/agenda.py` as in the spec ("File format", "Deterministic handli
 Verification: `python3 -I -B -m unittest discover -s tests -v` — 35 tests pass, including 20 concurrent initial additions, lock blocking, exact CRLF/binary preservation and archive boundaries. The same suite was observed failing before the CLI existed. No installed personal data was accessed.
 
 Compatibility verification: macOS system Python 3.9.6 initially failed on evaluated union annotations. Deferred annotations fix that startup error; the complete 39-test suite now passes on both Python 3.9.6 and 3.14.6.
+
+Final review: one separator-validation issue fixed after observing its regression fail in all ten affected add/day cases. Complete suites pass 40/40 on Python 3.9.6 and 3.14.6; both shell files pass individual syntax checks. See `../verification.md` for the review evidence and scope decisions.

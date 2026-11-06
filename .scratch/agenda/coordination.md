@@ -70,3 +70,7 @@ Coprire formato italiano e inglese, file mancante o danneggiato, preservazione
 dei byte non modificati, ambiguita delle ricerche, giorni sovrapposti, finestre
 in giorni lavorativi, archiviazione e scritture concorrenti. Aggiornare il
 ticket 01 solo con risultati effettivamente verificati.
+
+## Esito
+
+Ticket 01–05 implementati e verificati, con commit distinti per le integrazioni condivise. Ticket 06 ancora bloccato dai prerequisiti daily-loop. Revisione indipendente completata; unico problema materiale corretto con regressione RED→GREEN. Suite finale: 40/40 su Python 3.9.6 e 3.14.6. Dettagli in [verification.md](verification.md). Branch e worktree conservati per integrazione successiva.

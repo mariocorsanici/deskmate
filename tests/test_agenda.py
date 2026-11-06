@@ -203,6 +203,17 @@ class AgendaCLI(unittest.TestCase):
                 self.run_cli('add', description, rc=1)
                 self.assertEqual(self.path.read_bytes(), before)
 
+    def test_all_line_separators_rejected_before_add_or_day(self):
+        before = b'# Agenda\n## Days\n## Tasks\n- [ ] Existing\n'
+        for separator in ['\n', '\r', '\r\n', '\v', '\f', '\x1c', '\x1d', '\x1e', '\x85', '\u2028', '\u2029']:
+            text = 'Report' + separator + '- [ ] Injected'
+            for args in [('add', text, '--due', '2026-11-06'),
+                         ('day', '2026-11-06', 'day', text)]:
+                with self.subTest(separator=repr(separator), command=args[0]):
+                    self.seed(before)
+                    self.run_cli(*args, rc=1)
+                    self.assertEqual(self.path.read_bytes(), before)
+
     def test_invalid_metadata_and_dates_are_not_silently_parsed_as_descriptions(self):
         invalid = ['- [ ] Task · due: tomorrow', '- [ ] Task · when: 2026-02-30',
                    '- [ ] Task · due: 2026-11-06 · when: 2026-11-05',
