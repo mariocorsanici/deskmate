@@ -8,11 +8,19 @@ Claude Code skills to run your working day: open it in the morning, close it in 
 |---|---|---|
 | morning (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day, lists the commands you can use and opens the sessions in titled iTerm tabs |
 | during the day | `/study-later <topic>` | notes a topic to study later |
+| anytime | `/agenda <what>` | records non-development days and tasks, closes completed tasks; without arguments, shows the agenda |
 | end of each work session | `/checkpoint` | writes where the project stands in its project card |
 | Mon, Wed, Fri before closing | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md` |
 | evening (reminder) | `/call-it-a-day` | collects the project cards, checks the live state and writes `data/handoff.md` for tomorrow |
 
 After closing: study the topics you set aside, or admin work.
+
+`/agenda` keeps travel, office days and non-code tasks in `data/agenda.md`.
+Dates are optional references, and tasks stay open until explicitly closed.
+For example, `/agenda giovedì trasferta Monfalcone` reserves next Thursday;
+`/agenda nota spese novembre` saves an undated task; `/agenda fatto nota spese`
+closes it. Replies follow the configured language. See the [agenda reference](docs/agenda.md)
+for the command output, date interpretation and archive rules.
 
 ## Project cards
 
@@ -79,6 +87,7 @@ skills/                  the skills of the day
 .claude/skills/setup/    /setup, available when running claude inside the repo
 tools/
   sessions.py            summary of the Claude Code sessions in a period
+  agenda.py              locked reads, writes and archiving of non-development days and tasks
   log_event.sh           appends a row to the log
   token_usage.py         computes the tokens of each run from the transcripts
   hook_log.sh            UserPromptSubmit hook
@@ -100,4 +109,6 @@ data/                    personal files, not in git
 - `handoff.md`: state of the sessions and things to do, rewritten every evening; the previous version goes to `archive/`.
 - `lessons.md`: log of the retrospectives, with the running method experiments.
 - `study-later.md`: topics to study.
+- `agenda.md`: non-development days and tasks, managed through `tools/agenda.py`; the installer creates it only if absent.
+- `archive/agenda-YYYY-MM.md`: past non-development days and completed agenda tasks.
 - `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens`. A run lasts from its command to the next `/command` of the same session, or to the end of the session: for clean numbers, run the skills in a dedicated session or finish with `/clear`.
