@@ -10,3 +10,4 @@ Fixed weekdays (Mon/Wed/Fri) did not hold on busy weeks and ignore travel days. 
 - [ ] `/how-did-it-go` keeps each section to at most three points.
 
 ## Comments
+- 2026-11-06 (Claude, for Mario): `feature/agenda` adds `tools/agenda.py is-dev-day`. This ticket stays log-based; ticket 06 of `.scratch/agenda/` will make it skip non-development days once both branches are on `develop`.

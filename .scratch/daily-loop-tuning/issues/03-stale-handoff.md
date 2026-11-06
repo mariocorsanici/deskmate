@@ -9,3 +9,4 @@ Today's step 1 only checks whether the handoff is from the previous working day.
 - [ ] In that case "Where you are" items are reported from the checks and ticket 02's list; the handoff is used only for intent ("To do", "Before you start").
 
 ## Comments
+- 2026-11-06 (Claude, for Mario): `feature/agenda` adds `tools/agenda.py is-dev-day`. This ticket stays log-based; ticket 06 of `.scratch/agenda/` will make it skip non-development days once both branches are on `develop`.
