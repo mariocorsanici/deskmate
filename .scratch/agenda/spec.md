@@ -1,6 +1,6 @@
 # Agenda: non-development days and tasks
 
-Status: ready-for-agent
+Status: implemented tickets 01–05; integration follow-up 06 blocked by daily-loop-tuning
 
 ## Problem Statement
 
