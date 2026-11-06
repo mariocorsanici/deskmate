@@ -10,15 +10,21 @@ Get the user back on track in a few minutes, starting from the handoff written b
 
 ## Steps
 
+0. **Agenda first.** Get today's local date. Read `~/Dev/mc_dev/deskmate/docs/agenda.md`, then run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py list --today <today>` and `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py is-dev-day <today>`. Keep the JSON for the brief. Report initialization/repair notices and all invalid-line diagnostics in one short line; exit 2 still provides valid data, and exit 3 takes precedence when a whole day is reserved. On exit 1, explain that agenda availability could not be checked and resolve that before planning development.
+   - **Whole non-development day (exit 3):** say so first, naming the commitment; show only the **Non-development** agenda block described in step 4, then finish. Project checks, handoff reconstruction and session opening run only if the user explicitly asks to work anyway.
+   - **Half day:** name the reserved half and restrict the development plan to the other half. If both halves have separate entries, say there is no free development slot; propose or open work only on request. These half-day entries still count as development days for `is-dev-day`.
+
 1. **Read.** `~/Dev/mc_dev/deskmate/data/handoff.md` and the experiments of the latest entry in `~/Dev/mc_dev/deskmate/data/lessons.md`. If the handoff is not from the previous working day, say so and offer to rebuild it with `python3 -I ~/Dev/mc_dev/deskmate/tools/sessions.py --since <date>`.
 
 2. **Missed steps.** In `~/Dev/mc_dev/deskmate/data/log.csv`, check the previous working day: is there a `call-it-a-day`? If it was Monday, Wednesday or Friday, is there a `how-did-it-go`? The `morning-reminder` and `evening-reminder` rows tell whether the alert arrived and how the user answered. Report only what is missing, in one line.
+   For each candidate previous working day, run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py is-dev-day <date>`. Skip dates returning 3, including archived travel days, and continue to the preceding weekday for this missed-steps check. Report invalid-line diagnostics even with exit 3; exit 2 uses valid entries with that warning. This exclusion applies to missed steps; step 1 still checks the handoff's age against the actual previous working day, so a travel day does not make an old handoff current.
 
 3. **Refresh.** The handoff is a snapshot of last evening. Run `python3 -I ~/Dev/mc_dev/deskmate/tools/check.py`: it runs the read-only checks listed in each project card, except the standby ones (listed on its last line). For items that depend on other people or on external state (approvals, PRs, CI, pending replies) and have no check in the card, check them with a command. Done when every "Waiting on" has a state from this morning. Do not use Slack (no searches, no channel or DM reads): for replies awaited on Slack, report the state written in the handoff and let the user check.
 
 4. **Propose the day.** In chat, short:
    - **Before you start:** the preparation steps from the handoff.
    - **In stand-by:** the projects in state `standby`, in one line. Do not propose them and do not open sessions for them unless the user asks; if they do, run their checks with `check.py <card>`.
+   - **Non-development** ("Non sviluppo" in Italian), before the suggested order: show today's commitment, tasks from `due`, tasks from `deadline` with the deadline highlighted, `undated` as one count line, and `upcoming` days in one line. Merge a task appearing in both buckets into one line. Keep this block visible on a whole non-development day too.
    - **Suggested order:** first what unblocks others (messages to send, replies to give), then the long work.
    - **Method:** the running experiments from `lessons.md`, one line each, to keep them in mind.
    - The number of open items in `study-later.md`, without listing them: they are for after closing time.
