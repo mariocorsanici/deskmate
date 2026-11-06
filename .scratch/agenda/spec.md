@@ -76,7 +76,7 @@ The user may edit the file by hand. `tools/agenda.py` behaves exactly as follows
   - `undated:` count of open tasks without dates;
   - `upcoming:` day entries in the next 5 working days;
   - `closed:` tasks closed since a given date (`--closed-since YYYY-MM-DD`).
-- `is-dev-day YYYY-MM-DD`: exit 0 unless the agenda has a `day`/`giornata` entry for that date (exit 3). Used by other skills to exclude non-development days.
+- `is-dev-day YYYY-MM-DD`: exit 3 if the agenda has a whole-day (`day`/`giornata`) entry for that date; otherwise exit 2 if the file has invalid lines, else 0. Exit 3 wins over 2 (invalid lines are still printed). Half days (`morning`/`afternoon`) count as development days. Used by other skills to exclude non-development days.
 - `archive [--today YYYY-MM-DD] [--closed-before YYYY-MM-DD]`: moves past day entries, and closed tasks closed before the given date, to `data/archive/agenda-YYYY-MM.md`.
 
 `--today` exists so tests are independent of the clock.
