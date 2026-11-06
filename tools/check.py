@@ -11,6 +11,10 @@ Usage:
 
 Standby cards are skipped (their checks can be slow, e.g. SSH to a machine that is off),
 but their titles are listed on a last line, so they stay visible.
+
+Before a card's checks, every repo they name with `git -C <folder>` is fetched once, so that
+origin/... refs (and checks like `status -sb`) show the remote as it is now, not as of the last pull.
+Fetch only updates remote-tracking refs: local branches and files are untouched.
 """
 import pathlib
 import re
@@ -20,6 +24,8 @@ import sys
 PROJECTS = pathlib.Path.home() / ".claude" / "projects"
 CHECK = re.compile(r"^- (.+?): `(.+)`\s*$")
 STATE = re.compile(r"^- \*\*State:\*\*\s*(\w+)", re.M)
+GIT_DIR = re.compile(r"git -C (\S+)")
+FETCH = "GIT_SSH_COMMAND='ssh -o BatchMode=yes -o ConnectTimeout=8' git -C {} fetch --quiet"
 TIMEOUT = 15
 
 
@@ -47,6 +53,7 @@ def main():
     cards = [pathlib.Path(a).expanduser() for a in args] or sorted(PROJECTS.glob("*/memory/project-card.md"))
     skip = not args and "--all" not in sys.argv
     standby = []
+    fetched = set()
     for card in cards:
         text = card.read_text(encoding="utf-8")
         state = STATE.search(section(text, "Status"))
@@ -60,6 +67,11 @@ def main():
         checks = [c for c in checks if c]
         if not checks:
             print("   (no checks in the card)")
+        for repo in dict.fromkeys(GIT_DIR.findall("\n".join(c.group(2) for c in checks))):
+            if repo not in fetched:
+                fetched.add(repo)
+                result, first = run(FETCH.format(repo))
+                print(f"   fetch {repo}: {result}" + (f"  {first[:160]}" if first else ""))
         for c in checks:
             result, first = run(c.group(2))
             print(f"   {c.group(1)}: {result}" + (f"  {first[:160]}" if first else ""))
