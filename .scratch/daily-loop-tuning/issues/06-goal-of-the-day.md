@@ -1,6 +1,6 @@
 # 06: Goal of the day
 
-**Status:** needs-triage (experiment, confirm at the next /how-did-it-go)
+**Status:** ready-for-agent (confirmed at /how-did-it-go on 2026-11-06)
 
 The most productive recorded day (2026-10-28) had an explicit constraint ("tomorrow the camera ships back"). Days without one fragmented.
 

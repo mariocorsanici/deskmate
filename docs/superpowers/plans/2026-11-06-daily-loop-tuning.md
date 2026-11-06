@@ -98,3 +98,13 @@ one Important `$HOME` fetch regression, reproduced before its correction. Final
 automated verification passes 19 tests; whitespace checks pass. Documented local
 Git/calendar scenarios passed; authenticated provider behavior was not exercised.
 This managed worktree stays available and integration into develop waits for Codex.
+
+## Concurrent remote update
+
+Before publication, the shared remote advanced from `b393220` to `9727969`.
+Its two documentation commits were merged while preserving both the ticket 03
+implementation evidence and the agenda follow-up comment. Tickets 05–07 are now
+confirmed/ready and ticket 08 (morning login check) has been added; none of these
+newly ready tickets is implemented by this approved 01–04 execution. References
+to their pending triage above describe the original approved-plan snapshot.
+The required Codex-before-develop integration order remains unchanged.

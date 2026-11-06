@@ -13,7 +13,7 @@ The same review found three more gaps:
 
 ## Solution
 
-Small, independent changes to the existing skills and tools, one ticket each. Tickets 01–04 are ready. Tickets 05–07 are experiments the user confirms at the next `/how-did-it-go`; they stay `needs-triage` until then.
+Small, independent changes to the existing skills and tools, one ticket each. Tickets 01–08 are ready. Tickets 05–07 were confirmed at `/how-did-it-go` on 2026-11-06. Ticket 08 (morning login check) came from the same retrospective.
 
 ## Branching and dependencies
 

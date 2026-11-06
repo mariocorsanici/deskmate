@@ -13,3 +13,4 @@ Today's step 1 only checks whether the handoff is from the previous working day.
 ## Comments
 
 Implemented 2026-11-06. Handoffs record creation time separately from their target day; morning instructions count inactive intervening dates and use live facts. Calendar/timezone scenarios were replayed; unavailable-evidence behavior was instruction-reviewed. See `docs/testing/daily-loop-tuning.md`.
+- 2026-11-06 (Claude, for Mario): `feature/agenda` adds `tools/agenda.py is-dev-day`. This ticket stays log-based; ticket 06 of `.scratch/agenda/` will make it skip non-development days once both branches are on `develop`.
