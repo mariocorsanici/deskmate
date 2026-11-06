@@ -5,6 +5,8 @@ list writes one JSON object to stdout. Other commands print affected entry
 lines. Notices and diagnostics are stderr; exit codes are 0 (clean), 1
 (usage, no agenda writes), 2 (invalid lines), 3 (whole non-development day).
 """
+from __future__ import annotations
+
 import argparse
 from dataclasses import dataclass
 import datetime as dt

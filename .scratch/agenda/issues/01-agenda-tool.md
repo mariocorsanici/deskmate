@@ -15,3 +15,5 @@ Implement `tools/agenda.py` as in the spec ("File format", "Deterministic handli
 2026-11-06: Implemented the seven commands. `list` stdout is JSON; notices and invalid-line diagnostics are stderr. Existing English and Italian entries remain readable after a config-language change. `done --today` supplies a deterministic completion date. `is-dev-day` consults monthly archives so historical non-development days remain excluded after evening cleanup.
 
 Verification: `python3 -I -B -m unittest discover -s tests -v` — 35 tests pass, including 20 concurrent initial additions, lock blocking, exact CRLF/binary preservation and archive boundaries. The same suite was observed failing before the CLI existed. No installed personal data was accessed.
+
+Compatibility verification: macOS system Python 3.9.6 initially failed on evaluated union annotations. Deferred annotations fix that startup error; the complete 39-test suite now passes on both Python 3.9.6 and 3.14.6.
