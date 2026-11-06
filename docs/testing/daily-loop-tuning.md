@@ -24,3 +24,27 @@ For a failed fetch, the morning skill must treat subsequent remote reads as
 cached/unknown, even when `git show` succeeds. A missing branch/path is likewise
 unknown, not an empty activity window. This interpretation is an instruction
 review; it is not claimed as native-agent behavioral acceptance.
+
+## Morning remote window (02)
+
+Baseline instruction review: the old morning skill ran Checks but had no required
+remote commit/PR window before proposing the Handoff's old To do.
+
+The local Git probe on 2026-11-06 used `trunk`, a reader path containing spaces,
+and a commit authored by `Other Author <other@example.test>` at
+`2026-11-05T10:00:00+01:00`. These commands returned the expected results:
+
+```sh
+git -C '<reader with spaces>' symbolic-ref --short refs/remotes/origin/HEAD
+# origin/trunk
+git -C '<reader with spaces>' log origin/trunk --since=2026-11-04T17:00:00+01:00 --format='%h %aI %an <%ae> %s'
+# one commit, Other Author, Complete ticket
+git -C '<reader with spaces>' log origin/trunk --since=2026-11-06T12:00:00+01:00 --format=%h
+# empty
+```
+
+Changing the remote URL to a nonexistent local bare repository made fetch fail,
+while `git show origin/trunk:ticket.md` still succeeded. This proves why cached
+reads cannot establish freshness. Instruction review covers missing default refs,
+standby exclusion, unavailable `gh`/auth, precise PR-time filtering and incomplete
+pagination disclosure. No live GitHub request or native-model scenario was run.
