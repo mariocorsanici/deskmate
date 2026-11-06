@@ -39,16 +39,24 @@ class RemoteCheckTests(unittest.TestCase):
             projects = base / "projects"
             card = projects / "one/memory/project-card.md"
             card.parent.mkdir(parents=True)
+            import os
+            import shlex
+            path_arg = (f'$HOME/{shlex.quote(reader.name)}' if getattr(self, 'home_path', False)
+                        else shlex.quote(str(reader)))
             card.write_text("# Example\n## Status\n- **State:** active\n## Checks\n"
-                            f"- remote ticket: `git -C '{reader}' show origin/trunk:ticket.md | head -1`\n")
+                            f"- remote ticket: `git -C {path_arg} show origin/trunk:ticket.md | head -1`\n")
             output = io.StringIO()
-            with patch.object(checks, "PROJECTS", projects), patch.object(sys, "argv", ["check.py"]):
+            with patch.dict(os.environ, HOME=str(base)), patch.object(checks, "PROJECTS", projects), patch.object(sys, "argv", ["check.py"]):
                 with contextlib.redirect_stdout(output):
                     checks.main()
             self.assertIn(f"fetch {reader}: ok", output.getvalue())
             self.assertIn("remote ticket: ok  Status: done", output.getvalue())
             self.assertEqual((reader / "ticket.md").read_text(), "Status: todo\n")
             self.assertEqual(self.git("-C", reader, "rev-parse", "HEAD"), original)
+
+    def test_fetch_expands_documented_home_path(self):
+        self.home_path = True
+        self.test_fetches_quoted_remote_file_without_changing_checkout()
 
 
 if __name__ == "__main__":

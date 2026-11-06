@@ -2,6 +2,8 @@
 
 **Status:** ready-for-agent
 
+**Implementation:** complete (automated/local verification; native acceptance not claimed).
+
 Even with fresh refs, the morning report did not say *what* had moved. The user should see others' work before planning.
 
 - [x] For each active card's repo, after `check.py`, list commits on the remote default/integration branch newer than the handoff's timestamp, with author and subject (e.g. `git log origin/develop --since=<handoff time> --format='%h %an %s'`), and PRs merged in that window when `gh` is available.

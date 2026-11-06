@@ -57,9 +57,18 @@ def repositories(command):
         tokens = list(lexer)
     except ValueError:
         return []
-    return [str(pathlib.Path(tokens[i + 2]).expanduser())
-            for i in range(len(tokens) - 2)
-            if tokens[i:i + 2] == ["git", "-C"]]
+    folders = []
+    for i in range(len(tokens) - 2):
+        if tokens[i:i + 2] != ["git", "-C"]:
+            continue
+        folder = tokens[i + 2]
+        # Expand only documented home prefixes; never evaluate shell expressions.
+        for prefix in ("$HOME", "${HOME}"):
+            if folder == prefix or folder.startswith(prefix + "/"):
+                folder = str(pathlib.Path.home()) + folder[len(prefix):]
+                break
+        folders.append(str(pathlib.Path(folder).expanduser()))
+    return folders
 
 
 def main():

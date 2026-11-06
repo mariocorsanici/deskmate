@@ -89,3 +89,18 @@ All fixture data goes to temporary roots. Skill completion instructions were
 reviewed for current-session attribution and unfinished interactive work; native
 runtime adherence has not been tested. Measurements exclude final prose generated
 after the explicit marker and are not whole-interaction billing totals.
+
+## Independent review and correction
+
+The independent review of `b393220..105eb9d` found one Important issue and no
+Critical/Minor findings: quoting parsed paths suppressed the documented `$HOME`
+expansion during centralized fetch. A new two-clone regression with
+`git -C $HOME/'reader with spaces'` reproduced the stale result before the fix.
+The parser now expands `$HOME`/`${HOME}` home prefixes before safely quoting the
+literal fetch path. The supported regression passes without moving the checkout.
+The complete suite passes 19 tests, with ResourceWarnings treated as errors.
+
+The review set aside native runtime adherence, the future Codex rebase, pending
+experiments and final prose after the explicit marker. These remain the approved
+verification/integration/measurement boundaries, not claims of completed native
+acceptance. No other review findings remain.

@@ -2,6 +2,8 @@
 
 **Status:** ready-for-agent
 
+**Implementation:** complete (automated/local verification; native acceptance not claimed).
+
 Today's step 1 only checks whether the handoff is from the previous working day. A day off in between (travel, leave) leaves the handoff formally "previous day" but the world moved.
 
 - [x] `/whats-on-today` computes the gap between the handoff's timestamp and now, and the days in between with no deskmate activity in `log.csv`.

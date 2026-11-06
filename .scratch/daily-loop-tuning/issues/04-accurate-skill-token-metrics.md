@@ -2,6 +2,8 @@
 
 **Status:** ready-for-agent
 
+**Implementation:** complete (automated/local verification; native acceptance not claimed).
+
 `tools/token_usage.py` counts a run from its command to the next `/command` of the same session or the session's end. Work done after the skill inflates it (2026-11-03 `/checkpoint` in vlm: 182 turns, 96M tokens; 2026-11-06 `/whats-on-today`: 28 turns including a recap and a code change). Durations of the skills themselves cannot be compared over time.
 
 - [x] Each deskmate skill logs an end event as its last step (e.g. `log_event.sh <skill>-end "" <session> <cwd>`), or an equivalent marker `token_usage.py` can find in the transcript.
