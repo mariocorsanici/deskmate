@@ -1,6 +1,6 @@
 # 05: Retrospective every two development days
 
-**Status:** needs-triage (experiment, confirm at the next /how-did-it-go)
+**Status:** ready-for-agent (confirmed at /how-did-it-go on 2026-11-06)
 
 Fixed weekdays (Mon/Wed/Fri) did not hold on busy weeks and ignore travel days. The user proposed: one retrospective every two development days (works Mon–Fri).
 
