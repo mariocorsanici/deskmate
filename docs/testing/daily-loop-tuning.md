@@ -48,3 +48,25 @@ while `git show origin/trunk:ticket.md` still succeeded. This proves why cached
 reads cannot establish freshness. Instruction review covers missing default refs,
 standby exclusion, unavailable `gh`/auth, precise PR-time filtering and incomplete
 pagination disclosure. No live GitHub request or native-model scenario was run.
+
+## Stale Handoff scenarios (03)
+
+Baseline instruction review: a Wednesday-generated Handoff titled Thursday, read
+Friday after an inactive Thursday, passed the old "previous working day" title
+check. Creation-time metadata and intervening activity now determine the warning.
+
+Local calendar replay on 2026-11-06, with timezone UTC+01:00:
+
+| Creation → now | Work on intervening dates | Expected inactive count |
+| --- | --- | --- |
+| Wed 04 17:00 → Fri 06 09:00 | none (or reminder/end rows only) | 1 (Thursday) |
+| Thu 05 17:00 → Fri 06 09:00 | none | 0 |
+| Wed 04 17:00 → Fri 06 09:00 | Thursday Checkpoint | 0 |
+| Wed 04 23:30 at UTC−02:00 → Fri 06 09:00 local | none | 0 (creation is Thursday locally) |
+| Fri 06 17:00 → Mon 09 09:00 | none | 2 (Saturday and Sunday) |
+
+The date arithmetic was replayed with Python's timezone-aware `datetime`. Skill
+instruction review additionally covers missing metadata (mtime, marked estimated),
+future/unreadable timestamps or missing logs (unknown), current Checks failing
+(current fact unknown), and retaining the weekday retrospective rule. No claim of
+native-agent adherence is made by this arithmetic/instruction verification.

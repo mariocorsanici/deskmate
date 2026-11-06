@@ -26,6 +26,7 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 
    ```markdown
    # Handoff for <weekday> <date>
+   Generated: <current ISO-8601 creation timestamp with timezone offset>
 
    ## In short
    - one line per open session: name, what unblocks it
@@ -42,6 +43,8 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 
    In stand-by: <short names of the standby projects>
    ```
+
+   Keep the machine-readable `Generated:` label in English even when the headings are translated. Its value is the actual creation time, not the day named in the title.
 
 5. **Study later.** Suggest up to 5 topics met today that are worth studying calmly: concepts explained in a hurry, solutions adopted without fully understanding them, new tools. The user picks; add the chosen ones to `~/Dev/mc_dev/deskmate/data/study-later.md` in the `/study-later` format.
 
