@@ -25,6 +25,20 @@ Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md
 
 `/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint.
 
+## Morning freshness
+
+`/checkpoint` labels remote-state checks separately from local-state checks. Shared
+ticket files are read with `git show <remote>/<branch>:<path>` after the central
+fetch; local edits/branches are read from the working tree. Fetch failures make
+remote freshness unknown even when a cached ref can still be read.
+
+`/whats-on-today` reports remote commits and, when available, merged PRs since the
+Handoff was generated, marking other authors and reconciling completed work before
+planning. Handoffs carry a timezone-aware `Generated:` timestamp, separate from
+their target day. Intervening calendar dates without work events trigger a stale
+Handoff notice; current state then comes from live Checks and remote changes.
+Older files use mtime with an explicit estimate, and missing evidence stays unknown.
+
 ## Experiments
 
 `data/config.json` can hold a running experiment on the way of working, which the skills remind you of every morning. Today there is one, `experiments.fresh_sessions`: is it better to resume yesterday's session (`claude --resume`) or to start a new one that picks up from the project card? On the weekdays in `new_days`, `/whats-on-today` opens a new session (`open_tab.sh --new`), on the others it resumes; `/checkpoint` asks how the restart went (1–3); `tools/session_stats.py` measures each session-day from the transcripts (context at the first answer, tokens, compactions) and `/how-did-it-go` proposes a decision once both modes have `target_days` days.
@@ -80,7 +94,8 @@ skills/                  the skills of the day
 tools/
   sessions.py            summary of the Claude Code sessions in a period
   log_event.sh           appends a row to the log
-  token_usage.py         computes the tokens of each run from the transcripts
+  token_usage.py         computes bounded or legacy-window skill usage from transcripts
+  usage_log.py           shared locked, atomic activity CSV storage
   hook_log.sh            UserPromptSubmit hook
   hook_tokens.sh         Stop hook
   reminders.py           reminder texts, time windows, LaunchAgents and calendar file, from the config
@@ -100,4 +115,4 @@ data/                    personal files, not in git
 - `handoff.md`: state of the sessions and things to do, rewritten every evening; the previous version goes to `archive/`.
 - `lessons.md`: log of the retrospectives, with the running method experiments.
 - `study-later.md`: topics to study.
-- `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens`. A run lasts from its command to the next `/command` of the same session, or to the end of the session: for clean numbers, run the skills in a dedicated session or finish with `/clear`.
+- `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens, usage_scope`. Each completed skill writes a `<skill>-end` metadata row; its detail is a precise UTC end timestamp. Usage stops at the earliest valid matching marker, next command or session end. `usage_scope=end-marked` identifies marker-bounded measurements; `legacy-window` preserves the old next-command/session-end behavior for history and incomplete runs. Retrospectives use only end-marked runs for skill-cost comparisons. The final model reply after a marker is outside that measurement. End-event rows have no usage totals. Both writers preserve extension columns and serialize atomic updates through `.log.lock`. `DESKMATE_DATA_DIR` overrides the activity-log root for isolated checks.

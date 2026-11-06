@@ -70,3 +70,22 @@ instruction review additionally covers missing metadata (mtime, marked estimated
 future/unreadable timestamps or missing logs (unknown), current Checks failing
 (current fact unknown), and retaining the weekday retrospective rule. No claim of
 native-agent adherence is made by this arithmetic/instruction verification.
+
+## Skill boundaries and CSV integrity (04)
+
+Run `python3 -Werror::ResourceWarning -m unittest discover -s tests -v`.
+The new usage/CSV scenarios were run before implementation and exposed the missing
+marker boundary, missing scope and data-root override, legacy header/extension
+loss, and malformed transcript handling. The existing remote-check regression
+continued to pass. Synthetic fixtures cover:
+
+- explicit end followed by unrelated work; no marker; consecutive/repeated skills;
+- a missing first marker, late marker, different session/folder, invalid/naive or
+  early timestamps, timezone offsets and native message-ID deduplication;
+- legacy CSV upgrades, unknown/provider columns, precise end timestamps, invalid
+  CSV preservation and concurrent append/recompute blocked on the same lock.
+
+All fixture data goes to temporary roots. Skill completion instructions were
+reviewed for current-session attribution and unfinished interactive work; native
+runtime adherence has not been tested. Measurements exclude final prose generated
+after the explicit marker and are not whole-interaction billing totals.

@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # What's on today
 
+Before working, read `~/Dev/mc_dev/deskmate/docs/agents/skill-metrics.md` and capture this invocation’s native session/start identity for the completion step.
+
 Get the user back on track in a few minutes, starting from the handoff written by `/call-it-a-day`. Data files live in `~/Dev/mc_dev/deskmate/data/`. First read `~/Dev/mc_dev/deskmate/data/config.json`: address the user by `name` and write every reply in `language`. Short sentences, plain words.
 
 ## Steps
@@ -46,3 +48,14 @@ Get the user back on track in a few minutes, starting from the handoff written b
    On a **new session** day of the experiment, open the project's work with `open_tab.sh --new "<title>" <folder> "<prompt>"` instead: a fresh session in the same folder, started with a prompt in `language` asking it to pick up from the project card (read the Status, run the Checks, say where to start). Only for projects whose card has a `## Status` from `/checkpoint`; the others are resumed, and you say why.
 
    If the session is already running in a tab, the script brings that tab to the front instead of opening a second one. If an ID does not open, suggest `claude --resume` from the session's folder to pick it from the list.
+
+
+## Complete the measurement
+
+After completing the steps above, log this skill's end using the identity captured at its start:
+
+```bash
+~/Dev/mc_dev/deskmate/tools/log_event.sh whats-on-today-end "" "<session-id>" "<starting-folder>"
+```
+
+Follow the completion/unfinished-run rules in `docs/agents/skill-metrics.md`; send the prepared final reply after this last tool action.
