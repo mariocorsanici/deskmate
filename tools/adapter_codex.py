@@ -95,7 +95,7 @@ def indexed_record(row):
     return session
 
 
-def read_rollout(path, include_messages=False, usage_only=False):
+def read_rollout(path, include_messages=False, usage_only=False, on_message=None):
     session = record()
     if include_messages:
         session["messages"] = []
@@ -148,6 +148,14 @@ def read_rollout(path, include_messages=False, usage_only=False):
                     if payload.get("type") != "message" or payload.get("role") not in ("user", "assistant"):
                         continue
                     content = payload.get("content")
+                    if on_message is not None:
+                        malformed = not isinstance(content, (str, list))
+                        if isinstance(content, list):
+                            malformed = any(not isinstance(part, dict)
+                                            or (part.get("type") in ("input_text", "output_text")
+                                                and not isinstance(part.get("text"), str)) for part in content)
+                        if malformed:
+                            degraded(session, "Malformed Codex conversation content was omitted.")
                     if isinstance(content, str):
                         text = content
                     elif isinstance(content, list):
@@ -158,8 +166,11 @@ def read_rollout(path, include_messages=False, usage_only=False):
                     else:
                         continue
                     if text.strip():
-                        session["messages"].append({"role": payload["role"], "timestamp": stamp,
-                                                    "text": text.strip()})
+                        message = {"role": payload["role"], "timestamp": stamp, "text": text.strip()}
+                        if on_message is None:
+                            session["messages"].append(message)
+                        else:
+                            on_message(message, session)
     except (OSError, UnicodeError):
         degraded(session, "Codex rollout is unavailable or unreadable.")
     if not session["id"] or not session["cwd"] or timestamp(session["start"]) is None:
@@ -196,7 +207,13 @@ def discover(since: str) -> list[dict]:
     return sorted(records, key=lambda item: item["end"] or "")
 
 
-def read_session(session_id: str) -> dict:
+def read_delta(session_id: str, *, max_messages=12, max_characters=6000, after=None) -> dict:
+    from session_delta import extract
+    return extract("codex", session_id, read_session, max_messages=max_messages,
+                   max_characters=max_characters, after=after)
+
+
+def read_session(session_id: str, *, on_message=None) -> dict:
     if isinstance(session_id, str) and session_id and "/" not in session_id and "\\" not in session_id:
         try:
             rows = metadata_rows(session_id)
@@ -207,12 +224,12 @@ def read_session(session_id: str) -> dict:
             session = indexed_record(row)
             session["messages"] = []
             if row.get("history_mode") == "paginated":
-                return read_paginated(session)
+                return read_paginated(session, on_message=on_message)
             if not isinstance(row["rollout_path"], str):
                 return degraded(session, "Codex rollout metadata is malformed; continue from the Project card and Checks.")
             path = pathlib.Path(row["rollout_path"])
             if path.is_file():
-                rollout = read_rollout(path, include_messages=True)
+                rollout = read_rollout(path, include_messages=True, on_message=on_message)
                 if rollout["id"] == session_id:
                     rollout["usage"] = {**session["usage"], **rollout["usage"]}
                     return rollout
@@ -220,7 +237,7 @@ def read_session(session_id: str) -> dict:
         for path in rollouts():
             session = read_rollout(path)
             if session["id"] == session_id:
-                return read_rollout(path, include_messages=True)
+                return read_rollout(path, include_messages=True, on_message=on_message)
     session = degraded(record(session_id), "Codex Work session is unavailable; continue from the Project card and Checks.")
     session["messages"] = []
     return session
@@ -253,7 +270,7 @@ def read_usage(session_id: str) -> dict:
     return degraded(record(session_id), "Codex usage is unavailable; continue from the Project card and Checks.")
 
 
-def read_paginated(session):
+def read_paginated(session, *, on_message=None):
     paths = sorted(codex_home().glob("thread_history_*.sqlite"), reverse=True)
     if not paths:
         return degraded(session, "Codex paginated history is unavailable; continue from the Project card and Checks.")
@@ -275,6 +292,11 @@ def read_paginated(session):
                         content = item.get("content", [])
                         if not isinstance(content, list):
                             raise ValueError("invalid message content")
+                        if on_message is not None and any(
+                                not isinstance(part, dict)
+                                or (part.get("type") in ("text", "input_text")
+                                    and not isinstance(part.get("text"), str)) for part in content):
+                            degraded(session, "Malformed Codex conversation content was omitted.")
                         text = "\n".join(part["text"] for part in content if isinstance(part, dict)
                                          and part.get("type") in ("text", "input_text")
                                          and isinstance(part.get("text"), str))
@@ -287,7 +309,11 @@ def read_paginated(session):
                     if not isinstance(text, str) or stamp is None:
                         raise ValueError("invalid conversation item")
                     if text.strip():
-                        session["messages"].append({"role": role, "timestamp": stamp, "text": text.strip()})
+                        message = {"role": role, "timestamp": stamp, "text": text.strip()}
+                        if on_message is None:
+                            session["messages"].append(message)
+                        else:
+                            on_message(message, session)
                 except (ValueError, TypeError):
                     degraded(session, "Malformed or unsupported Codex history items were skipped.")
     except (sqlite3.Error, OSError):

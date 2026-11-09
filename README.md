@@ -80,6 +80,52 @@ codes are 1 (unavailable Provider/terminal launch), 2 (invalid configuration/inp
 and 3 (card revision conflict). Existing low-level launch commands remain during
 the ongoing skill/installer migration.
 
+## Bounded Session deltas
+
+`deskmate session-delta --provider claude|codex --session-id ID` reads only
+conversation text into a bounded Session delta. Claude JSONL, Codex rollout JSONL
+and Codex paginated SQLite history use the same selection rules. Metadata,
+reasoning, raw tool results and native skill instructions are excluded.
+
+```bash
+bin/deskmate session-delta --provider codex --session-id ID
+bin/deskmate --json session-delta --provider claude --session-id ID --max-messages 20 --max-characters 10000
+```
+
+The default is **12 messages and 6,000 characters**. Set
+`session_delta.max_messages` and `session_delta.max_characters` in
+`data/config.json` to change the defaults; command flags override them for one
+read without changing any data. Limits must be positive integers. The reader
+streams records and retains bounded early/recent candidates instead of building
+the complete conversation in memory.
+
+The boundary is the saved Checkpoint in the shared Project card, matched to both
+the Provider and native session ID. A `/checkpoint` or `$checkpoint` prompt alone
+does not prove a successful save. With no matching saved Checkpoint, coverage is
+explicitly from session start. Legacy `YYYY-MM-DD HH:MM` Checkpoints assume the
+local timezone and have an estimated minute boundary, disclosed as partial
+coverage. `--after ISO_TIMESTAMP` supplies a precise boundary with an explicit
+timezone. Messages at or before the boundary are excluded; unknown message times
+after a known boundary are omitted with a warning.
+
+Selection keeps the first eligible message plus the latest messages. If the
+character budget is exceeded, up to half goes to the early message and the rest
+to the newest messages. A one-message or one-character budget prefers the latest
+message. Text can be clipped within a message; character counts mean Unicode
+code points in message text, excluding JSON and display formatting.
+
+Text output reports limits, included/omitted messages and characters, truncation,
+coverage and warnings. `--format json` returns a schema-1 result with `provider`,
+`id`, `status`, `warnings`, `checkpoint`, `limits`, `messages`,
+`included_messages`, `omitted_messages`, `characters`, `omitted_characters`,
+`truncated` and `coverage`. The global `--json` option wraps this in Deskmate's
+normal envelope and selects JSON content automatically. Counts describe readable,
+eligible conversation; skipped corrupt records cannot be counted accurately.
+Missing/unreadable history returns exit 0 with `status: degraded` and partial or
+unavailable coverage so the Daily loop can continue. Invalid limits/configuration
+return exit 2. This command performs local extraction only; Provider switching
+and redaction/consent belong to later tickets.
+
 ## Experiments
 
 `data/config.json` can hold a running experiment on the way of working, which the skills remind you of every morning. Today there is one, `experiments.fresh_sessions`: is it better to resume yesterday's session (`claude --resume`) or to start a new one that picks up from the project card? On the weekdays in `new_days`, `/whats-on-today` opens a new session (`open_tab.sh --new`), on the others it resumes; `/checkpoint` asks how the restart went (1–3); `tools/session_stats.py` measures each session-day from the transcripts (context at the first answer, tokens, compactions) and `/how-did-it-go` proposes a decision once both modes have `target_days` days.

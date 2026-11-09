@@ -11,6 +11,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 COMMANDS = {
+    "session-delta": [sys.executable, "-I", str(ROOT / "tools" / "session_delta.py")],
     "work-session": [sys.executable, "-I", str(ROOT / "tools" / "work_sessions.py")],
     "integration": [sys.executable, "-I", str(ROOT / "tools" / "adapter_cli.py"), "integration"],
     "provider-launch": [sys.executable, "-I", str(ROOT / "tools" / "adapter_cli.py"), "provider-launch"],
@@ -30,6 +31,7 @@ COMMANDS = {
     "configure": [sys.executable, "-I", str(ROOT / "tools" / "providers.py"), "configure"],
 }
 DESCRIPTIONS = {
+    "session-delta": "read bounded conversation after a saved Checkpoint",
     "work-session": "continue a Project with its recorded Provider or explicitly start anew",
     "integration": "configure Provider hooks and shared skills",
     "provider-launch": "launch or resume a Provider Work session",
@@ -49,6 +51,7 @@ DESCRIPTIONS = {
     "configure": "record installed and Default providers",
 }
 USAGE = {
+    "session-delta": "deskmate session-delta --provider claude|codex --session-id ID [--after ISO_TIMESTAMP] [--max-messages N] [--max-characters N] [--format text|json]",
     "work-session": "deskmate work-session --folder PATH [--new [--provider claude|codex]] [--title TEXT] [--prompt TEXT] [--dry-run]",
     "integration": "deskmate integration --provider claude|codex [--remove] [--verify]",
     "provider-launch": "deskmate provider-launch --provider claude|codex --folder PATH [--session-id ID] [--prompt TEXT] [--dry-run]",
@@ -122,7 +125,7 @@ def main(argv: list[str] | None = None) -> int:
 
     command = args[0]
     invocation = [*COMMANDS[command], *args[1:]]
-    if json_output and command == "work-session":
+    if json_output and command in ("work-session", "session-delta"):
         invocation.append("--format=json")
     if not json_output:
         return subprocess.run(invocation, check=False).returncode

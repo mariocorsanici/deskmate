@@ -79,8 +79,14 @@ def discover(since: str) -> list[dict]:
     return sorted(records.values(), key=lambda item: item['end'])
 
 
-def read_session(session_id: str) -> dict:
-    return _read_transcript(session_id, include_messages=True)
+def read_session(session_id: str, *, on_message=None) -> dict:
+    return _read_transcript(session_id, include_messages=True, on_message=on_message)
+
+
+def read_delta(session_id: str, *, max_messages=12, max_characters=6000, after=None) -> dict:
+    from session_delta import extract
+    return extract("claude", session_id, read_session, max_messages=max_messages,
+                   max_characters=max_characters, after=after)
 
 
 def read_usage(session_id: str) -> dict:
@@ -88,7 +94,7 @@ def read_usage(session_id: str) -> dict:
     return _read_transcript(session_id, include_messages=False)
 
 
-def _read_transcript(session_id: str, *, include_messages: bool) -> dict:
+def _read_transcript(session_id: str, *, include_messages: bool, on_message=None) -> dict:
     session = {'provider': 'claude', 'id': session_id, 'cwd': None,
                'start': None, 'end': None, 'usage': {},
                'status': 'ok', 'warnings': []}
@@ -141,7 +147,7 @@ def _read_transcript(session_id: str, *, include_messages: bool) -> dict:
                     ts = None
                 usage = message.get('usage')
                 identity = message.get('id')
-                if isinstance(usage, dict) and role == 'assistant':
+                if on_message is None and isinstance(usage, dict) and role == 'assistant':
                     if not isinstance(identity, str) or identity not in seen:
                         if isinstance(identity, str):
                             seen.add(identity)
@@ -153,6 +159,15 @@ def _read_transcript(session_id: str, *, include_messages: bool) -> dict:
                 if not include_messages:
                     continue
                 content = message.get('content')
+                if on_message is not None:
+                    malformed = not isinstance(content, (str, list)) and not (
+                        content is None and isinstance(usage, dict))
+                    if isinstance(content, list):
+                        malformed = any(not isinstance(block, dict)
+                                        or (block.get('type') == 'text' and not isinstance(block.get('text'), str))
+                                        for block in content)
+                    if malformed:
+                        warn('Malformed Claude conversation content was omitted.')
                 if isinstance(content, list):
                     content = '\n'.join(block['text'] for block in content
                                         if isinstance(block, dict) and block.get('type') == 'text'
@@ -165,7 +180,11 @@ def _read_transcript(session_id: str, *, include_messages: bool) -> dict:
                         continue
                     args = re.search(r'<command-args>(.*?)</command-args>', content, re.S)
                     content = (name.group(1) + ' ' + (args.group(1) if args else '')).strip()
-                session['messages'].append({'role': role, 'timestamp': ts, 'text': content.strip()})
+                message = {'role': role, 'timestamp': ts, 'text': content.strip()}
+                if on_message is None:
+                    session['messages'].append(message)
+                else:
+                    on_message(message, session)
     except (OSError, UnicodeError) as error:
         warn(f'Claude transcript unreadable: {error.reason if isinstance(error, UnicodeError) else error.strerror}.')
     return session
