@@ -3,18 +3,23 @@
 
 Usage:
   reminders.py check                     validates the reminders section of config.json
-  reminders.py text <morning|evening>    title on the first line, then the alert message
+  reminders.py text <morning|evening> [--with-provider]  title, message, buttons, optional Provider
   reminders.py window <morning|evening>  exit 0 if now is a good time to show the alert
   reminders.py plist <morning|evening>   LaunchAgent for the mac channel, on stdout
+  reminders.py respond <morning|evening> <answer> --provider claude|codex  records the desktop response
   reminders.py ics                       writes data/deskmate-reminders.ics, prints "changed" or "unchanged"
 """
+import csv
 import datetime as dt
-import json
 import os
 import pathlib
 import plistlib
 import re
 import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import activity_log
+import providers
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
@@ -58,15 +63,41 @@ TEXTS = {
 
 
 def config():
-    try:
-        c = json.loads((DATA / "config.json").read_text())
-    except (FileNotFoundError, json.JSONDecodeError):
-        c = {}
+    c = providers.read_config()
     return c, {**DEFAULTS, **c.get("reminders", {})}
 
 
+def provider_order(c):
+    # Pre-migration installations were Claude-only.
+    if "providers" not in c:
+        return ["claude"]
+    selection = c["providers"]
+    if isinstance(selection, dict):
+        installed, default = selection.get("installed"), selection.get("default")
+        if (isinstance(installed, list) and installed
+                and all(isinstance(p, str) and p in ("claude", "codex") for p in installed)
+                and len(set(installed)) == len(installed) and default in installed):
+            return [default, *(p for p in installed if p != default)]
+    raise ValueError("Invalid Provider configuration; run deskmate configure")
+
+
 def texts(c):
-    return TEXTS.get(c.get("language"), TEXTS["en"])
+    ordered = provider_order(c)
+    syntax = {"claude": "/", "codex": "$"}
+    labels = {"claude": "Claude Code", "codex": "Codex CLI"}
+
+    def invocation(match):
+        skill = match.group(1) + (match.group(2) or "")
+        if len(ordered) == 1:
+            return syntax[ordered[0]] + skill
+        return " | ".join(f"{labels[p]}: {syntax[p]}{skill}" for p in ordered)
+
+    def render(value):
+        return re.sub(r"/([a-z]+(?:-[a-z]+)*)( <[^>]+>)?", invocation, value)
+
+    template = TEXTS.get(c.get("language"), TEXTS["en"])
+    return {key: [render(line) for line in value] if isinstance(value, list) else render(value)
+            for key, value in template.items()}
 
 
 def hour_minute(value):
@@ -137,6 +168,16 @@ def main():
         else:
             print(t["snooze"])
             print(t["done"])
+        if "--with-provider" in sys.argv[3:]:
+            print(provider_order(c)[0])
+
+    elif cmd == "respond":
+        if (kind not in ("morning", "evening") or len(sys.argv) != 6
+                or sys.argv[4] != "--provider" or sys.argv[5] not in ("claude", "codex")):
+            raise ValueError("Usage: deskmate reminders respond <morning|evening> <answer> --provider claude|codex")
+        # An alert response is not a native Work session or skill invocation.
+        activity_log.append_event(f"{kind}-reminder", sys.argv[3] or "ignored",
+                                  provider=sys.argv[5])
 
     elif cmd == "window":
         # if the Mac was asleep at reminder time, launchd fires on wake: show it only while it still makes sense
@@ -186,4 +227,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (OSError, ValueError, csv.Error) as error:
+        print(error, file=sys.stderr)
+        sys.exit(2)

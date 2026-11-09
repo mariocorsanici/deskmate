@@ -70,7 +70,7 @@ USAGE = {
     "check": "deskmate check [--all] [card ...]",
     "sessions": "deskmate sessions [--since DATE] [--messages N] [--cut N]",
     "session-stats": "deskmate session-stats [--since DATE]",
-    "reminders": "deskmate reminders <check|text|window|plist|ics> [kind]",
+    "reminders": "deskmate reminders <check|text|window|plist|ics|respond> [kind] [answer] [--provider claude|codex] [--with-provider]",
     "open-session": "deskmate open-session [--new] <title> <folder> <session-or-prompt>",
     "log-event": "deskmate log-event <event> [detail] [session] [cwd] [--provider claude|codex]",
     "metrics": "deskmate metrics [--provider claude|codex|all] [--since DATE]",

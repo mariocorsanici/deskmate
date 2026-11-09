@@ -56,6 +56,14 @@ keeping existing channels, language and response logging. No real notifications
 in tests. RED tests pin each single Provider, both defaults, localized text,
 calendar escaping and recorded Provider identity; then GREEN/full suite/commit.
 
+- [x] Provider matrix, ordering, localization/calendar, response/snooze/dry-run
+  scenarios observed RED and then GREEN with isolated configuration/fake commands.
+- [x] Independent review completed; displayed-Provider attribution race fixed
+  with RED/GREEN regression. Restore concise CSV errors and retain both invocation
+  arguments with additional RED/GREEN regressions.
+- [x] Full suite 193/193 on Python 3.14.6; reminder suite 13/13 on system Python
+  3.9.6. See `docs/testing/provider-reminders.md`.
+
 ### Task 4 — C13: installation, migration and removal
 
 Add stable setup/remove operations with provider overrides, explicit default for
@@ -95,3 +103,17 @@ and automated checks, record the concrete remaining check and preserve the branc
 
 - C10: 180/180 final full-suite tests passed with no skips and ResourceWarnings as errors; 23 focused tests also passed on system Python. Independent review found four Important issues, reproduced RED and fixed GREEN; one generic transcript warning remains Minor. See `docs/testing/provider-switches.md`.
 - Stop directive: the owner requested stopping at the next committed/pushed ticket while C10 was underway. Commit C10 and stop; tasks C12, C13, C11 and C14 remain unstarted. No push, merge, real model request or installed-user-data operation is included in this boundary.
+
+- C12 resumed: on 2026-11-09 the owner requested the next scheduled ticket only;
+  session `/root` continued Task 3 on the existing branch from `8e34b5a`.
+- C12: 13 reminder tests passed, full suite 193/193 passed, and all 13 reminder
+  tests passed on system Python 3.9.6. One independent ticket review completed;
+  the attribution race and error-reporting regression were fixed with RED/GREEN
+  regressions. Native desktop/calendar/model acceptance is still pending.
+- C12 decision: a desktop response is attributed to the Default provider displayed
+  in the alert, without a native session identity; this is not proof of skill use.
+  Legacy configurations without Provider settings remain Claude-only until setup
+  migration. Both choices preserve existing data meaning; interpreting reminder
+  rows as actual Provider usage would misattribute metrics.
+- Stop after the C12 ticket commit. C13 is next; no push, merge, installation or
+  authenticated native request is included in this task.
