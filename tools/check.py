@@ -34,9 +34,9 @@ def title(text, path):
     return (m.group(1) or m.group(2)).strip(" .") if m else path.parent.name
 
 
-def run(command):
+def run(command, *, cwd=None):
     try:
-        r = subprocess.run(["/bin/zsh", "-c", command], capture_output=True, text=True, timeout=TIMEOUT)
+        r = subprocess.run(["/bin/zsh", "-c", command], capture_output=True, text=True, timeout=TIMEOUT, cwd=cwd)
     except subprocess.TimeoutExpired:
         return "timeout", ""
     out = (r.stdout.strip() or r.stderr.strip()).splitlines()

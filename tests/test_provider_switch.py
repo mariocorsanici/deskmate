@@ -46,7 +46,8 @@ class ProviderSwitchTest(unittest.TestCase):
                         break
                     output += chunk
                     if b'Confirm transfer' in output and not sent:
-                        os.write(master, answer.encode() + b'\n')
+                        reply = answer() if callable(answer) else answer
+                        os.write(master, reply.encode() + b'\n')
                         sent = True
                 if process.poll() is not None:
                     break

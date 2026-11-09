@@ -2,11 +2,11 @@
 
 Updated: 2026-11-09
 Integration branch: `feature/codex-cli-support`
-Latest work: ticket 09, explicit degradable Provider switch (2026-11-09).
+Latest work: ticket 10, protected bounded Provider transfers (2026-11-09).
 
 ## Progress
 
-Tickets **01–09 are complete** on the integration branch:
+Tickets **01–10 are complete** on the integration branch:
 
 - 01–02: provider-neutral CLI and provider detection/configuration.
 - 03: shared Project cards with revision checks and safe Claude migration.
@@ -16,6 +16,7 @@ Tickets **01–09 are complete** on the integration branch:
 - 07: recorded-provider routing, explicit lost-session recovery and revision-safe native ownership confirmation.
 - 08: streaming bounded Session deltas for Claude JSONL, Codex rollout JSONL and paginated SQLite history, matching saved Checkpoints and reporting coverage.
 - 09: explicit new-Provider continuation from the shared card/current Checks, interactive overlap consent and revision-safe native ownership.
+- 10: local redaction, uncertain-finding refusal, interactive transfer consent, private one-use bundles, metadata-only audit and automatic expired-bundle cleanup.
 
 The 01–06 automated suite passed **105 tests**, with no skips and Python `ResourceWarning`s treated as errors. Independent Standards and Spec reviews found no remaining material issues. Claude’s native skill discovery and hook delivery were also verified in a disposable configuration with a synthetic API key; no model request was made.
 
@@ -27,9 +28,11 @@ also passes on macOS system Python. An independent review found four Important
 issues; public RED/GREEN regressions verify the fixes. See
 `docs/testing/bounded-session-deltas.md` for boundaries and review evidence.
 
-Ticket 09 validation passed **163 tests**, including six new public switch/PTY tests. No native model calls were made. Protected Session delta transfer is the next ticket.
+Ticket 09 validation passed **163 tests**, including six new public switch/PTY tests. No native model calls were made. Protected Session delta transfer is implemented by ticket 10.
 
-Tickets **10–14 have not started**. Independent ticket 07 review identified three important issues; public regressions verified their fixes (late launch evidence, legacy Claude folder-key collision, and existing-tab focus). Ticket 07 adds isolated public-command tests for routing, journal concurrency, early/late hooks and ownership recovery. The completed implementation commits remain local and have not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
+Ticket 10 validation passed **180 tests**, no skips, with ResourceWarnings as errors. All **23 switch/transfer tests** also pass on system Python. Four Important findings from an independent review were fixed with public RED/GREEN regressions; one generic transcript warning is a deferred Minor. Evidence: `docs/testing/provider-switches.md`. The owner requested stopping after C10 commit.
+
+Tickets **11–14 have not started**. Independent ticket 07 review identified three important issues; public regressions verified their fixes (late launch evidence, legacy Claude folder-key collision, and existing-tab focus). Ticket 07 adds isolated public-command tests for routing, journal concurrency, early/late hooks and ownership recovery. The completed implementation commits remain local and have not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
 
 ## Early manual checks
 

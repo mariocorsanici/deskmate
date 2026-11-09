@@ -44,10 +44,10 @@ directory, target-owned read-and-delete and one-hour orphan cleanup. Switch plan
 add the bounded `read_delta` result. Public `transfer-read` consumes only managed,
 matching-target bundles; bundle content never enters audit records or argv.
 
-- [ ] Public RED tests: canaries, redaction counts, uncertain findings, no bypass,
+- [x] Public RED tests: canaries, redaction counts, uncertain findings, no bypass,
   permissions, path-only launch, wrong-target/symlink refusal, consume/expiry,
   no unrelated file removal, stale card and content-free audit.
-- [ ] Implement and exercise real file/CLI boundaries; GREEN, full suite and commit.
+- [x] Implement and exercise real file/CLI boundaries; GREEN, full suite and commit.
 
 ### Task 3 — C12: dual-Provider reminders
 
@@ -92,3 +92,6 @@ and automated checks, record the concrete remaining check and preserve the branc
   existing worktree; native quota-hold clarification asked while synthetic work proceeds.
 
 - C09: six acceptance tests observed RED, then GREEN. Full suite 163/163 passed with ResourceWarnings as errors; no skipped/native checks claimed.
+
+- C10: 180/180 final full-suite tests passed with no skips and ResourceWarnings as errors; 23 focused tests also passed on system Python. Independent review found four Important issues, reproduced RED and fixed GREEN; one generic transcript warning remains Minor. See `docs/testing/provider-switches.md`.
+- Stop directive: the owner requested stopping at the next committed/pushed ticket while C10 was underway. Commit C10 and stop; tasks C12, C13, C11 and C14 remain unstarted. No push, merge, real model request or installed-user-data operation is included in this boundary.

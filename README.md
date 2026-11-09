@@ -82,7 +82,34 @@ the ongoing skill/installer migration.
 
 ## Provider switches
 
-`bin/deskmate switch --folder PATH --to claude|codex --preview` reviews an explicit switch. Run without `--preview` in a terminal to confirm a new target Work session. Cancellation preserves the source owner; a successful terminal submission remains pending until native hooks confirm ownership. Context travels through a private file path. Ticket 09 provides card-plus-current-Checks recovery; protected bounded Session delta transfer is completed by ticket 10.
+```bash
+bin/deskmate switch --folder PATH --to claude --preview
+bin/deskmate switch --folder PATH --to codex
+```
+
+A switch creates a **new** target Work session from the shared Project card,
+current Checks and an optional bounded Session delta. The source Provider may be
+unavailable. Checks run in the selected Project directory. The preview reports
+source/target, card revision, exact bundle bytes, included/omitted context,
+coverage, truncation and redaction categories/counts. Common credential formats
+are redacted locally; uncertain recognized values block transfer and offer source
+review/removal/replacement before a new preview. Redaction is conservative and
+does not claim to recognize every possible secret.
+
+Without `--preview`, the command requires a terminal and explicit `yes` consent,
+including a warning when another Work session may still be active. There is no
+`--yes` or piped-input bypass. Cancellation preserves ownership; a changed card
+invalidates the preview. Terminal submission remains pending until matching native
+hooks confirm the target's real identity.
+
+Only a private mode-0600 bundle path is passed to the target. Its startup prompt
+uses `deskmate transfer-read --bundle PATH --provider claude|codex` to validate and
+consume that managed file once. No transferred content is recorded in audit
+metadata or launch arguments. Expired bundles cannot be consumed; successful
+later normal commands remove valid managed bundles older than one hour. Explicit
+previews, dry runs and Session delta reads remain read-only. `deskmate
+transfer-cleanup` also performs cleanup directly, preserving fresh/unrelated files
+and symlinks. See [verification and review evidence](docs/testing/provider-switches.md).
 
 ## Bounded Session deltas
 

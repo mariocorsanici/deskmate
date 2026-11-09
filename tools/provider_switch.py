@@ -2,6 +2,8 @@
 """Explicit new-Provider continuation from durable state and current Checks."""
 from __future__ import annotations
 import argparse
+import hashlib
+import shlex
 import json
 import os
 from pathlib import Path
@@ -12,6 +14,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import check
 import project_cards as cards
 import work_sessions
+import activity_log
+import transfers
+import session_delta
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -38,7 +43,7 @@ def prepare(folder, target):
         for line in check.section(text, 'Checks').splitlines():
             matched = check.CHECK.match(line)
             if matched:
-                state, output = check.run(matched[2])
+                state, output = check.run(matched[2], cwd=project)
                 results.append({'label': matched[1], 'status': state, 'output': output[:1000]})
                 if state != 'ok':
                     warnings.append('Some current Checks are unavailable; treat those facts as unknown.')
@@ -48,35 +53,41 @@ def prepare(folder, target):
             'instructions': 'Continue from the Project card and current Checks. Ask only for missing context.',
             'warnings': warnings}
     plan['checks_count'] = len(results)
+    plan['card_digest'] = hashlib.sha256(text.encode('utf-8')).hexdigest()
+    limits = session_delta.configured_limits()
+    delta = work_sessions.implementation(owner['provider']).read_delta(owner['session_id'], max_messages=limits[0], max_characters=limits[1])
+    body['delta'] = delta
+    plan['coverage'] = delta['coverage']
+    body, redactions, blocked = transfers.redact(body)
+    plan['manifest'] = transfers.manifest(body, redactions, blocked)
+    if blocked:
+        plan.update(status='refused', reason='uncertain_secret')
+        plan['warnings'].append('Review, remove or replace suspected credential content in the source card/transcript, then prepare a new preview. Nothing was transferred.')
     return plan, body
-
-
-def private_bundle(body):
-    directory = cards.data_root() / 'transfers'
-    if directory.is_symlink():
-        raise ValueError('Transfer directory must not be a symlink')
-    directory.mkdir(mode=0o700, parents=True, exist_ok=True)
-    if directory.stat().st_mode & 0o077:
-        raise ValueError('Transfer directory must have private permissions (0700)')
-    fd, path = tempfile.mkstemp(prefix='transfer-', suffix='.json', dir=directory)
-    with os.fdopen(fd, 'w', encoding='utf-8') as stream:
-        json.dump(body, stream)
-        stream.flush()
-        os.fsync(stream.fileno())
-    return Path(path)
 
 
 def launch(plan, body):
     _, _, card, _ = cards.identity(plan['cwd'])
     current, owner = cards.read_card(card)
-    if not owner or owner['revision'] != plan['card_revision'] or current != body['card']:
+    if not owner or owner['revision'] != plan['card_revision'] or hashlib.sha256(current.encode('utf-8')).hexdigest() != plan['card_digest']:
         return {**plan, 'status': 'conflict', 'reason': 'Project card changed after preview'}
-    path = private_bundle(body)
-    prompt = (f'Read the private Deskmate transfer at {path}. '
-              'Continue this Project from its saved card and current Checks; ask only for missing context.')
+    transfers.cleanup()
+    path = transfers.create(body)
+    audit = {key: plan['manifest'][key] for key in ('source_provider', 'target_provider', 'card_id', 'card_revision', 'bytes', 'redactions')}
+    try:
+        activity_log.append_event('provider-switch', json.dumps({**audit, 'outcome': 'approved'}),
+                                  plan['source_session_id'], plan['cwd'], plan['source_provider'])
+    except (OSError, ValueError):
+        path.unlink(missing_ok=True)
+        raise ValueError('Transfer audit could not be recorded; launch was cancelled') from None
+    read_command = shlex.join([str(ROOT / 'bin/deskmate'), 'transfer-read', '--bundle', str(path), '--provider', plan['provider']])
+    prompt = ('Read the private Deskmate transfer with ' + read_command +
+              '. Continue from its saved Project card and current Checks, using the bounded delta only as recovery context. Ask only for missing context.')
     result = work_sessions.start_session(plan, prompt=prompt)
     if result['status'] == 'conflict' or (result['status'] == 'error' and result.get('reason') != 'launch_uncertain'):
         path.unlink(missing_ok=True)
+    activity_log.append_event('provider-switch', json.dumps({**audit, 'outcome': result['status']}),
+                              plan['source_session_id'], plan['cwd'], plan['source_provider'])
     return result
 
 
@@ -85,6 +96,10 @@ def show(plan):
     print(f"Project card: {plan.get('card_id')}, revision {plan.get('card_revision')}; current Checks: {plan.get('checks_count', 0)}")
     if plan.get('possible_overlap'):
         print('Warning: potentially simultaneous Work sessions may still be active.')
+    if plan.get('manifest'):
+        manifest = plan['manifest']
+        print(f"Transfer: {manifest['bytes']} bytes; redactions: {json.dumps(manifest['redactions'])}; blocked findings: {manifest['blocked_findings']}")
+        print('Delta coverage: ' + json.dumps(manifest['delta']))
     for warning in plan.get('warnings', []):
         print('warning: ' + warning)
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -11,6 +12,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 COMMANDS = {
+    "transfer-read": [sys.executable, "-I", str(ROOT / "tools" / "transfers.py"), "read"],
+    "transfer-cleanup": [sys.executable, "-I", str(ROOT / "tools" / "transfers.py"), "cleanup"],
     "switch": [sys.executable, "-I", str(ROOT / "tools" / "provider_switch.py")],
     "session-delta": [sys.executable, "-I", str(ROOT / "tools" / "session_delta.py")],
     "work-session": [sys.executable, "-I", str(ROOT / "tools" / "work_sessions.py")],
@@ -32,6 +35,8 @@ COMMANDS = {
     "configure": [sys.executable, "-I", str(ROOT / "tools" / "providers.py"), "configure"],
 }
 DESCRIPTIONS = {
+    "transfer-read": "consume a private transfer for its target Provider",
+    "transfer-cleanup": "remove expired managed transfer bundles",
     "switch": "explicitly continue a Project in a new target Provider session",
     "session-delta": "read bounded conversation after a saved Checkpoint",
     "work-session": "continue a Project with its recorded Provider or explicitly start anew",
@@ -53,6 +58,8 @@ DESCRIPTIONS = {
     "configure": "record installed and Default providers",
 }
 USAGE = {
+    "transfer-read": "deskmate transfer-read --bundle PATH --provider claude|codex",
+    "transfer-cleanup": "deskmate transfer-cleanup",
     "switch": "deskmate switch --folder PATH --to claude|codex [--preview]",
     "session-delta": "deskmate session-delta --provider claude|codex --session-id ID [--after ISO_TIMESTAMP] [--max-messages N] [--max-characters N] [--format text|json]",
     "work-session": "deskmate work-session --folder PATH [--new [--provider claude|codex]] [--title TEXT] [--prompt TEXT] [--dry-run]",
@@ -97,6 +104,19 @@ def command_help_text(command: str) -> str:
     return f"usage: {USAGE[command]}\n\n{DESCRIPTIONS[command]}\n"
 
 
+def cleanup_transfers(command, args):
+    # Preview/delta inspection and explicit dry runs keep their read-only contract.
+    if (command in ('switch', 'session-delta', 'transfer-read', 'transfer-cleanup')
+            or any(flag in args for flag in ('--preview', '--dry-run', '--help', '-h'))
+            or os.environ.get('DESKMATE_DRY_RUN')):
+        return ''
+    directory = pathlib.Path(os.environ.get('DESKMATE_DATA_DIR', ROOT / 'data')).expanduser() / 'transfers'
+    if not directory.exists() and not directory.is_symlink():
+        return ''
+    result = subprocess.run(COMMANDS['transfer-cleanup'], capture_output=True, text=True, check=False)
+    return 'warning: expired transfer cleanup could not be completed\n' if result.returncode else ''
+
+
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     json_output = bool(args and args[0] == "--json")
@@ -131,7 +151,10 @@ def main(argv: list[str] | None = None) -> int:
     if json_output and command in ("work-session", "session-delta", "switch"):
         invocation.append("--format=json")
     if not json_output:
-        return subprocess.run(invocation, check=False).returncode
+        code = subprocess.run(invocation, check=False).returncode
+        if code == 0:
+            sys.stderr.write(cleanup_transfers(command, args[1:]))
+        return code
 
     completed = subprocess.run(
         invocation,
@@ -139,7 +162,8 @@ def main(argv: list[str] | None = None) -> int:
         text=True,
         check=False,
     )
-    write_json(command, completed.returncode, completed.stdout, completed.stderr)
+    warning = cleanup_transfers(command, args[1:]) if completed.returncode == 0 else ''
+    write_json(command, completed.returncode, completed.stdout, completed.stderr + warning)
     return completed.returncode
 
 
