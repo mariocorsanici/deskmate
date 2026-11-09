@@ -2,11 +2,11 @@
 
 Updated: 2026-11-09
 Integration branch: `feature/codex-cli-support`
-Latest work: ticket 08, bounded Session delta extraction (2026-11-06).
+Latest work: ticket 09, explicit degradable Provider switch (2026-11-09).
 
 ## Progress
 
-Tickets **01–08 are complete** on the integration branch:
+Tickets **01–09 are complete** on the integration branch:
 
 - 01–02: provider-neutral CLI and provider detection/configuration.
 - 03: shared Project cards with revision checks and safe Claude migration.
@@ -15,6 +15,7 @@ Tickets **01–08 are complete** on the integration branch:
 - 06: provider-aware logs, migrations and separate usage metrics.
 - 07: recorded-provider routing, explicit lost-session recovery and revision-safe native ownership confirmation.
 - 08: streaming bounded Session deltas for Claude JSONL, Codex rollout JSONL and paginated SQLite history, matching saved Checkpoints and reporting coverage.
+- 09: explicit new-Provider continuation from the shared card/current Checks, interactive overlap consent and revision-safe native ownership.
 
 The 01–06 automated suite passed **105 tests**, with no skips and Python `ResourceWarning`s treated as errors. Independent Standards and Spec reviews found no remaining material issues. Claude’s native skill discovery and hook delivery were also verified in a disposable configuration with a synthetic API key; no model request was made.
 
@@ -26,7 +27,9 @@ also passes on macOS system Python. An independent review found four Important
 issues; public RED/GREEN regressions verify the fixes. See
 `docs/testing/bounded-session-deltas.md` for boundaries and review evidence.
 
-Tickets **09–14 have not started**. Independent ticket 07 review identified three important issues; public regressions verified their fixes (late launch evidence, legacy Claude folder-key collision, and existing-tab focus). Ticket 07 adds isolated public-command tests for routing, journal concurrency, early/late hooks and ownership recovery. The completed implementation commits remain local and have not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
+Ticket 09 validation passed **163 tests**, including six new public switch/PTY tests. No native model calls were made. Protected Session delta transfer is the next ticket.
+
+Tickets **10–14 have not started**. Independent ticket 07 review identified three important issues; public regressions verified their fixes (late launch evidence, legacy Claude folder-key collision, and existing-tab focus). Ticket 07 adds isolated public-command tests for routing, journal concurrency, early/late hooks and ownership recovery. The completed implementation commits remain local and have not been pushed or merged into `develop` or `main`. The complete authenticated Daily-loop acceptance belongs to ticket 14.
 
 ## Early manual checks
 

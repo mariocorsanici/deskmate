@@ -80,6 +80,10 @@ codes are 1 (unavailable Provider/terminal launch), 2 (invalid configuration/inp
 and 3 (card revision conflict). Existing low-level launch commands remain during
 the ongoing skill/installer migration.
 
+## Provider switches
+
+`bin/deskmate switch --folder PATH --to claude|codex --preview` reviews an explicit switch. Run without `--preview` in a terminal to confirm a new target Work session. Cancellation preserves the source owner; a successful terminal submission remains pending until native hooks confirm ownership. Context travels through a private file path. Ticket 09 provides card-plus-current-Checks recovery; protected bounded Session delta transfer is completed by ticket 10.
+
 ## Bounded Session deltas
 
 `deskmate session-delta --provider claude|codex --session-id ID` reads only
