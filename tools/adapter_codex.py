@@ -459,7 +459,20 @@ def verification_hook(session_id, cwd):
     raise ValueError("Deskmate UserPromptSubmit hook is not installed.")
 
 
-def configure_hooks(remove: bool = False) -> dict:
+def configure_hooks(remove: bool = False, *, capability=None) -> dict:
+    # Share the setup lock so direct integration cannot overwrite its publication.
+    import fcntl
+    directory = hooks_path().parent
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+        with (directory / '.deskmate-integration.lock').open('a') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            return _configure_hooks_locked(remove, capability=capability)
+    except OSError as error:
+        return {'provider': 'codex', 'status': 'error', 'warnings': [str(error)]}
+
+
+def _configure_hooks_locked(remove: bool = False, *, capability=None) -> dict:
     result = {"provider": "codex", "status": "ok", "warnings": [], "guidance": [
         "In Codex CLI, open /hooks and review and trust each Deskmate hook. New or changed definitions are skipped until trusted.",
         "Review normal project trust and command approvals when Codex requests them. Deskmate does not bypass approval or hook trust.",
@@ -486,7 +499,8 @@ def configure_hooks(remove: bool = False) -> dict:
             for skill, link in skills:
                 if (link.exists() or link.is_symlink()) and not (link.is_symlink() and link.resolve() == skill.resolve()):
                     raise ValueError(f"Existing Codex skill is not owned by Deskmate: {link.name}; move or rename it and rerun integration.")
-        supported, warning = (True, None) if remove else hook_capability()
+        supported, warning = (True, None) if remove else (
+            capability if capability is not None else hook_capability())
         if not supported:
             result.update(status="degraded", warnings=[warning])
         else:

@@ -19,7 +19,7 @@ PROBE_TIMEOUT_SECONDS = 2
 CONFIG_SCHEMA_VERSION = 1
 VERSION_PATTERN = re.compile(r"(?<!\w)\d+(?:\.\d+)+(?:[-+][0-9A-Za-z.-]+)?(?!\w)")
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
+DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data")).expanduser().resolve()
 
 
 @dataclasses.dataclass(frozen=True)

@@ -163,19 +163,48 @@ and redaction/consent belong to later tickets.
 
 ## Installation
 
-Clone the repo into `~/Dev/mc_dev/deskmate` (the skills look for their files there), then:
+From the cloned repository, run `./install.sh` (or `python3 -I bin/deskmate setup`).
+The common setup detects compatible Claude Code and Codex CLI installations,
+links the same skills into each selected Provider, migrates existing data with
+backups, and verifies logging in disposable state. If both are compatible,
+choose a Default provider. Existing preferences are retained.
 
 ```bash
-cd ~/Dev/mc_dev/deskmate && claude
+./install.sh --non-interactive --default-provider codex
+# Explicit subset; repeat --provider to select both:
+./install.sh --provider claude
 ```
 
-and run `/setup`: it asks your preferences, checks the prerequisites, runs `install.sh` and verifies that everything responds. Run `/setup` again whenever you want to change a preference. Without Claude: edit `data/config.json` and run `./install.sh`. To remove everything: `./install.sh --remove` (data stays).
+The command is linked as `~/.local/bin/deskmate`. For zsh/bash, setup adds a marked
+PATH block when needed; open a new shell or follow its printed export command.
+`/setup` in Claude and `$setup` in Codex use one shared setup skill. Before the
+first install, Claude can discover that skill inside this repository.
 
-Requires macOS with `jq` and `python3`; iTerm to open sessions in tabs.
+Data defaults to `<repo>/data`; `DESKMATE_DATA_DIR` selects another directory.
+`CODEX_HOME` selects the Codex hook configuration directory. Backups and the
+recoverable migration journal live under `<data>/backups/install/`. Rerunning
+setup recovers an interrupted installation; if another writer changed a file,
+it stops and identifies the file and preserved backups. An unresolved legacy
+Project card needs `--project /absolute/project/folder` rather than a guessed path.
+
+Setup preserves unrelated hooks and configuration. Codex hooks must also be
+enabled in the installed CLI and trusted through `/hooks`; setup prints guidance.
+Its synthetic logging check does not prove runtime approval. Verify actual
+native delivery separately in an authorized Work session. See
+[installation verification](docs/testing/installation.md).
+
+Requires Python 3.9+ and macOS. Desktop reminders additionally need `launchctl`
+and `osascript`; iTerm opens work sessions in tabs. Slack remains planned.
+
+To remove integrations, run `deskmate remove` or `./install.sh --remove`.
+Personal data, shared cards, logs and calendar files stay by default. Interactive
+removal separately offers a default-no purge, requiring the exact `DELETE`.
+Automation preserves data with `--non-interactive`; only an explicit
+`--purge-data` deletes the selected data directory and its card links.
 
 ## Configuration
 
-All preferences live in `data/config.json`, written by `/setup` (or by hand) and applied by `install.sh`:
+All preferences live in the selected data directory’s `config.json`, preserved by setup and applied by `install.sh`:
 
 ```json
 {
@@ -210,17 +239,23 @@ non-interactive configuration requires an explicit choice, for example
 
 ## What gets installed
 
-- **Skills:** links from `~/.claude/skills/<name>` to `skills/<name>`, so changes in the repo apply immediately.
-- **Hooks** in `~/.claude/settings.json`:
-  - `UserPromptSubmit` → `tools/hook_log.sh`: logs every skill run in `data/log.csv`;
-  - `Stop` → `tools/hook_tokens.sh`: fills in the tokens used by each run (in the background).
-- **Reminders:** with the `mac` channel, two LaunchAgents generated from the config in `~/Library/LaunchAgents` (`com.deskmate.morning`, `com.deskmate.evening`); with `calendar`, the `.ics` file in `data/`.
+- **Command:** `~/.local/bin/deskmate` links to `bin/deskmate`.
+- **Skills:** Claude links under `~/.claude/skills`; Codex links under
+  `~/.agents/skills`, all pointing to the same repository `skills/` sources.
+- **Hooks:** Provider adapters merge Deskmate handlers into
+  `~/.claude/settings.json` and `$CODEX_HOME/hooks.json` (default `~/.codex`).
+  Other handlers and preferences remain intact; repeated setup adds no duplicates.
+- **Project cards:** existing Claude cards migrate to shared data with backups;
+  their former locations become links to the shared cards.
+- **Reminders:** the `mac` channel installs two LaunchAgents in
+  `~/Library/LaunchAgents`; `calendar` generates `<data>/deskmate-reminders.ics`.
+  The LaunchAgents retain the selected data directory in their environment.
 
 ## Layout
 
 ```
 skills/                  the skills of the day
-.claude/skills/setup/    /setup, available when running claude inside the repo
+.claude/skills/setup/    link to the shared setup source for initial Claude discovery
 bin/deskmate             stable command used by skills and automation
 tools/
   sessions.py            summary of the Claude Code sessions in a period

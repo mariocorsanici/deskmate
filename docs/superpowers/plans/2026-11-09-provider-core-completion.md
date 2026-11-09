@@ -117,3 +117,61 @@ and automated checks, record the concrete remaining check and preserve the branc
   rows as actual Provider usage would misattribute metrics.
 - Stop after the C12 ticket commit. C13 is next; no push, merge, installation or
   authenticated native request is included in this task.
+
+- C13 resumed 2026-11-09, owner request "Iniziamo ticket C13", session `/root`.
+  Execute Task 4 only, inline, with TDD and one independent final review.
+  Prepare in `/private/tmp/deskmate-c13` because the existing linked worktree
+  is outside the sandbox writable roots; apply the verified patch to the
+  existing feature worktree with filesystem authorization at the ticket boundary.
+  Baseline source: `e375535`. No actual user installation or native model request.
+
+### C13 task detail
+
+Interfaces: `deskmate setup [--provider claude|codex]...
+[--default-provider claude|codex] [--non-interactive] [--project PATH]...
+[--name NAME] [--language LANGUAGE]`; `deskmate remove [--non-interactive]
+[--purge-data]`. `install.sh` forwards to these commands.
+
+- [x] RED: public command tests cover detection/default/override matrix, portable
+  skill links and actual shell discovery, unrelated hooks/preferences, repeated
+  setup, config/cards/log backups and future schema rejection without mutation.
+- [x] Implement `tools/installation.py` to preflight and stage using existing
+  adapters and migration readers. Resolve Claude project identity from explicit
+  folders, card folder paths or session indexes; stop with `--project` guidance
+  when uncertain, without guessing a path from its lossy encoded key.
+- [x] RED then GREEN: journaled atomic per-file publication in
+  `tools/install_transaction.py`, rollback and interrupted-transaction recovery,
+  permission/collision failure and concurrent-change refusal. Use existing card,
+  log and native hook locks while publishing to preserve concurrent writers.
+- [x] RED then GREEN: logging verification and trust guidance, reminders through
+  fake launchctl, shell path exposure, owned removal, default data preservation,
+  interactive default-no/exact DELETE and explicit unattended purge.
+- [x] Full suite and system Python focused suite; independent review/fixes with
+  regressions; document evidence; apply to existing feature worktree and commit
+  C13 only. Record native acceptance as pending.
+
+- C13 implementation: shared setup/remove facade, staged adapters, reusable
+  journaled file/link publication, verified runtime service rollback, private
+  backups, normalized paths and preserved unrelated state. Common setup skill
+  scenario observed baseline failures then passed with the shared replacement.
+- C13 review: one independent review, six Important findings reproduced RED
+  and fixed GREEN (custom Codex configuration, service-only journals, failed
+  service restoration, configuration lost-update race, tilde-root schema bypass,
+  unsafe repository-ancestor purge). Setup Codex metadata contract also fixed
+  after the full suite exposed the missing file.
+- C13 decision: only zsh/bash receive managed PATH entries; linked/special shell
+  files require explicit manual PATH guidance rather than being replaced. A
+  project with unresolved legacy path identity stops setup with --project
+  guidance. Wrong inference would risk migrating the wrong durable card.
+- C13 deferred Minor: Provider detection output is printed before explicit
+  subset selection, so its included/excluded wording describes detection.
+  Actual installed configuration/integrations and verification reflect the
+  override; ambiguous wording can be clarified separately.
+
+- C13 verification: 31/31 focused tests; 224/224 full-suite tests on Python
+  3.14.6; 31/31 installation scenarios on Python 3.9.6, ResourceWarnings as
+  errors. All six Important findings fixed with observed RED/GREEN regressions;
+  review outcome and the deferred wording Minor are in docs/testing/installation.md.
+  Keep this feature branch/worktree for C11 and C14; no integration before C14.
+
+- Stop at the C13 local ticket commit. Next scheduled ticket is C11; C14 remains blocked by C11. No push, merge, personal installation or native request authorized in this boundary.

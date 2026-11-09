@@ -12,6 +12,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 COMMANDS = {
+    "setup": [sys.executable, "-I", str(ROOT / "tools" / "installation.py"), "setup"],
+    "remove": [sys.executable, "-I", str(ROOT / "tools" / "installation.py"), "remove"],
     "transfer-read": [sys.executable, "-I", str(ROOT / "tools" / "transfers.py"), "read"],
     "transfer-cleanup": [sys.executable, "-I", str(ROOT / "tools" / "transfers.py"), "cleanup"],
     "switch": [sys.executable, "-I", str(ROOT / "tools" / "provider_switch.py")],
@@ -35,6 +37,8 @@ COMMANDS = {
     "configure": [sys.executable, "-I", str(ROOT / "tools" / "providers.py"), "configure"],
 }
 DESCRIPTIONS = {
+    "setup": "install compatible Providers and migrate shared data with backups",
+    "remove": "remove integrations, preserving personal data unless explicitly purged",
     "transfer-read": "consume a private transfer for its target Provider",
     "transfer-cleanup": "remove expired managed transfer bundles",
     "switch": "explicitly continue a Project in a new target Provider session",
@@ -58,6 +62,8 @@ DESCRIPTIONS = {
     "configure": "record installed and Default providers",
 }
 USAGE = {
+    "setup": "deskmate setup [--provider claude|codex]... [--default-provider claude|codex] [--non-interactive] [--project PATH]... [--name NAME] [--language LANGUAGE]",
+    "remove": "deskmate remove [--non-interactive] [--purge-data]",
     "transfer-read": "deskmate transfer-read --bundle PATH --provider claude|codex",
     "transfer-cleanup": "deskmate transfer-cleanup",
     "switch": "deskmate switch --folder PATH --to claude|codex [--preview]",
@@ -106,7 +112,7 @@ def command_help_text(command: str) -> str:
 
 def cleanup_transfers(command, args):
     # Preview/delta inspection and explicit dry runs keep their read-only contract.
-    if (command in ('switch', 'session-delta', 'transfer-read', 'transfer-cleanup')
+    if (command in ('setup', 'remove', 'switch', 'session-delta', 'transfer-read', 'transfer-cleanup')
             or any(flag in args for flag in ('--preview', '--dry-run', '--help', '-h'))
             or os.environ.get('DESKMATE_DRY_RUN')):
         return ''

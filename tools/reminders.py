@@ -22,7 +22,7 @@ import activity_log
 import providers
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
+DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data")).expanduser().resolve()
 ICS = DATA / "deskmate-reminders.ics"
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 RETRO_DAYS = {"mon", "wed", "fri"}
