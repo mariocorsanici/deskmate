@@ -175,3 +175,56 @@ Interfaces: `deskmate setup [--provider claude|codex]...
   Keep this feature branch/worktree for C11 and C14; no integration before C14.
 
 - Stop at the C13 local ticket commit. Next scheduled ticket is C11; C14 remains blocked by C11. No push, merge, personal installation or native request authorized in this boundary.
+
+
+### C11 task detail — resumed 2026-11-10
+
+Owner authorized updating the shared tracker and starting C11. Reuse Task 5,
+inline with TDD, from clean `3b0c510`. Baseline 224/224 passed. Work in
+`/private/tmp/deskmate-c11-a6hra4n5` until the verified patch can be applied to
+the existing feature worktree with filesystem authorization. C14, native model
+requests, personal installation, push and merge remain outside this ticket.
+
+Interfaces: `deskmate retrospective --since DATE [--select PROVIDER:ID]...
+[--format text|json]`; alternatively `--deepen PROVIDER:ID` with an explicit
+`--max-messages N` and/or `--max-characters N`. Selection replaces recommendations;
+repeating `--select` adds sessions, omitting it reads no deltas. Deepening accepts
+one session and overrides only this command's limits.
+
+Design: one `tools/retrospective.py` builds a read-only durable/metadata view,
+then optionally reads chosen deltas through existing adapters. Reuse shared card
+validation, CSV reading, cached raw metrics and configured delta limits. Avoid
+`metrics.report`, which refreshes native usage by scanning transcripts; initial
+metrics explicitly identify metadata/cached snapshot provenance. Keep all
+candidates and Provider identities visible, while recommending at most five
+with reasons from logged activity, card ownership, incomplete metadata and recency.
+The skill owns user confirmation and the conversation, using this command rather
+than introducing a persistent selection store or an interactive CLI wizard.
+Existing C08 owns bounded reads; this ticket adds orchestration and scenarios.
+
+- [x] Public RED: nine synthetic CLI scenarios fail because the retrospective
+  command is missing (one rejection-only test already passes and is not RED proof).
+- [x] Add durable/metadata collection, reasoned recommendations and isolated
+  Provider metrics. Guard the initial phase against conversation reader entry.
+- [x] Add validated explicit selection and one-session deepening, configured
+  limits, per-session degradation and read-only CLI routing.
+- [x] Apply old/new skill to synthetic scenarios; update instructions for the
+  selection pause, durable evidence, separated raw metrics and bounded deepening.
+- [x] Full suite, focused suite on system Python, independent review and fixes,
+  ticket/evidence/tracker updates, apply to existing feature worktree and commit.
+
+- C11 instruction scenario: baseline read eight unselected Claude transcripts;
+  revised flow listed all 11 Provider-owned candidates and stopped before reads.
+  Chosen Codex-only selection and 3/40 one-off deepening worked; next read
+  reverted to configured 2/20 without a configuration change.
+- C11 review fix pass: malformed cached metadata now degrades its record; the
+  experiment lens uses saved evidence to avoid unselected transcript scans.
+  Alternative date forms are explicitly rejected to prevent silent evidence loss.
+  These cases were observed RED and then GREEN; no review findings deferred.
+- C11 choice: native/cached counters are labelled by Provider, source and snapshot
+  time; saved experiment samples can support decisions, unavailable measurements
+  cannot. Standalone session-stats remains available outside this retrospective.
+
+- C11 final verification: 239/239 full suite on Python 3.14.6; 15/15 focused
+  retrospective scenarios on Python 3.9.6, ResourceWarnings as errors, no skips.
+  All acceptance checkboxes and evidence updated; apply/verify/commit C11 only.
