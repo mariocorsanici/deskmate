@@ -31,14 +31,27 @@ def print_sessions(records, count, cut):
         print(f"folder:  {session['cwd']}")
         print(f"active:  {session['start']} -> {session['end']}")
         if session['cwd']:
-            invocation = ['claude', '--resume'] if session['provider'] == 'claude' else ['codex', 'resume']
-            print(f"resume:  cd {shlex.quote(session['cwd'])} && {shlex.join([*invocation, session['id']])}")
+            import project_cards
+            try:
+                _, _, card, _ = project_cards.identity(session['cwd'])
+                _, owner = project_cards.read_card(card)
+            except (OSError, ValueError):
+                owner = None
+            if owner and (owner['provider'], owner['session_id']) == (session['provider'], session['id']):
+                print(f"resume:  {shlex.join(['deskmate', 'work-session', '--folder', session['cwd']])}")
+            else:
+                print(f"resume unresolved: {session['provider']}:{session['id']}; "
+                      "write a Checkpoint in that Work session before routing this Project.")
         for message in session.get('messages', [])[-count:] if count else []:
             who = 'USER' if message['role'] == 'user' else session['provider'].upper()
             text = message['text']
             if len(text) > cut:
                 text = text[:cut] + ' […]'
             print(f"[{message['timestamp']}] {who}: {text}\n")
+        if 'coverage' in session:
+            print('delta: ' + json.dumps({key: session[key] for key in (
+                'checkpoint', 'limits', 'included_messages', 'omitted_messages', 'characters',
+                'omitted_characters', 'truncated', 'coverage')}))
         for warning in session.get('warnings', []):
             print(f'warning: {warning}')
 
@@ -70,9 +83,9 @@ def main():
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers(dest='command', required=True)
     sessions = commands.add_parser('sessions')
-    sessions.add_argument('--provider', choices=['claude', 'codex', 'all'], default='claude')
+    sessions.add_argument('--provider', choices=['claude', 'codex', 'all'], default='all')
     sessions.add_argument('--since', default=dt.date.today().isoformat())
-    sessions.add_argument('--messages', type=int, default=8)
+    sessions.add_argument('--messages', type=int, default=0)
     sessions.add_argument('--cut', type=int, default=700)
     sessions.add_argument('--format', choices=['text', 'json'], default='text')
     session = commands.add_parser('session')
@@ -125,10 +138,13 @@ def main():
             implementation = adapter(provider)
             discovered = implementation.discover(args.since)
             if args.messages:
-                discovered = [implementation.read_session(item['id']) for item in discovered]
-                for item in discovered:
-                    item['messages'] = [{**message, 'text': message['text'][:args.cut]}
-                                        for message in item['messages'][-args.messages:]]
+                if args.cut == 0:
+                    raise ValueError('--cut must be positive when reading messages')
+                from session_delta import configured_limits
+                configured_limits(args.messages, args.cut)
+                discovered = [{**item, **implementation.read_delta(item['id'], max_messages=args.messages,
+                                                        max_characters=args.cut)}
+                              for item in discovered]
             records.extend(discovered)
         if args.format == 'json':
             print(json.dumps(records))

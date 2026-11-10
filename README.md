@@ -1,6 +1,8 @@
 # deskmate
 
-Claude Code skills to run your working day: open it in the morning, close it in the late afternoon, and every other day take stock of how you work. Claude acts as the colleague at the next desk who keeps track of where everything stands.
+Shared skills for Claude Code and Codex CLI to run your working day: open it in the morning, close it in the late afternoon, and every other day take stock of how you work. Deskmate acts as the colleague at the next desk who keeps track of where everything stands.
+
+Use `/skill` in Claude Code and `$skill` in Codex CLI. Setup links the same sources into both. The table uses Claude syntax; substitute `$` in Codex.
 
 ## A typical day
 
@@ -19,11 +21,11 @@ After closing: study the topics you set aside, or admin work.
 Each project has one shared Markdown card at `data/projects/<slug>-<path-hash>/project-card.md`, independent of Claude or Codex. `DESKMATE_DATA_DIR` overrides the data root. Claude’s existing `~/.claude/projects/<folder-key>/memory/project-card.md` becomes a symlink to that same document. `/checkpoint`, run inside the project's session, keeps two sections of it up to date:
 
 - `## Status`: state (`active`, `paused`, `standby`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
-- `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `tools/check.py` runs them for `/whats-on-today` and `/call-it-a-day`.
+- `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `deskmate check` runs them for `/whats-on-today` and `/call-it-a-day`.
 
-`paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `check.py` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
+`paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `deskmate check` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
 
-`/call-it-a-day` reads the cards instead of the transcripts; it falls back to the transcript only for sessions that worked after their last checkpoint.
+`/call-it-a-day` reads the cards instead of the transcripts; it discovers both Providers without reading messages, then reads bounded Session deltas only for work after its matching Checkpoint or without a matching card. Missing history is disclosed and does not block the Handoff.
 
 Use `bin/deskmate card locate <project-folder>` to get its canonical path and metadata as JSON, and `bin/deskmate card list` to discover shared cards. `bin/deskmate card migrate <project-folder>` imports an existing Claude card, preserves an exact content-addressed backup under `data/backups/project-cards/`, and installs the Claude symlink. Repeating migration is safe; differing legacy/shared content stops for explicit resolution.
 
@@ -50,8 +52,7 @@ bin/deskmate work-session --folder /path/to/project --new --provider codex
 
 `--provider` requires `--new`; it cannot turn a resume into a Provider switch.
 `--title` and `--prompt` supply optional terminal and initial-message text.
-This starts a new native Work session; the context-transfer and switch preview
-flow remains work for later tickets.
+This starts a new native Work session. To carry existing progress to another Provider, use the explicit switch preview below.
 
 Opening an iTerm tab submits a command; it does not prove that the native CLI
 started. A new session therefore remains `pending` until a matching native
@@ -77,8 +78,7 @@ how to continue. Interrupted confirmation can retry through the same correlated
 native hook, including a confirming write whose card was already published.
 Unknown future schemas stop before launch or durable changes. Other failure
 codes are 1 (unavailable Provider/terminal launch), 2 (invalid configuration/input)
-and 3 (card revision conflict). Existing low-level launch commands remain during
-the ongoing skill/installer migration.
+and 3 (card revision conflict). Daily-loop launch and resume use `work-session`; Provider switches use `switch`.
 
 ## Provider switches
 
@@ -92,7 +92,7 @@ current Checks and an optional bounded Session delta. The source Provider may be
 unavailable. Checks run in the selected Project directory. The preview reports
 source/target, card revision, exact bundle bytes, included/omitted context,
 coverage, truncation and redaction categories/counts. Common credential formats
-are redacted locally; uncertain recognized values block transfer and offer source
+are redacted locally; ambiguous recognized multiline/container values block transfer and offer source
 review/removal/replacement before a new preview. Redaction is conservative and
 does not claim to recognize every possible secret.
 
@@ -109,7 +109,7 @@ metadata or launch arguments. Expired bundles cannot be consumed; successful
 later normal commands remove valid managed bundles older than one hour. Explicit
 previews, dry runs and Session delta reads remain read-only. `deskmate
 transfer-cleanup` also performs cleanup directly, preserving fresh/unrelated files
-and symlinks. See [verification and review evidence](docs/testing/provider-switches.md).
+and symlinks. Interrupted writes remain private in reserved staging files; cleanup expires abandoned staging files after one hour while preserving active writers. See [verification and review evidence](docs/testing/provider-switches.md).
 
 ## Bounded Session deltas
 
@@ -154,12 +154,48 @@ normal envelope and selects JSON content automatically. Counts describe readable
 eligible conversation; skipped corrupt records cannot be counted accurately.
 Missing/unreadable history returns exit 0 with `status: degraded` and partial or
 unavailable coverage so the Daily loop can continue. Invalid limits/configuration
-return exit 2. This command performs local extraction only; Provider switching
-and redaction/consent belong to later tickets.
+return exit 2. This command performs local extraction only; `switch` applies redaction, preview and consent before cross-Provider transfer.
 
 ## Experiments
 
-`data/config.json` can hold a running experiment on the way of working, which the skills remind you of every morning. Today there is one, `experiments.fresh_sessions`: is it better to resume yesterday's session (`claude --resume`) or to start a new one that picks up from the project card? On the weekdays in `new_days`, `/whats-on-today` opens a new session (`open_tab.sh --new`), on the others it resumes; `/checkpoint` asks how the restart went (1–3); `tools/session_stats.py` measures each session-day from the transcripts (context at the first answer, tokens, compactions) and `/how-did-it-go` proposes a decision once both modes have `target_days` days.
+`experiments.fresh_sessions` in `config.json` can select new-session weekdays
+with `new_days`; other days resume. Morning uses `work-session --new --provider`
+with the recorded Provider for a project that has a Checkpoint. Checkpoint asks
+for a 1–3 restart rating and logs its Provider. Morning and retrospective inspect
+previously saved measurements, label missing evidence and retain separate native
+counters. Historical Claude experiment measurements remain available explicitly
+through `deskmate session-stats`; this Claude-only diagnostic scans transcripts
+and is outside routine morning/retrospective collection.
+
+## Discovery and retrospective
+
+`deskmate sessions` lists metadata from both Providers by default, without
+conversation text. Use `--provider claude|codex|all`, `--since YYYY-MM-DD` and
+`--format json` to filter or consume the result. A native ID alone is not unique:
+retain the Provider too. `--messages N --cut N` explicitly reads bounded deltas;
+`--cut` is the total character budget per session. Coverage, Checkpoint boundary,
+truncation and omitted counts accompany the result. Prefer `session-delta` for
+one chosen session. `session` is an explicit native diagnostic read and is not
+used by the Daily loop.
+
+```bash
+deskmate retrospective --since 2026-11-01 --format json
+deskmate retrospective --since 2026-11-01 --select codex:ID --format json
+deskmate retrospective --since 2026-11-01 --deepen codex:ID --max-messages 20 --format json
+```
+
+The first command reads durable evidence and native metadata, shows all candidate
+Work sessions and recommends at most five. Only explicit selection reads their
+bounded deltas. The user may replace the recommendation, select more than five,
+or choose none. Deepening requires an explicit one-session choice and one-off
+limits; it leaves configuration unchanged. Raw usage remains partitioned by
+Provider, source and snapshot time. Unavailable histories limit evidence rather
+than stop the day.
+
+A Handoff uses `deskmate work-session --folder PATH` for the current card owner.
+When other active work in that folder has a different Provider or ID, its resume
+remains unresolved until that Work session writes a Checkpoint; routing cannot
+promise to resume it. An unowned project starts new with the Default provider.
 
 ## Installation
 
@@ -230,7 +266,7 @@ Providers and choose the Default provider. With both Providers available,
 non-interactive configuration requires an explicit choice, for example
 `bin/deskmate configure --non-interactive --default-provider codex`.
 
-- `name`: how Claude addresses you. `language`: for Claude's replies, the handoff, the lessons and the reminders (reminder texts exist in `en` and `it`, other languages fall back to English).
+- `name`: how the skills address you. `language`: for replies, the handoff, the lessons and the reminders (reminder texts exist in `en` and `it`, other languages fall back to English).
 - `providers.installed`: compatible Providers found during configuration. `providers.default`: the Provider used when a Project card has no Work session to resume. Reminders show only the configured Providers: `/skill` for Claude Code, `$skill` for Codex CLI, with the Default provider first when both are installed. Desktop responses record that displayed Default provider without a native Work session identity.
 - `channels`:
   - `mac`: an alert on the Mac that records your answer (used by `/how-did-it-go`). If the Mac is asleep at reminder time, the alert shows up on wake while it still makes sense (morning: up to 3 hours later; evening: from 1 hour before to 4 hours after); if the Mac is off, it is skipped.
@@ -257,18 +293,20 @@ non-interactive configuration requires an explicit choice, for example
 skills/                  the skills of the day
 .claude/skills/setup/    link to the shared setup source for initial Claude discovery
 bin/deskmate             stable command used by skills and automation
-tools/
-  sessions.py            summary of the Claude Code sessions in a period
-  log_event.sh           appends a row to the log
-  token_usage.py         computes the tokens of each run from the transcripts
-  hook_log.sh            UserPromptSubmit hook
-  hook_tokens.sh         Stop hook
-  reminders.py           reminder texts, time windows, LaunchAgents and calendar file, from the config
-  morning_reminder.sh    morning alert on the Mac
-  evening_reminder.sh    evening alert on the Mac
-  check.py               runs the checks listed in the project cards
-  session_stats.py       data for the resume-or-new-session experiment
-  open_tab.sh            opens a session in a titled iTerm tab, or brings it to the front if already running
+tools/                   internal implementations behind bin/deskmate
+  adapter_claude.py       Claude native storage, hooks and launch
+  adapter_codex.py        Codex native storage, hooks and launch
+  work_sessions.py       routing and confirmed native ownership
+  project_cards.py       shared cards, revisions and migration
+  session_delta.py       bounded reads with coverage and omission counts
+  retrospective.py       durable evidence, candidates and explicit selection
+  hook_event.py          shared native hook handler
+  activity_log.py         Provider-aware activity and atomic migration
+  metrics.py             separate native Provider usage
+  installation.py        recoverable setup/removal
+  reminders.py           configured Provider syntax, LaunchAgents and calendar
+  morning_reminder.sh    desktop wrapper through the stable command
+  evening_reminder.sh    desktop wrapper through the stable command
 install.sh               install, update, remove
 data/                    personal files, not in git
 ```
@@ -280,4 +318,9 @@ data/                    personal files, not in git
 - `handoff.md`: state of the sessions and things to do, rewritten every evening; the previous version goes to `archive/`.
 - `lessons.md`: log of the retrospectives, with the running method experiments.
 - `study-later.md`: topics to study.
-- `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens`. A run lasts from its command to the next `/command` of the same session, or to the end of the session: for clean numbers, run the skills in a dedicated session or finish with `/clear`.
+- `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens, schema_version, provider`. Historical rows migrate as Claude; Provider plus native ID identifies a Work session. Raw Codex counters live separately under `usage/`. A run lasts from its command to the next `/command` of the same session, or to the end of the session: for clean numbers, run the skills in a dedicated session or finish with `/clear`.
+
+
+The [Provider-neutral contract](docs/provider-neutral-cli.md) records durable
+architecture and acceptance decisions. See [Daily-loop verification](docs/testing/daily-loop.md)
+for synthetic evidence, native acceptance still pending, and obsolete command migration.

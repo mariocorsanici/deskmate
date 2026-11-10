@@ -87,7 +87,7 @@ class ClaudeAdapterTest(unittest.TestCase):
                           'message': {'content': text}} for text in ['first', 'second', 'third']])
         records = self.record('sessions', '--provider', 'claude', '--messages', '2', '--cut', '3',
                               '--format', 'json')
-        self.assertEqual([item['text'] for item in records[0]['messages']], ['sec', 'thi'])
+        self.assertEqual([item['text'] for item in records[0]['messages']], ['f', 'th'])
         missing = self.record('session', '--provider', 'claude', '--session-id', 'absent')
         self.assertEqual(missing['status'], 'degraded')
         self.assertEqual(missing['messages'], [])

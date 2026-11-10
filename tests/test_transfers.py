@@ -115,6 +115,66 @@ class TransfersTest(unittest.TestCase):
         self.assertEqual(unrelated.read_text(), 'KEEP')
         self.assertTrue(linked.is_symlink())
 
+    def test_interrupted_bundle_write_is_expired_without_removing_unrelated_files(self):
+        script = ("import json,os,sys\nfrom pathlib import Path\n"
+                  "sys.path.insert(0, sys.argv[1])\nimport transfers\n"
+                  "def interrupted_dump(body, stream):\n"
+                  "    stream.write('{\"private\": \"INTERRUPTED_CONTEXT_CANARY'); stream.flush(); os._exit(71)\n"
+                  "transfers.json.dump = interrupted_dump\n"
+                  "transfers.create({'schema_version':1,'source_provider':'claude',"
+                  "'target_provider':'codex','card_id':'demo'})\n")
+        result = subprocess.run([sys.executable, '-c', script, str(ROOT / 'tools')],
+                                env=self.fixture.env, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 71, result.stderr)
+        parent = self.data / 'transfers'
+        files = list(parent.iterdir())
+        self.assertEqual(len(files), 1)
+        interrupted = files[0]
+        self.assertIn('INTERRUPTED_CONTEXT_CANARY', interrupted.read_text())
+        old = time.time() - 3700
+        os.utime(interrupted, (old, old))
+        unrelated = parent / 'notes.json'
+        unrelated.write_text('KEEP')
+        linked = parent / ('.pending-transfer-' + 'f' * 32 + '.json')
+        linked.symlink_to(unrelated)
+        hardlinked = parent / ('.pending-transfer-' + 'e' * 32 + '.json')
+        os.link(unrelated, hardlinked)
+        os.utime(unrelated, (old, old))
+        output = self.fixture.command('transfer-cleanup')
+        self.assertEqual(output['removed'], 1)
+        self.assertFalse(interrupted.exists())
+        self.assertEqual(unrelated.read_text(), 'KEEP')
+        self.assertTrue(linked.is_symlink())
+        self.assertTrue(hardlinked.is_file())
+
+    def test_cleanup_preserves_active_staging_writer_then_expires_its_abandoned_file(self):
+        import select
+        script = ("import os,sys\nsys.path.insert(0, sys.argv[1])\nimport transfers\n"
+                  "def paused_dump(body, stream):\n"
+                  "    stream.write('PARTIAL_ACTIVE_CONTEXT'); stream.flush()\n"
+                  "    print('ready', flush=True); sys.stdin.readline(); os._exit(71)\n"
+                  "transfers.json.dump = paused_dump\ntransfers.create({})\n")
+        process = subprocess.Popen([sys.executable, '-c', script, str(ROOT / 'tools')],
+                                   env=self.fixture.env, stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            self.assertTrue(select.select([process.stdout], [], [], 10)[0])
+            self.assertEqual(process.stdout.readline().strip(), 'ready')
+            staged = next((self.data / 'transfers').iterdir())
+            self.assertEqual(self.fixture.command('transfer-cleanup')['removed'], 0)
+            old = time.time() - 3700
+            os.utime(staged, (old, old))
+            self.assertEqual(self.fixture.command('transfer-cleanup')['removed'], 0)
+            self.assertTrue(staged.exists())
+            process.communicate('exit\n', timeout=10)
+            self.assertEqual(process.returncode, 71)
+            self.assertEqual(self.fixture.command('transfer-cleanup')['removed'], 1)
+            self.assertFalse(staged.exists())
+        finally:
+            if process.poll() is None:
+                process.kill()
+            process.communicate(timeout=10)
+
     def test_bundle_older_than_one_hour_cannot_be_consumed(self):
         path = self.launch()
         old = time.time() - 3700
@@ -179,6 +239,44 @@ class TransfersTest(unittest.TestCase):
         self.assertEqual(result['reason'], 'uncertain_secret')
         self.assertGreater(result['manifest']['blocked_findings'], 0)
         self.assertNotIn('SYNTHETIC_TRUNCATED_PASSWORD', json.dumps(result))
+
+    def test_ambiguous_multiline_credentials_block_preview_and_launch(self):
+        variants = ['credentials: { value: MULTILINE_CREDENTIAL_CANARY }',
+                    'password: [ MULTILINE_CREDENTIAL_CANARY ]',
+                    'password: |\n  MULTILINE_CREDENTIAL_CANARY',
+                    'api_token: >-\n  MULTILINE_CREDENTIAL_CANARY',
+                    'password = """\nMULTILINE_CREDENTIAL_CANARY\n"""',
+                    'password:\n  MULTILINE_CREDENTIAL_CANARY',
+                    'password=\\\n  MULTILINE_CREDENTIAL_CANARY']
+        for content in variants:
+            with self.subTest(content=content.splitlines()[0]):
+                candidate = self.home / 'multiline-candidate.md'
+                candidate.write_text('# Demo\n## Status\n' + content + '\n## Checks\n')
+                revision = self.fixture.command('card', 'locate', self.project)['metadata']['revision']
+                self.fixture.command('card', 'write', self.project, '--expected-revision', revision,
+                                     '--provider', 'claude', '--session-id', 'native-123', '--from', candidate)
+                before = self.fixture.tree()
+                result = self.switch.preview(code=4)
+                self.assertEqual(result['reason'], 'uncertain_secret')
+                self.assertGreater(result['manifest']['blocked_findings'], 0)
+                self.assertNotIn('MULTILINE_CREDENTIAL_CANARY', json.dumps(result))
+                code, output = self.switch.interactive('yes')
+                self.assertEqual(code, 4, output)
+                self.assertNotIn('Confirm transfer', output)
+                self.assertEqual(self.fixture.tree(), before)
+                self.assertFalse((self.data / 'transfers').exists())
+
+    def test_multiline_credentials_in_delta_block_transfer(self):
+        directory = self.home / '.claude/projects/multiline'
+        directory.mkdir(parents=True)
+        (directory / 'native-123.jsonl').write_text(json.dumps({
+            'type': 'user', 'cwd': str(self.project), 'timestamp': '2026-11-09T10:00:00Z',
+            'message': {'content': 'password: |\n  DELTA_MULTILINE_CREDENTIAL_CANARY'}}) + '\n')
+        before = self.fixture.tree()
+        result = self.switch.preview(code=4)
+        self.assertEqual(result['reason'], 'uncertain_secret')
+        self.assertNotIn('DELTA_MULTILINE_CREDENTIAL_CANARY', json.dumps(result))
+        self.assertEqual(self.fixture.tree(), before)
 
     def test_escaped_quoted_passwords_are_fully_redacted(self):
         values = ['password="left\\"SYNTHETIC_DOUBLE_SUFFIX"',

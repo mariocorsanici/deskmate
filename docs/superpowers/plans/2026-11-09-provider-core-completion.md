@@ -228,3 +228,51 @@ Existing C08 owns bounded reads; this ticket adds orchestration and scenarios.
 - C11 final verification: 239/239 full suite on Python 3.14.6; 15/15 focused
   retrospective scenarios on Python 3.9.6, ResourceWarnings as errors, no skips.
   All acceptance checkboxes and evidence updated; apply/verify/commit C11 only.
+
+### C14 task detail — resumed 2026-11-10
+
+Owner request "Iniziamo il task C14", session `/root`, baseline `b10d282`.
+Execute Task 6 only in a disposable copy, then apply to the existing feature
+worktree. The native-request hold remains; incomplete native acceptance prevents
+closing C14 or merging. No personal installation, push or merge is included.
+
+- [x] Apply baseline morning/evening/Checkpoint/study scenarios; reproduce
+  Claude-only routing, premature history reads, wrong data root and rating owner.
+- [x] Replace morning launch with `work-session`, evening collection with
+  Provider-owned metadata and individually bounded deltas, and native skill
+  syntax/data-root/Checkpoint-rating guidance in the shared sources.
+- [x] Remove obsolete shell entry points and the superseded Claude session
+  summarizer; remove `open-session`. Keep exact legacy hook identifiers only
+  for setup/removal ownership matching, never dispatch.
+- [x] RED/GREEN default session discovery: both Providers, no messages; explicit
+  message reads carry bounded delta coverage, omissions and truncation. A listed
+  session without matching card ownership does not get a misleading resume.
+- [x] Synthetic Daily loops exercise setup, real installed hook commands,
+  routing/confirmation, Checkpoint, Checks, selected retrospective, evening
+  evidence and preserving removal for singles and both defaults. Switch and
+  consume run both directions through fake native tools and real public commands.
+- [x] Promote the specification to `docs/provider-neutral-cli.md`; final user
+  commands in README; tracker disposition and native runbook in
+  `docs/testing/daily-loop.md`.
+- [x] Full/system checks and independent whole-feature review/fixes: 248/248
+  on Python 3.14.6; 27/27 Daily-loop/transfer scenarios on Python 3.9.6.
+- [x] Applied to the existing feature worktree; destination full suite passed before the local synthetic C14 checkpoint commit.
+- [ ] Run authenticated native acceptance after the owner lifts the hold.
+
+Baseline verification: 239 tests ran; a pre-existing PTY harness race reported
+one failure despite printed `Switch confirmed`. The isolated affected transfer
+expiry scenario passed on rerun. Investigation found EOF can arrive before
+`poll()` observes exit; the harness now waits boundedly for exit before failing.
+No production switch behavior changed for that race.
+
+C14 independent whole-feature review found two Important privacy/lifecycle issues:
+recognized multiline credentials retained their body after marker-only redaction,
+and abrupt transfer writes could survive expiry indefinitely. Both reproduced
+RED before the fix pass. Ambiguous credential extents now block; transfer creation
+uses private reserved staging plus atomic publication, and expiry preserves live
+writers and unrelated files. Additional lock-removal regression failed as expected.
+
+Review disposition: authenticated native acceptance remains on hold; exhaustive
+secret detection is not guaranteed; structured Check allowlisting and non-macOS
+support remain deferred. Evidence and practical limitations are recorded in
+`docs/testing/daily-loop.md`.

@@ -6,11 +6,20 @@
 
 **Status:** ready-for-agent
 
-- [ ] Every skill, hook, reminder and documented command uses the provider-neutral interface.
-- [ ] Replaced Claude-only entry points are removed rather than retained as a deprecation layer.
-- [ ] Repository-wide reference checks find no stale calls to removed entry points.
-- [ ] Documentation explains setup, native skill syntax, Default provider behavior, resume and Provider switch behavior.
-- [ ] Automated tests cover the complete Daily loop with Claude only, Codex only and both Providers installed.
+**Implementation:** synthetic implementation verified; native acceptance pending (quota hold).
+**Owner:** `/root`, started 2026-11-10 from `b10d282`.
+
+- [x] Every skill, hook, reminder and documented command uses the provider-neutral interface.
+- [x] Replaced Claude-only entry points are removed rather than retained as a deprecation layer.
+- [x] Repository-wide reference checks find no stale calls to removed entry points.
+- [x] Documentation explains setup, native skill syntax, Default provider behavior, resume and Provider switch behavior.
+- [x] Automated tests cover the complete Daily loop with Claude only, Codex only and both Providers installed.
 - [ ] A manual acceptance run uses dedicated non-sensitive Claude and Codex Work sessions.
 - [ ] Manual acceptance verifies skill discovery, hook logging, same-Provider resume and a real Provider switch in both directions.
-- [ ] Temporary tracker decisions are either promoted to durable documentation or identified for removal before merge.
+- [x] Temporary tracker decisions are either promoted to durable documentation or identified for removal before merge.
+
+## Comments
+
+C14 independent implementation follows Task 6 of the existing core-completion plan. See `docs/testing/daily-loop.md` for the final command contract, automated/instruction scenarios, explicit native matrix and tracker disposition. Native checkboxes remain open; no personal installation, native request, push or merge.
+
+Synthetic validation: 248/248 full-suite tests on Python 3.14.6; 27/27 Daily-loop and transfer scenarios on Python 3.9.6; ResourceWarnings as errors. One independent whole-feature review; both Important findings fixed with RED/GREEN regressions. No new review findings deferred. Destination full suite passed before the local checkpoint commit; see Git history for its identity.

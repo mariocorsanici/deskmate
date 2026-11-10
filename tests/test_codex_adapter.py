@@ -414,7 +414,7 @@ class CodexAdapterTest(unittest.TestCase):
                              "--messages", "1", "--cut", "80", "--format", "json")
         self.assertEqual(delta[0]["messages"][0]["text"], "Completed patch")
         human = self.text_command("sessions", "--provider", "codex", "--since", "2026-10-01", "--messages", "0")
-        self.assertIn("codex resume " + SESSION_ID, human)
+        self.assertIn("resume:  deskmate work-session --folder", human)
         hook("UserPromptSubmit", "$how-did-it-go")
         hook("UserPromptSubmit", "$call-it-a-day")
         hook("Stop")
@@ -502,7 +502,7 @@ class CodexAdapterTest(unittest.TestCase):
         bounded = self.command("sessions", "--provider", "codex", "--since", "2026-10-01",
                                "--format", "json", "--messages", "1", "--cut", "9")
         self.assertEqual(bounded[0]["messages"], [
-            {"role": "assistant", "timestamp": STAMP, "text": "The build"}])
+            {"role": "assistant", "timestamp": "2026-10-20T12:00:00+00:00", "text": "The build"}])
 
     def test_unknown_malformed_and_missing_sessions_degrade_without_losing_valid_progress(self):
         path = self.write_rollout([

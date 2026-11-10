@@ -4,12 +4,13 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 import json
+import fcntl
 import os
 from pathlib import Path
 import re
 import stat
 import sys
-import tempfile
+import uuid
 import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -18,6 +19,7 @@ import project_cards as cards
 TTL = 3600
 KIND = 'deskmate-provider-transfer'
 NAME = re.compile(r'transfer-[A-Za-z0-9_-]+\.json')
+PENDING_NAME = re.compile(r'\.pending-transfer-[a-f0-9]{32}\.json')
 KEY_BLOCK = re.compile(r'-----BEGIN ((?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY)-----.*?-----END \1-----', re.S)
 ASSIGNMENT = re.compile(r'''(?P<prefix>(?<![\w])(?P<key>[A-Za-z_][A-Za-z0-9_.-]*)["'`*]*[ \t]*[:=][*]*[ \t]*)''')
 TOKEN = re.compile(r'\b(?:sk-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{16,}|github_pat_[A-Za-z0-9_]{16,}|hf_[A-Za-z0-9]{16,}|xox[baprs]-[A-Za-z0-9-]{12,}|AKIA[0-9A-Z]{16})\b')
@@ -49,11 +51,22 @@ def redact(payload):
             if match.start() < consumed or not credential_key(match['key']):
                 continue
             start = match.end()
-            if start == len(text) or text[start] in '\r\n':
+            if start == len(text):
+                continue
+            if text[start] in '\r\n':
+                # An indented continuation may hold a multiline credential.
+                if re.match(r'\r?\n[ \t]+\S', text[start:]):
+                    blocked += 1
                 continue
             end = start
             complete = True
-            if text[start] in ('"', "'"):
+            if (text[start] in '|>{[' or text.startswith(('\"\"\"', "'''"), start)
+                    or re.match(r'\\[ \t]*\r?\n', text[start:])):
+                # Block scalar markers, triple quotes and shell continuations:
+                # replacing only the marker would leave the credential body.
+                complete = False
+                end = start + 1
+            elif text[start] in ('"', "'"):
                 quote = text[start]
                 end += 1
                 complete = False
@@ -129,18 +142,46 @@ def directory(create=False):
 
 def create(body):
     parent = directory(create=True)
-    fd, name = tempfile.mkstemp(prefix='transfer-', suffix='.json', dir=parent)
-    path = Path(name)
+    token = uuid.uuid4().hex
+    pending = parent / ('.pending-transfer-' + token + '.json')
+    path = parent / ('transfer-' + token + '.json')
+    fd = os.open(pending, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
     try:
         with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
             os.fchmod(stream.fileno(), 0o600)
             json.dump({**body, 'kind': KIND}, stream)
             stream.flush()
             os.fsync(stream.fileno())
+            os.replace(pending, path)
     except BaseException:
-        path.unlink(missing_ok=True)
+        pending.unlink(missing_ok=True)
         raise
     return path
+
+
+def cleanup_pending(parent):
+    """Expire abandoned reserved staging files without interpreting partial JSON."""
+    removed = 0
+    for path in parent.glob('.pending-transfer-*.json'):
+        if not PENDING_NAME.fullmatch(path.name):
+            continue
+        try:
+            fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+            with os.fdopen(fd, 'rb') as stream:
+                fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                metadata = os.fstat(stream.fileno())
+                if (not stat.S_ISREG(metadata.st_mode) or metadata.st_uid != os.getuid()
+                        or metadata.st_mode & 0o777 != 0o600 or metadata.st_nlink != 1
+                        or time.time() - metadata.st_mtime < TTL):
+                    continue
+                current = path.lstat()
+                if (current.st_dev, current.st_ino) == (metadata.st_dev, metadata.st_ino):
+                    path.unlink()
+                    removed += 1
+        except OSError:
+            continue
+    return removed
 
 
 def inspect(path, *, provider=None, expired_ok=False):
@@ -185,6 +226,7 @@ def cleanup():
     parent = directory()
     removed = 0
     if parent.exists():
+        removed += cleanup_pending(parent)
         for path in parent.glob('transfer-*.json'):
             try:
                 preliminary = path.lstat()

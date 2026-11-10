@@ -51,10 +51,12 @@ class ProviderSwitchTest(unittest.TestCase):
                         sent = True
                 if process.poll() is not None:
                     break
-            if process.poll() is None:
+            try:
+                code = process.wait(timeout=max(.1, deadline - time.monotonic()))
+            except subprocess.TimeoutExpired:
                 process.kill()
                 self.fail('Interactive switch did not terminate: ' + output.decode(errors='replace'))
-            return process.wait(), output.decode(errors='replace')
+            return code, output.decode(errors='replace')
         finally:
             os.close(master)
             if process.poll() is None:

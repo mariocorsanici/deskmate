@@ -150,12 +150,16 @@ class DeskmateCliTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            result = self.run_deskmate("sessions", home=home)
+            (projects / "sessions-index.json").write_text(json.dumps({'entries': [{
+                'sessionId': 'session-123', 'projectPath': '/tmp/demo',
+                'created': timestamp, 'modified': timestamp}]}))
+
+            result = self.run_deskmate("sessions", "--provider", "claude", "--messages", "8", home=home)
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("SESSION session-123", result.stdout)
         self.assertIn("folder:  /tmp/demo", result.stdout)
-        self.assertIn("resume:  cd /tmp/demo && claude --resume session-123", result.stdout)
+        self.assertIn("resume unresolved: claude:session-123", result.stdout)
         self.assertIn("USER: Start the work", result.stdout)
         self.assertIn("CLAUDE: Ready", result.stdout)
         self.assertEqual(result.stderr, "")
@@ -168,7 +172,7 @@ class DeskmateCliTest(unittest.TestCase):
             "sessions",
             "session-stats",
             "reminders",
-            "open-session",
+            "work-session",
             "log-event",
             "token-usage",
         }
@@ -213,7 +217,7 @@ class DeskmateCliTest(unittest.TestCase):
             "sessions",
             "session-stats",
             "reminders",
-            "open-session",
+            "work-session",
             "log-event",
             "token-usage",
         )
@@ -316,25 +320,6 @@ class DeskmateCliTest(unittest.TestCase):
         self.assertIn("per mode", result.stdout)
         self.assertIn("resume no days yet (target 5)", result.stdout)
         self.assertIn("new    no days yet (target 5)", result.stdout)
-
-    def test_open_session_supports_a_side_effect_free_dry_run(self):
-        with tempfile.TemporaryDirectory() as directory:
-            home = pathlib.Path(directory)
-
-            result = self.run_deskmate(
-                "open-session",
-                "--new",
-                "Demo",
-                str(home),
-                "Continue from the Project card",
-                home=home,
-                extra_env={"DESKMATE_DRY_RUN": "1"},
-            )
-
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("[Demo]", result.stdout)
-        self.assertIn("claude", result.stdout)
-        self.assertIn("Continue\\ from\\ the\\ Project\\ card", result.stdout)
 
     def test_log_event_and_token_usage_write_only_isolated_state(self):
         with tempfile.TemporaryDirectory() as directory:
