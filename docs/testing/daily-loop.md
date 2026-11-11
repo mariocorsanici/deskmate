@@ -1,8 +1,11 @@
 # Provider-neutral Daily-loop verification
 
-C14 began on 2026-11-10 from `b10d282`. **Native acceptance is pending under the
-owner's existing model-request quota hold. C14 is not complete and the feature
-must not merge into develop yet.** This records synthetic development separately
+C14 began on 2026-11-10 from `b10d282`. **Codex native execution is recorded in the
+[2026-11-11 run](c14-codex-native-2026-11-11.md) and
+[timestamp correction](c14-codex-timestamp-fix-2026-11-11.md). Claude and
+cross-Provider acceptance remain on hold; a separate Codex SQLite post-exit
+observation needs triage. C14 is not complete and the feature must not merge
+into develop yet.** This records synthetic development separately
 from approval and delivery in actual Claude Code/Codex CLI Work sessions.
 
 ## Final entry points and migration
@@ -83,7 +86,7 @@ bounded process completion instead of treating EOF as a still-running failure.
 Final command results and independent review findings are recorded below after
 verification, without inferring native completion.
 
-## Native acceptance runbook — not executed
+## Native acceptance runbook — see current evidence above
 
 Use dedicated non-sensitive test projects and Work sessions, isolated data and
 native configuration. Obtain authorization lifting the quota hold before native
@@ -92,13 +95,13 @@ requests or changes to installed personal integration state.
 | Scenario | Evidence required | Status |
 | --- | --- | --- |
 | Claude only | Setup twice, `/setup`, all five Daily-loop skills discovered, actual prompt/Stop delivery, matching Provider/session rows | Pending |
-| Codex only | Setup twice, `$setup`, all five skills discovered, normal `/hooks` trust, actual prompt/Stop delivery | Pending |
+| Codex only | Setup twice, `$setup`, all five skills discovered, normal `/hooks` trust, actual prompt/Stop delivery | Executed; see current Codex evidence |
 | Both, each Default provider | Default-first reminders, unowned launch selects default, same shared skill/card content | Pending |
-| Same-Provider resume | Real launched native ID and folder match the saved card; default does not override ownership | Pending |
+| Same-Provider resume | Real launched native ID and folder match the saved card; default does not override ownership | Codex verified; Claude pending |
 | Claude → Codex | Saved card/current Checks/bounded delta preview, explicit overlap consent, new native ID, path-only transfer, consume/delete | Pending |
 | Codex → Claude | Same guarantees in reverse; no cross-Provider resume claim | Pending |
-| Source/history unavailable | Continue from card and Checks with explicit missing-context disclosure | Pending |
-| Complete Daily loop | Actual morning → Checkpoint → selected retrospective → evening Handoff under each Provider | Pending |
+| Source/history unavailable | Continue from card and Checks with explicit missing-context disclosure | Codex post-exit degradation observed (C14-CODEX-02); cross-Provider recovery pending |
+| Complete Daily loop | Actual morning → Checkpoint → selected retrospective → evening Handoff under each Provider | Codex executed; Claude pending |
 | macOS/calendar channels | Native notifications/responses and real calendar import behavior, recorded separately from model tests | Pending |
 
 Record date, native versions, Provider/session identities, actual commands,
@@ -182,3 +185,14 @@ is silently claimed fixed or accepted by synthetic tests.
   native acceptance remains pending and no push/merge is authorized.
 
 Destination full suite passed on the existing feature worktree before its local checkpoint commit. Native acceptance remains pending.
+
+
+## Latest Codex native evidence — 2026-11-11
+
+The Codex group ran setup/discovery/trust, actual skill and lifecycle logging,
+Checkpoint/full exit/resume, selected retrospective, lessons and evening Handoff.
+C14-CODEX-01 was then fixed and its fresh native regression passed without
+formatting hints. See [correction evidence](c14-codex-timestamp-fix-2026-11-11.md).
+The Pending table above records the original runbook; Codex execution is now
+recorded, while C14-CODEX-02 (post-exit SQLite availability), Claude and
+cross-Provider acceptance remain open. C14 is not closed.

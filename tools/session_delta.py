@@ -4,34 +4,18 @@ from __future__ import annotations
 
 import argparse
 from collections import deque
-import datetime as dt
 import importlib
 import json
 from pathlib import Path
-import re
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import project_cards
 import providers
+from checkpoints import checkpoint_boundary, instant
 
 DEFAULT_MESSAGES = 12
 DEFAULT_CHARACTERS = 6000
-
-
-def instant(value, *, require_zone=False, native=False):
-    if not isinstance(value, str):
-        raise ValueError('Timestamp must be an ISO timestamp')
-    try:
-        stamp = dt.datetime.fromisoformat(value.replace('Z', '+00:00'))
-        if require_zone and stamp.tzinfo is None:
-            raise ValueError('Timestamp must include a timezone')
-        if native and stamp.tzinfo is None:
-            # Both native adapters already interpret naive runtime times as UTC.
-            stamp = stamp.replace(tzinfo=dt.timezone.utc)
-        return stamp.astimezone(dt.timezone.utc)
-    except (ValueError, OverflowError, OSError):
-        raise ValueError('Timestamp must be a representable ISO timestamp with the required timezone') from None
 
 
 def positive(value):
@@ -60,16 +44,7 @@ def saved_checkpoint(folder, provider, session_id):
     if (not metadata or metadata['provider'] != provider
             or metadata['session_id'] != session_id):
         return None
-    status = re.search(r'^## Status\s*\n(.*?)(?=^## |\Z)', text, re.M | re.S)
-    if not status:
-        return None
-    match = re.search(r'^Checkpoint ([^,\n]+), session `([^`]+)`', status[1], re.M)
-    if not match or match[2] != session_id:
-        return None
-    stamp = instant(match[1])
-    minute = bool(re.fullmatch(r'\d{4}-\d\d-\d\d[ T]\d\d:\d\d', match[1]))
-    return {'timestamp': stamp.isoformat(), 'source': 'project-card',
-            'precision': 'minute' if minute else 'second'}
+    return checkpoint_boundary(text, session_id=session_id)
 
 
 def is_conversation(message):

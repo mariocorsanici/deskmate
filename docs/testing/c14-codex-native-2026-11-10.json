@@ -1,0 +1,142 @@
+{
+  "date": "2026-11-10",
+  "source_commit": "24b431f",
+  "status": "stopped-by-owner-partial-acceptance",
+  "native_process": {
+    "exec_session": 86728,
+    "exit_code": 0,
+    "stopped": true
+  },
+  "provider": "codex",
+  "cli_version": "0.167.0",
+  "model_display": "GPT-6.1-Sol default",
+  "session_id": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41",
+  "project_folder": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project",
+  "workspace": "/private/tmp/deskmate-c14-native.sLNGoR",
+  "completed_native_turns": [
+    {
+      "completed_at": "2026-11-10T18:31:54.452Z",
+      "duration_ms": 210929,
+      "answer": "Setup completato con exit `0`, usando esclusivamente `--provider codex --default-provider codex --non-interactive`.\n\n- Conservati `C14 acceptance`, lingua `it` e tutti i reminders, incluso `channels=[]`.\n- Logging sintetico Codex verificato; backup presente nel data dir isolato.\n- Claude escluso dall’installazione, ma rilevato automaticamente dal setup.\n- Nessuna credenziale letta, nessuno switch o checkpoint eseguito.\n\nLe cinque skill operative installate sono `checkpoint`, `whats-on-today`, `call-it-a-day`, `how-did-it-go`, `study-later`, oltre a `setup`. Non posso confermarle come visibili nel catalogo nativo di questa sessione: ho verificato i collegamenti su disco.\n\nID nativo: `01a1c6a5-8e07-7103-a7a5-2fd0ba517b41`.\n\nResta pendente la verifica nativa dopo la revisione degli hook in `/hooks`, senza eseguire checkpoint ora."
+    },
+    {
+      "completed_at": "2026-11-10T18:34:00.380Z",
+      "duration_ms": 28321,
+      "answer": "C14 acceptance, restiamo qui nella sessione Codex corrente.\n\nRicostruzione dai soli dati isolati: manca `handoff.md`, non ci sono schede progetto né Checkpoint precedenti. `lessons.md` non contiene esperimenti; `study-later.md` ha **0 elementi**. Nessuna chiusura o risposta ai reminder del giorno precedente registrata: coerente con il primo giorno e `channels=[]`.\n\n`deskmate card list` e `deskmate check` terminano senza errori, ma non ci sono check configurati. Ho consultato solo i metadati della sessione Codex odierna, senza leggere conversazioni. Nessun progetto in standby o dipendenza documentata.\n\nIl piano minimo è:\n\n1. Verificare `manual-probe.txt`, già presente con contenuto `Dedicated non-sensitive C14 acceptance project.`\n2. A fine lavoro, eseguire `$checkpoint` qui: creare la prima scheda nel data dir isolato, con stato, prossimo passo e check di sola lettura del file.\n3. Confermare il salvataggio e la riga nativa `checkpoint` con provider `codex` e ID `01a1c6a5-8e07-7103-a7a5-2fd0ba517b41`.\n\nComandi disponibili:\n\n- `$whats-on-today`: riprendere il lavoro della giornata.\n- `$checkpoint`: salvare lo stato a fine sessione.\n- `$call-it-a-day`: preparare il passaggio per domani.\n- `$how-did-it-go`: rivedere metodo e organizzazione.\n- `$study-later`: aggiungere un argomento da studiare.\n- `$setup`: verificare o aggiornare l’installazione.\n\nCheckpoint ancora da eseguire."
+    },
+    {
+      "completed_at": "2026-11-10T18:34:46.864Z",
+      "duration_ms": 11967,
+      "answer": "Aggiunto alla lista isolata:\n\n- [ ] 2026-11-10 — **Verifica degli hook Codex** — Argomento emerso durante la prova C14 nel progetto temporaneo, per distinguere gli eventi reali dalle verifiche sintetiche.\n\nElementi aperti: **1**."
+    },
+    {
+      "completed_at": "2026-11-10T18:37:33.036Z",
+      "duration_ms": 29711,
+      "answer": "C14 acceptance, checkpoint salvato tramite `card write`, **exit 0**, revisione **1**, con l’ID nativo corrente `01a1c6a5-8e07-7103-a7a5-2fd0ba517b41`.\n\n- Stato: **active**.\n- `manual-probe.txt`: contenuto verificato; check di sola lettura superato.\n- Registrati setup, ricostruzione mattutina e 1 argomento study-later, distinguendo logging sintetico ed eventi nativi osservati.\n- Prossimo passo: **prova di resume Codex**, poi retrospettiva.\n\nSalvato nella scheda progetto; `$call-it-a-day` la userà."
+    }
+  ],
+  "actual_hook_log_rows": [
+    {
+      "date": "2026-11-10",
+      "time": "19:28",
+      "event": "session-start",
+      "provider": "codex",
+      "session": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41",
+      "cwd": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": ""
+    },
+    {
+      "date": "2026-11-10",
+      "time": "19:33",
+      "event": "whats-on-today",
+      "provider": "codex",
+      "session": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41",
+      "cwd": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": ""
+    },
+    {
+      "date": "2026-11-10",
+      "time": "19:34",
+      "event": "study-later",
+      "provider": "codex",
+      "session": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41",
+      "cwd": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": ""
+    },
+    {
+      "date": "2026-11-10",
+      "time": "19:37",
+      "event": "checkpoint",
+      "provider": "codex",
+      "session": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41",
+      "cwd": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": ""
+    },
+    {
+      "date": "2026-11-10",
+      "time": "19:38",
+      "event": "session-end",
+      "provider": "codex",
+      "session": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41",
+      "cwd": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": ""
+    }
+  ],
+  "checkpoint": {
+    "path": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/data/projects/project-fad511a36f16/project-card.md",
+    "metadata": {
+      "provider": "codex",
+      "revision": 1,
+      "schema_version": 1,
+      "session_id": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41"
+    },
+    "content": "---\nname: project-card\ndescription: Temporary C14 Codex-only acceptance project.\ntype: project\ndeskmate: {\"provider\":\"codex\",\"revision\":1,\"schema_version\":1,\"session_id\":\"01a1c6a5-8e07-7103-a7a5-2fd0ba517b41\"}\n---\n# C14 Codex-only acceptance\n\nWorking folder: `/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project`.\nBranch: unavailable; the working folder is not a Git repository.\nReference document: `manual-probe.txt`.\n\n## Status\nCheckpoint 2026-11-10 19:37, session `01a1c6a5-8e07-7103-a7a5-2fd0ba517b41`, folder `/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project`.\n- **State:** active\n- **Where you are:** First checkpoint. manual-probe.txt exists and contains exactly \"Dedicated non-sensitive C14 acceptance project.\" (with a trailing newline). Setup completed with exit 0 using --provider codex --default-provider codex --non-interactive after the sandbox lock failure was resolved through approval. Synthetic Codex hook logging passed; this does not establish native delivery. Name C14 acceptance, language it and reminders.channels=[] were preserved. Setup detected Claude but installed only Codex. Morning reconstruction used isolated data and Codex session metadata with messages 0: no prior handoff, cards, checkpoints or lesson experiments; card list and check returned exit 0 with no configured checks. No other session was opened. Study-later contains 1 open topic, Codex hook verification. The isolated log now contains real whats-on-today, study-later and checkpoint rows matching this Codex session and folder, distinct from the setup synthetic verification. Resume has not been tested. No credentials or other projects were read and no Claude work session or switch was launched.\n- **To do:** **Test Codex resume for this project**, then run a retrospective distinguishing real native events from synthetic checks.\n- **Waiting on:** nothing\n- **Before you start:** Review and trust Deskmate hooks in /hooks if not already trusted; runtime trust status has not been independently verified.\n\n## Checks\n- manual-probe exact content: `test -f /private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project/manual-probe.txt && test \"$(cat /private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project/manual-probe.txt)\" = \"Dedicated non-sensitive C14 acceptance project.\"`\n"
+  },
+  "native_usage_snapshot": {
+    "provider": "codex",
+    "schema_version": 1,
+    "sessions": {
+      "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41": {
+        "cwd": "/private/tmp/deskmate-c14-native.sLNGoR/acceptance/codex-only/project",
+        "end": "2026-11-10T18:37:32+00:00",
+        "id": "01a1c6a5-8e07-7103-a7a5-2fd0ba517b41",
+        "provider": "codex",
+        "start": "2026-11-10T18:08:21+00:00",
+        "status": "ok",
+        "usage": {
+          "thread_token_usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 683392,
+            "input_tokens": 734811,
+            "output_tokens": 3641,
+            "reasoning_output_tokens": 84,
+            "total_tokens": 738452
+          },
+          "tokens_used": 738452
+        },
+        "warnings": []
+      }
+    }
+  },
+  "temporary_auth_reference_removed": true,
+  "remaining": [
+    "Full native discovery of all five skills",
+    "Same-Provider resume",
+    "Selected retrospective",
+    "Evening Handoff",
+    "Complete Daily loop",
+    "Claude group",
+    "Cross-Provider group"
+  ],
+  "resume_requires_owner_request": true
+}

@@ -123,6 +123,40 @@ class SessionDeltaTest(unittest.TestCase):
         self.assertEqual(result['coverage']['origin'], 'session-start')
         self.assertIsNone(result['checkpoint'])
 
+    def test_checkpoint_iso_offsets_roundtrip_to_the_same_delta_boundary(self):
+        for stamp in ('2026-11-06T10:01:00Z', '2026-11-06T11:01:00+01:00',
+                      '2026-11-06T05:01:00-05:00'):
+            with self.subTest(timestamp=stamp):
+                case = SessionDeltaTest()
+                case.setUp()
+                try:
+                    case.history('rollout', [('user', 'saved request'),
+                                              ('assistant', 'saved reply'),
+                                              ('user', 'new progress')])
+                    case.checkpoint('codex', stamp)
+                    delta = case.delta('codex')
+                    self.assertEqual(delta['checkpoint']['timestamp'], '2026-11-06T10:01:00+00:00')
+                    self.assertEqual([m['text'] for m in delta['messages']], ['new progress'])
+                    self.assertEqual(delta['coverage']['origin'], 'checkpoint')
+                    self.assertEqual(delta['warnings'], [])
+                finally:
+                    case.doCleanups()
+
+    def test_preexisting_invalid_checkpoint_discloses_bounded_fallback(self):
+        self.history('rollout', [('user', 'saved request'), ('assistant', 'saved reply'),
+                                 ('user', 'new progress')])
+        self.checkpoint('codex')
+        card = next((self.data / 'projects').glob('*/project-card.md'))
+        card.write_text(card.read_text().replace('2026-11-06T10:01:00+00:00',
+                                                '2026-11-06 11:01 CET'))
+        delta = self.delta('codex', '--max-messages', '1', '--max-characters', '5')
+        self.assertIsNone(delta['checkpoint'])
+        self.assertEqual(delta['coverage']['origin'], 'session-start')
+        self.assertLessEqual(delta['included_messages'], 1)
+        self.assertLessEqual(delta['characters'], 5)
+        self.assertTrue(any('Checkpoint' in warning and 'invalid' in warning
+                            for warning in delta['warnings']))
+
     def test_checkpoint_from_another_session_does_not_cut_current_context(self):
         self.history('claude', [('user', 'unsaved'), ('assistant', 'progress')])
         self.checkpoint('claude', '2026-11-06T11:00:00Z', session='another-session')

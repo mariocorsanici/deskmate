@@ -1,0 +1,782 @@
+{
+  "date": "2026-11-11",
+  "source_commit": "24b431f132d1a04ab5bd64ee6d3f211ed57be8b3",
+  "workspace": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9",
+  "project_folder": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+  "provider": "codex",
+  "cli_version": "0.167.0",
+  "status": "completed-with-open-finding",
+  "previous_evidence": "docs/testing/c14-codex-native-2026-11-10.json",
+  "session_id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+  "native_processes": [
+    {
+      "mode": "new",
+      "exit_code": 0
+    },
+    {
+      "mode": "resume",
+      "exit_code": 0
+    }
+  ],
+  "setup_preflight": "Claude Code: included (2.1.322 (Claude Code))\nCodex CLI: included (codex-cli 0.167.0)\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/config.json\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/lessons.md\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/study-later.md\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.agents/skills/call-it-a-day\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.agents/skills/checkpoint\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.agents/skills/how-did-it-go\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.agents/skills/setup\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.agents/skills/study-later\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.agents/skills/whats-on-today\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.codex/hooks.json\nUpdated: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.local/bin/deskmate\nMigration backups and recovery journal: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/backups/install/b8158ae36b404194928b71f2c8866400\ncodex: logging verified (isolated synthetic hook; native approval pending)\nIn Codex CLI, open /hooks and review and trust each Deskmate hook. New or changed definitions are skipped until trusted.\nReview normal project trust and command approvals when Codex requests them. Deskmate does not bypass approval or hook trust.\nUse native skills such as $checkpoint. User skills are linked under ~/.agents/skills; restart Codex if they are not visible.\nRun deskmate integration --provider codex --verify to test synthetic logging. After trusting hooks, run $checkpoint in a real Work session and check its Codex log row to verify runtime delivery.\nDeskmate ready: ~/.local/bin/deskmate. Open a new shell or run export PATH=\"$HOME/.local/bin:$PATH\".\n",
+  "final_isolated_config": {
+    "language": "it",
+    "name": "C14 acceptance",
+    "providers": {
+      "default": "codex",
+      "installed": [
+        "codex"
+      ]
+    },
+    "reminders": {
+      "channels": [],
+      "days": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+      ],
+      "evening": "17:00",
+      "morning": "09:00"
+    },
+    "schema_version": 1
+  },
+  "skill_discovery": {
+    "status": "passed",
+    "method": "Observed native /skills List skills and filtered each name",
+    "skills": [
+      "checkpoint",
+      "whats-on-today",
+      "how-did-it-go",
+      "call-it-a-day",
+      "study-later",
+      "setup"
+    ],
+    "note": "Explicit-only skills are visible in the TUI picker; absence from the implicit model catalog is not a discovery failure."
+  },
+  "hook_trust": {
+    "method": "Normal native startup review; reviewed SessionStart, trusted it, then trusted the remaining definitions in /hooks",
+    "bypass_used": false,
+    "persisted_states": {
+      "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.codex/hooks.json:session_start:0:0": {
+        "trusted_hash": "sha256:7082b3474e442f270f1cb03f669ad6a20486644f4975732cb8eb004da1fe3024"
+      },
+      "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.codex/hooks.json:session_end:0:0": {
+        "trusted_hash": "sha256:dd587a8d5440c0349bce973070fc81f8d30e97d9db4bea245d4feb3156f486b5"
+      },
+      "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.codex/hooks.json:user_prompt_submit:0:0": {
+        "trusted_hash": "sha256:d9577a5ff52e1964018cfdddabea95b6219aae7bc4842a0268f49dc549c3dd86"
+      },
+      "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.codex/hooks.json:stop:0:0": {
+        "trusted_hash": "sha256:0d67c65dda54a06d3c9e52fd305396aa13f988b531a292a99baf85e631cb3c3c"
+      }
+    },
+    "project_trust_prompt": "No separate project trust prompt appeared with workspace-write sandbox and on-request approvals."
+  },
+  "completed_native_turns": [
+    {
+      "completed_at": "2026-11-11T09:58:42.112Z",
+      "turn_id": "01a1ca09-dd90-7af1-b485-49d3f821d1b6",
+      "answer": "Setup eseguito con `--provider codex --default-provider codex --non-interactive`: exit `0`, Claude escluso.\n\nConservati `C14 acceptance`, lingua `it`, promemoria lun–ven 09:00/17:00 e `channels=[]`. Verifica sintetica hook riuscita; nessun nuovo backup necessario.\n\nDiscovery delle cinque skill **non confermata**: il catalogo esposto al modello non le elenca; `$setup` è arrivata tramite invocazione esplicita. Serve verificarle in `/skills` nella sessione corrente.\n\nID nativo: `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`.\n\nNessun checkpoint eseguito. Verifica nativa rinviata; setup indica di controllare la fiducia dei hook in `/hooks`."
+    },
+    {
+      "completed_at": "2026-11-11T10:48:39.724Z",
+      "turn_id": "01a1ca39-4a28-73e0-8c95-ae73d733052e",
+      "answer": "Setup completato, exit `0`, solo Codex e provider predefinito `codex`. Verifica sintetica riuscita; discovery delle cinque skill confermata dall’operatore in `/skills`, oltre a `setup`.\n\nConservati nome `C14 acceptance`, lingua `it` e promemoria lun–ven 09:00/17:00 con `channels=[]`.\n\nStessa sessione, ID nativo: `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`. Nessun checkpoint eseguito."
+    },
+    {
+      "completed_at": "2026-11-11T10:51:18.481Z",
+      "turn_id": "01a1ca3b-497b-74c0-bfd4-d7c5b77ad580",
+      "answer": "C14 acceptance, ricostruzione mattutina completata:\n\n- Handoff e schede assenti; nessun controllo di progetto configurato.\n- Ieri manca `call-it-a-day`. Nessun esperimento attivo; 0 argomenti da studiare.\n- `manual-probe.txt` presente e leggibile: `Dedicated non-sensitive C14 Codex acceptance project.`\n\nRestiamo nella sessione corrente. Prossimo passo: `$checkpoint`; per ora nessuna scheda, lezione o Handoff creati."
+    },
+    {
+      "completed_at": "2026-11-11T12:23:07.765Z",
+      "turn_id": "01a1ca8e-da6d-7563-bfc0-ec546534dd22",
+      "answer": "C14 acceptance, checkpoint salvato nella scheda: stato `active`, revisione `0 → 1`, exit `0`.\n\nCheck di sola lettura superato: contenuto esatto di `manual-probe.txt`, incluso newline finale. Registrati setup e mattina completati, discovery e trust confermati dall’operatore.\n\nProssimi passi: verifica resume Codex → retrospettiva → Handoff.\n\nID nativo: `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`. Nessun’altra sessione avviata. `$call-it-a-day` userà la scheda."
+    },
+    {
+      "completed_at": "2026-11-11T14:09:45.564Z",
+      "turn_id": "01a1caf0-b411-78e0-bfa5-05f7b82e2b1e",
+      "answer": "C14 acceptance, ID e cartella coincidono con la scheda; Check superato e conservato.\n\nCheckpoint salvato con `card write`, revisione `1 → 2`, stato `active`. Resume Codex verificato; rimossa l’attesa di autorizzazione. Prossimi passi: retrospettiva e Handoff.\n\nID: `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`. `$call-it-a-day` userà la scheda aggiornata."
+    },
+    {
+      "completed_at": "2026-11-11T14:11:08.973Z",
+      "turn_id": "01a1caf2-8af6-7be1-9d02-7839769a598a",
+      "answer": "Aggiunto alla lista isolata:\n\n- [ ] 2026-11-11 — **Verifica degli hook Codex: distinguere logging sintetico, delivery nativa e trust delle definizioni.** — Emerso nella prova manuale C14 dopo setup, checkpoint nativi e verifica del resume Codex.\n\nArgomenti aperti: **1**."
+    },
+    {
+      "completed_at": "2026-11-11T14:15:45.451Z",
+      "turn_id": "01a1caf6-7879-7780-8d1f-2c044206c403",
+      "answer": "C14 acceptance, periodo **9–11 novembre 2026**.\n\nEvidenze durevoli: scheda rev. `2`, stato `active`; setup, mattina e resume registrati come completati. Il log mostra uscita alle 14:23 e riapertura alle 15:08. Handoff assente; nessuna lezione precedente.\n\n**Candidati completi: uno**\n\n- `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`\n  Cartella: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`\n  Attività: 11/11, 10:22–15:15 CET. Nessun metadato mancante segnalato.\n  **Raccomandata:** contiene il ciclo C14 e possiede la scheda.\n\nMetriche Codex da snapshot dell’11/11 alle 15:11 CET, potenzialmente arretrato; nessun dato Claude.\n\nNessun messaggio letto. Selezioni questa sessione oppure **nessuna**, continuando dalle sole evidenze durevoli?"
+    },
+    {
+      "completed_at": "2026-11-11T14:20:51.776Z",
+      "turn_id": "01a1cafb-257c-7752-b147-dd345897c92d",
+      "answer": "C14 acceptance, letto solo il delta di `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`.\n\n- **Continuità riuscita:** log di uscita 14:23 e riapertura 15:08; scheda rev. `2` e risposta delle 15:09 confermano stesso ID, cartella e Check superato.\n- **Avanzamento coerente:** scheda e log registrano mattina, due checkpoint e argomento di studio. Handoff ancora assente: manca il confronto tra piano serale e risultato.\n- **Lettura controllata:** alle 15:15 la retrospettiva si è fermata alla selezione; il delta è stato richiesto dopo la tua scelta.\n- **Ritmo e ostacoli:** risulta una sola sessione Codex riaperta; nessun blocco nella scheda. Rilavorazioni, attese effettive e abitudini ricorrenti non sono determinabili da questa prova.\n\n**Limiti:** configurazione di **12 messaggi / 6.000 caratteri**; inclusi 12 messaggi e 3.877 caratteri, omessi 12 messaggi e 3.949 caratteri. Copertura **parziale e troncata**. L’adattatore segnala il checkpoint come illeggibile/non valido e parte dall’inizio sessione: il confine del delta non è verificato, pur essendo disponibile la scheda durevole.\n\nMetriche Codex da snapshot dell’11/11 alle 15:15:45 CET, potenzialmente arretrato; nessun confronto con Claude. Nessun esperimento precedente registrato.\n\nPropongo di ripetere il controllo ID/cartella/Check a ogni resume e verificare il riconoscimento del confine checkpoint nei prossimi delta.\n\n`lessons.md` non modificato. Attendo il tuo riscontro."
+    },
+    {
+      "completed_at": "2026-11-11T14:23:45.429Z",
+      "turn_id": "01a1cafd-48c5-7352-affc-e7c1aae4bbf6",
+      "answer": "C14 acceptance, nuovo checkpoint salvato con `card write`: revisione **2 → 3**, stato `active`, Check conservato e superato.\n\nTimestamp: `2026-11-11T15:23:20+01:00`. Registrati problema `CET` e correzione dei soli dati di prova; codice invariato.\n\nRetrospettiva ripresa sulla sola sessione autorizzata:\n\n- Confine riconosciuto dalla scheda, precisione al secondo, stato `ok`.\n- Limiti: **12 messaggi / 6.000 caratteri**.\n- Nessun messaggio successivo al nuovo checkpoint: **0 inclusi, 0 omessi**, nessun troncamento; copertura completa dal confine.\n\n`lessons.md` invariato."
+    },
+    {
+      "completed_at": "2026-11-11T14:28:14.982Z",
+      "turn_id": "01a1cb01-4882-73c1-a377-fea1b5a52896",
+      "answer": "C14 acceptance, aggiornata [lessons.md](/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/lessons.md) in italiano con osservazioni confermate, limiti delle evidenze, anomalia CET, correzione dei dati di prova e i due esperimenti concordati.\n\nNessun’altra sessione letta. Codice invariato e C14 ancora `active`. Mi fermo prima dell’Handoff."
+    },
+    {
+      "completed_at": "2026-11-11T14:31:37.457Z",
+      "turn_id": "01a1cb03-f506-7ac2-a4d4-e8e7aecdd0f4",
+      "answer": "C14 acceptance, [Handoff salvato](/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/handoff.md) in italiano, con Provider, ID nativo e cartella per la ripresa.\n\nResta **1 lavoro aperto**: domani rivedere le evidenze e correggere il problema del timestamp. Check superato; C14 ancora `active`, codice non dichiarato corretto.\n\nNessuna nuova lettura di messaggi o sessione avviata. Dopo la chiusura: l’argomento sugli hook Codex già presente nella lista di studio."
+    }
+  ],
+  "actual_hook_log_rows": [
+    {
+      "date": "2026-11-11",
+      "time": "10:56",
+      "weekday": "wed",
+      "event": "session-start",
+      "detail": "",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "11:50",
+      "weekday": "wed",
+      "event": "whats-on-today",
+      "detail": "Prova manuale C14 Codex nel solo ambiente temporaneo corrente. Esegui la ricostruzione mattutina dai dati isolati; restiamo in questa sessione, senza avviare altre sessioni/provider. Il lavoro di oggi e verificare manual-probe.txt nel progetto corrente e salvare poi un checkpoint. Non creare ancora scheda, lezioni o Handoff. Risposta breve.",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "13:22",
+      "weekday": "wed",
+      "event": "checkpoint",
+      "detail": "Salva un checkpoint reale per il progetto corrente, stato active. Verifica manual-probe.txt e inserisci un Check di sola lettura sul suo contenuto esatto. Registra setup e mattina completati, discovery e trust verificati dall operatore; prossimo passo: verificare resume Codex, poi retrospettiva e Handoff. Usa l ID nativo corrente e card write con revisione attesa. Non avviare altre sessioni/provider. Risposta breve.",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "14:23",
+      "weekday": "wed",
+      "event": "session-end",
+      "detail": "",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "15:08",
+      "weekday": "wed",
+      "event": "session-start",
+      "detail": "",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "15:08",
+      "weekday": "wed",
+      "event": "checkpoint",
+      "detail": "Questa sessione e stata riaperta con codex resume dopo uscita completa. Prima di salvare, verifica che ID nativo corrente e cartella coincidano con la scheda esistente e che il Check passi. Aggiorna il checkpoint tramite card write: resume Codex verificato, prossimo passo retrospettiva e Handoff. Rimuovi la precedente indicazione di attendere autorizzazione al resume, ora autorizzato ed eseguito. Mantieni stato active e il Check del file. Non avviare altre sessioni/provider. Risposta breve con ID e revisione.",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "15:10",
+      "weekday": "wed",
+      "event": "study-later",
+      "detail": "Verifica degli hook Codex: distinguere logging sintetico, delivery nativa e trust delle definizioni. Aggiungi soltanto questo argomento alla lista isolata. Risposta breve.",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "15:15",
+      "weekday": "wed",
+      "event": "how-did-it-go",
+      "detail": "Esegui la retrospettiva della sola prova C14 nei dati isolati. Inizia dalle evidenze durevoli, mostra tutti i candidati e le raccomandazioni, poi fermati per la selezione prima di leggere messaggi. Non avviare sessioni/provider e non consultare progetti personali. Risposta breve.",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "15:22",
+      "weekday": "wed",
+      "event": "checkpoint",
+      "detail": "La retrospettiva selezionata ha riprodotto un problema: il timestamp della scheda contiene CET e saved_checkpoint lo rifiuta; stesso ID, progetto e scheda sono validi. Salva un NUOVO checkpoint usando un timestamp ISO 8601 con offset numerico +01:00, senza CET, via card write con revisione attesa. Mantieni il Check. Registra il problema osservato e la correzione dei soli dati di prova, senza modificare il codice. Dopo il salvataggio riprendi la retrospettiva gia autorizzata della sola codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6 con retrospective --since 2026-11-09 --select codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6 --format json. Conferma confine e limiti; non scrivere ancora lessons.md. Risposta breve.",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "15:29",
+      "weekday": "wed",
+      "event": "call-it-a-day",
+      "detail": "Chiudi la giornata della prova C14 nel solo ambiente isolato. La retrospettiva e salvata oggi; usa scheda, metadati e Check reali e crea Handoff in italiano. Conserva Provider, ID nativo e cartella nella ripresa. Prossimo passo per domani: rivedere le evidenze di accettazione e correggere il problema del timestamp emerso, senza dichiarare il codice corretto o C14 completa. Non avviare sessioni/provider. Nessun nuovo argomento di studio da aggiungere: puoi suggerire quello gia presente. Risposta breve e riporta il percorso dell Handoff.",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "15:35",
+      "weekday": "wed",
+      "event": "session-end",
+      "detail": "",
+      "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    }
+  ],
+  "resume_route": {
+    "schema_version": 1,
+    "status": "ok",
+    "mode": "resume",
+    "provider": "codex",
+    "session_id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+    "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+    "card_revision": 1,
+    "reason": null,
+    "warnings": [],
+    "choices": [
+      "codex"
+    ],
+    "possible_overlap": []
+  },
+  "checkpoint_before_resume": "---\nname: project-card\ndescription: Isolated C14 acceptance test for the Codex Deskmate integration.\ntype: project\ndeskmate: {\"provider\":\"codex\",\"revision\":1,\"schema_version\":1,\"session_id\":\"01a1c9ea-5895-7262-ab1c-e7a3ebe266d6\"}\n---\n\n# C14 Codex acceptance\n\nWorking folder: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\nBranch: not applicable; this folder is not a Git repository.\nReference docs: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/setup/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/whats-on-today/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/checkpoint/SKILL.md`.\n\n## Status\nCheckpoint 2026-11-11 13:22 CET, session `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`, folder `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\n- **State:** active\n- **Where you are:** Codex-only setup completed with exit 0 and successful synthetic hook verification. Morning reconstruction completed from isolated data. Operator confirmed all five work skills plus setup in the TUI catalog and verified hook trust. The current native Codex checkpoint event is present in the activity log for this session and folder. manual-probe.txt has the exact expected content, including its final newline. No retrospective or Handoff has been written.\n- **To do:** **Verify Codex resume for this project and native session**; then run the retrospective ($how-did-it-go); then write the Handoff ($call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** keep HOME, CODEX_HOME and DESKMATE_DATA_DIR in the isolated temporary environment; use Codex only. Opening or resuming another session requires a later explicit user instruction.\n\n## Checks\n- manual-probe exact content: `python3 -I -c 'from pathlib import Path; actual = Path('\"'\"'/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project/manual-probe.txt'\"'\"').read_bytes(); expected = b'\"'\"'Dedicated non-sensitive C14 Codex acceptance project.\\n'\"'\"'; assert actual == expected, repr(actual); print(\"exact content OK (including final newline)\")'`\n",
+  "checkpoint_before_timestamp_correction": "---\nname: project-card\ndescription: Isolated C14 acceptance test for the Codex Deskmate integration.\ntype: project\ndeskmate: {\"provider\":\"codex\",\"revision\":2,\"schema_version\":1,\"session_id\":\"01a1c9ea-5895-7262-ab1c-e7a3ebe266d6\"}\n---\n\n# C14 Codex acceptance\n\nWorking folder: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\nBranch: not applicable; this folder is not a Git repository.\nReference docs: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/setup/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/whats-on-today/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/checkpoint/SKILL.md`.\n\n## Status\nCheckpoint 2026-11-11 15:09 CET, session `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`, folder `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\n- **State:** active\n- **Where you are:** Codex-only setup and morning reconstruction completed. Operator confirmed all five work skills plus setup in the TUI catalog and verified hook trust. The operator reports a complete exit followed by codex resume; Codex resume is verified by the current runtime native ID and working folder matching the existing card and by the passing read-only exact-content Check. The current native Codex checkpoint event is present in the activity log for this session and folder. manual-probe.txt matches its expected bytes, including the final newline.\n- **To do:** **Run the retrospective ($how-did-it-go)**; then write the Handoff ($call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** keep HOME, CODEX_HOME and DESKMATE_DATA_DIR in the isolated temporary environment; use Codex only and continue in the current resumed session.\n\n## Checks\n- manual-probe exact content: `python3 -I -c 'from pathlib import Path; actual = Path('\"'\"'/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project/manual-probe.txt'\"'\"').read_bytes(); expected = b'\"'\"'Dedicated non-sensitive C14 Codex acceptance project.\\n'\"'\"'; assert actual == expected, repr(actual); print(\"exact content OK (including final newline)\")'`\n",
+  "checkpoint_final": "---\nname: project-card\ndescription: Isolated C14 acceptance test for the Codex Deskmate integration.\ntype: project\ndeskmate: {\"provider\":\"codex\",\"revision\":3,\"schema_version\":1,\"session_id\":\"01a1c9ea-5895-7262-ab1c-e7a3ebe266d6\"}\n---\n\n# C14 Codex acceptance\n\nWorking folder: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\nBranch: not applicable; this folder is not a Git repository.\nReference docs: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/setup/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/whats-on-today/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/checkpoint/SKILL.md`.\n\n## Status\nCheckpoint 2026-11-11T15:23:20+01:00, session `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`, folder `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\n- **State:** active\n- **Where you are:** Codex-only setup and morning reconstruction completed. Operator confirmed discovery of all five work skills plus setup and verified hook trust. Codex resume was verified with the same native session ID, project folder and passing exact-content Check. The selected retrospective reproduced a saved_checkpoint parse failure for the previous timestamp containing CET; session ownership and the shared card remained valid. The failure was reproduced directly before this save. This new test-data checkpoint uses ISO 8601 with numeric offset +01:00 and seconds precision. Only isolated test data is corrected; application code is unchanged. The manual-probe exact-content Check is retained.\n- **To do:** **Resume the authorized retrospective for this Codex session and verify its checkpoint boundary and configured limits**; obtain user feedback before recording lessons; then write the Handoff ($call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** keep HOME, CODEX_HOME and DESKMATE_DATA_DIR in the isolated temporary environment; use Codex only and continue in the current resumed session.\n\n## Checks\n- manual-probe exact content: `python3 -I -c 'from pathlib import Path; actual = Path('\"'\"'/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project/manual-probe.txt'\"'\"').read_bytes(); expected = b'\"'\"'Dedicated non-sensitive C14 Codex acceptance project.\\n'\"'\"'; assert actual == expected, repr(actual); print(\"exact content OK (including final newline)\")'`\n",
+  "lessons": "# Lessons\n\nRetrospectives, latest at the bottom.\n\n## 2026-11-11 (periodo 2026-11-09 → 2026-11-11)\n\nAmbito: sola prova manuale C14 isolata, progetto `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`, sessione `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`. Fonti: scheda condivisa, log attività e soltanto i delta già selezionati dall'operatore. Orari locali del 2026-11-11 in +01:00, salvo indicazione diversa. Osservazioni ed esperimenti confermati dall'operatore prima della registrazione.\n\n**Cosa ha funzionato:**\n- Continuità e ripresa: il log registra uscita alle 14:23 e riapertura alle 15:08. Nel delta selezionato, alle 15:09, il checkpoint conferma stesso ID nativo, cartella e Check del contenuto esatto di `manual-probe.txt`, incluso il newline finale. La scheda rev. 2 conservava stato `active` e prossimi passi; la rev. 3 conserva il Check.\n- Uso di Codex e controllo della lettura: il log registra la mattina alle 11:50 e la richiesta di retrospettiva alle 15:15. Il delta selezionato delle 15:15 mostra l'arresto per la selezione; la lettura successiva riguarda soltanto la sessione scelta. La scheda rev. 3 registra setup completato e conferme dell'operatore su discovery e trust. Queste conferme restano attribuite all'operatore; il test di logging sintetico, la delivery nativa documentata dagli eventi del log e il trust delle definizioni sono verifiche distinte.\n- Gestione dello studio: log e delta selezionato delle 15:10–15:11 registrano un solo argomento sugli hook nella lista isolata.\n\n**Da migliorare:**\n- Anomalia del formato temporale: la precedente riga `Checkpoint 2026-11-11 15:09 CET` è stata rifiutata da `saved_checkpoint`, pur con ID, progetto e scheda validi. Il primo delta selezionato segnalava stato `degraded`, confine assente e origine `session-start`. Il problema è stato riprodotto prima del nuovo salvataggio; la scheda rev. 3 e l'evento checkpoint delle 15:22 documentano problema e correzione dei soli dati di prova.\n- Il nuovo checkpoint `2026-11-11T15:23:20+01:00`, salvato con revisione attesa 2 → 3, è riconosciuto nella seconda retrospettiva selezionata come `2026-11-11T14:23:20+00:00`, fonte `project-card`, precisione al secondo, stato `ok` e `coverage.origin=checkpoint`. Il codice non è stato modificato: questo esito verifica il formato corretto nei dati di prova e non dichiara corretto il codice né conclusa C14. Non ci sono elementi per classificare il problema come ricorrente.\n\n**Limiti delle evidenze:**\n- Limiti configurati invariati: 12 messaggi e 6.000 caratteri. Primo delta: 12 messaggi inclusi, 12 omessi; 3.877 caratteri inclusi, 3.949 omessi; copertura parziale e troncata dall'inizio sessione.\n- Dopo il nuovo checkpoint: 0 messaggi e 0 caratteri inclusi o omessi, nessun troncamento, copertura completa dal confine. Il delta vuoto non riassume il lavoro precedente: per quello restano disponibili scheda, log e primo delta già selezionato. Nessun approfondimento e nessun'altra sessione letta.\n- Ritmo: una sola giornata di test osservata; nessuna conclusione su abitudini nei giorni senza eventi. Piano e realtà: Handoff ancora assente, quindi confronto con un piano serale non disponibile. Rilavorazioni: osservata la riscrittura del timestamp; altre rilavorazioni non determinabili dal delta parziale. Attese e blocchi: la scheda indica «nothing», ma i tempi effettivi non sono misurati. Cambi di contesto: documentata una riapertura della stessa sessione; nessuna evidenza sufficiente per misurare interruzioni o parallelismo.\n- Metriche Codex da metadati e snapshot, ultimo snapshot restituito alle 15:20:51 del 2026-11-11, potenzialmente arretrato; nessun confronto o somma con contatori Claude. Esperimento `fresh_sessions` non configurato; valutazioni di ripresa e confronti fra modalità non disponibili.\n\n**Esperimenti precedenti:** nessuno; `lessons.md` non conteneva voci precedenti.\n\n**Esperimenti in corso:**\n- A ogni resume confrontare ID nativo e cartella con la scheda ed eseguire il Check di sola lettura; registrare coincidenza ed esito prima di proseguire.\n- Salvare ogni nuovo timestamp del checkpoint in ISO 8601 con offset numerico; prima di chiudere la sessione verificare nella retrospettiva della sola sessione autorizzata che `coverage.origin=checkpoint`, riportando confine, limiti ed eventuali omissioni.\n\nC14 resta in stato `active`. Prossimo passo: Handoff con `$call-it-a-day`, da eseguire solo dopo la prossima istruzione dell'operatore.\n",
+  "handoff": "# Handoff per giovedì 2026-11-12\n\nPreparato il 2026-11-11T15:31:29+01:00, per C14 acceptance. Ambito: sola prova C14 nell'ambiente temporaneo isolato.\n\n## In breve\n- C14 Codex acceptance: 1 lavoro aperto, stato `active`. Domani rivedere le evidenze di accettazione e correggere il problema del timestamp emerso. Il codice non è stato modificato o dichiarato corretto; C14 non è completa.\n\n## 1. C14 Codex acceptance\n\nRipresa: `deskmate work-session --folder \"/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project\"`.\nProvider registrato nella scheda: `codex`.\nID nativo da conservare: `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`.\nCartella da conservare: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\nLa scheda condivisa rev. 3 appartiene allo stesso Provider e ID della sessione corrente. La ripresa segue questa proprietà registrata. Il comando è solo annotato: durante la chiusura non è stata avviata alcuna sessione o Provider.\n\n- **Dove sei:** setup Codex e mattina completati; discovery delle cinque skill più setup e trust delle definizioni confermati dall'operatore. Verifica sintetica del logging, delivery nativa nei log e trust sono evidenze distinte. Resume Codex dopo uscita completa verificato con stesso ID, cartella e Check superato. Scheda rev. 3 in stato `active`, checkpoint `2026-11-11T15:23:20+01:00`. La retrospettiva del periodo 9–11 novembre è salvata in `lessons.md`, confermata dall'operatore, con due esperimenti. Questo avanzamento successivo al checkpoint supera l'indicazione della scheda di completare ancora la retrospettiva.\n- **Problema osservato:** il precedente timestamp `2026-11-11 15:09 CET` veniva rifiutato da `saved_checkpoint`, pur con ID, cartella e scheda validi. È stato riprodotto il rifiuto e corretto soltanto il nuovo checkpoint nei dati di prova, usando ISO 8601 con offset numerico. Il codice resta da esaminare e correggere; il salvataggio riuscito non chiude il problema software né C14.\n- **Da fare:** **rivedere le evidenze di accettazione C14**, mantenendo separate prove sintetiche, eventi nativi e conferme dell'operatore; poi correggere il problema del formato temporale nel flusso che scrive e legge il checkpoint e verificarlo con prove mirate. Salvare quindi un nuovo checkpoint con revisione attesa e rivalutare l'esito di accettazione prima di dichiarare conclusa C14.\n- **In attesa di:** nessuno; restano attività tecniche da svolgere.\n- **Prima di iniziare:** mantenere HOME, CODEX_HOME e DESKMATE_DATA_DIR nei percorsi temporanei configurati sotto `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9`. Usare solo Codex e questo progetto. A ogni resume confrontare ID nativo e cartella con la scheda ed eseguire il Check prima di proseguire.\n\n### Controlli reali e fonti\n\n- `deskmate check`, eseguito il `2026-11-11T15:30:36+01:00`: **OK**, 1 Check sul contenuto esatto di `manual-probe.txt`, incluso il newline finale. Il comando di sola lettura resta nella sezione `## Checks` della scheda. Nessuna contraddizione rilevata rispetto al contenuto dichiarato.\n- Lettura diretta di `saved_checkpoint` alle 15:30: confine riconosciuto da `project-card`, normalizzato a `2026-11-11T14:23:20+00:00`, precisione al secondo.\n- Metadati odierni raccolti con `sessions --provider all --since 2026-11-11 --messages 0 --format json`: una sola identità, `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`, cartella corretta, ultima attività rilevata `2026-11-11T15:30:10+01:00`, stato `ok`, nessun avviso di discovery. Nessuna sessione Claude restituita.\n- Nessuna nuova lettura di messaggi per questa chiusura: la sessione corrente è esclusa dalle letture aggiuntive. L'attività successiva al checkpoint è documentata dalla retrospettiva salvata e da questa chiusura. Si usano scheda, metadati, Check e lezioni durevoli; non si presume che il checkpoint copra l'attività successiva.\n- Ultimo delta già autorizzato dopo la correzione dei dati: `coverage.origin=checkpoint`, copertura completa dal confine, stato `ok`, limiti 12 messaggi / 6.000 caratteri, 0 messaggi e 0 caratteri inclusi o omessi, nessun troncamento. Questo delta vuoto non copre retroattivamente la giornata. Il primo delta selezionato aveva copertura parziale dall'inizio sessione: 12 messaggi inclusi e 12 omessi, 3.877 caratteri inclusi e 3.949 omessi, troncamento presente. Limiti e lacune sono conservati in `lessons.md`.\n- Fonti durevoli: `projects/project-4b1ff03d0781/project-card.md`, `lessons.md`, `log.csv`, `study-later.md`. Nessun Handoff precedente da archiviare. La cartella di prova non è un repository Git; nessuno stato di PR o CI è stato attestato.\n\n### Esperimenti concordati\n\n1. A ogni resume confrontare ID nativo, cartella e Check; registrare coincidenza ed esito.\n2. Salvare timestamp ISO 8601 con offset numerico e verificare `coverage.origin=checkpoint` prima della chiusura, riportando confine, limiti ed eventuali omissioni.\n\n## Attività concluse oggi\n- Setup e ricostruzione mattutina della prova.\n- Verifica della continuità con `codex resume` e checkpoint con controllo di revisione.\n- Retrospettiva selezionata e registrazione dei due esperimenti in italiano.\n- Correzione del formato nei soli dati di prova e verifica del riconoscimento del confine. Il problema nel codice resta aperto.\n\nIn attesa: nessun progetto in stato `standby`.\n\n## Dopo la chiusura\n- Argomento già presente nella lista di studio: **Verifica degli hook Codex: distinguere logging sintetico, delivery nativa e trust delle definizioni.** Nessun nuovo argomento aggiunto; 1 voce aperta.\n- Nessuna attività amministrativa emersa.\n",
+  "study_later": "# Study later\n\nTopics to study after closing time.\n- [ ] 2026-11-11 — **Verifica degli hook Codex: distinguere logging sintetico, delivery nativa e trust delle definizioni.** — Emerso nella prova manuale C14 del progetto corrente, dopo setup, checkpoint nativi e verifica del resume Codex.\n",
+  "native_retrospective_calls": [
+    {
+      "timestamp": "2026-11-11T14:15:29.472Z",
+      "input": "const r=await tools.exec_command({cmd:\"/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.local/bin/deskmate retrospective --since 2026-11-09 --format json\",\"login\":false,\"max_output_tokens\":10000});text(r);\nif(r.exit_code===0){try{store(\"c14_retro_durable_report\",JSON.parse(r.output));}catch{}}\n"
+    },
+    {
+      "timestamp": "2026-11-11T14:20:24.639Z",
+      "input": "text(await tools.exec_command({cmd:\"/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.local/bin/deskmate retrospective --since 2026-11-09 --select codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6 --format json\",\"login\":false,\"max_output_tokens\":14000}));\n"
+    },
+    {
+      "timestamp": "2026-11-11T14:23:37.051Z",
+      "input": "text(await tools.exec_command({cmd:\"/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/home/.local/bin/deskmate retrospective --since 2026-11-09 --select codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6 --format json\",\"login\":false,\"max_output_tokens\":10000}));\ntext(await tools.exec_command({cmd:\"python3 -I -c 'import pathlib,hashlib; p=pathlib.Path(\\\"/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/lessons.md\\\"); print(\\\"LESSONS_SHA256\\\",hashlib.sha256(p.read_bytes()).hexdigest())'\",\"login\":false,\"max_output_tokens\":300}));\n"
+    }
+  ],
+  "retrospective_initial": {
+    "schema_version": 1,
+    "since": "2026-11-09",
+    "phase": "selection",
+    "durable": {
+      "cards": [
+        {
+          "path": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/projects/project-4b1ff03d0781/project-card.md",
+          "text": "---\nname: project-card\ndescription: Isolated C14 acceptance test for the Codex Deskmate integration.\ntype: project\ndeskmate: {\"provider\":\"codex\",\"revision\":2,\"schema_version\":1,\"session_id\":\"01a1c9ea-5895-7262-ab1c-e7a3ebe266d6\"}\n---\n\n# C14 Codex acceptance\n\nWorking folder: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\nBranch: not applicable; this folder is not a Git repository.\nReference docs: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/setup/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/whats-on-today/SKILL.md`, `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/source/skills/checkpoint/SKILL.md`.\n\n## Status\nCheckpoint 2026-11-11 15:09 CET, session `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`, folder `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`.\n- **State:** active\n- **Where you are:** Codex-only setup and morning reconstruction completed. Operator confirmed all five work skills plus setup in the TUI catalog and verified hook trust. The operator reports a complete exit followed by codex resume; Codex resume is verified by the current runtime native ID and working folder matching the existing card and by the passing read-only exact-content Check. The current native Codex checkpoint event is present in the activity log for this session and folder. manual-probe.txt matches its expected bytes, including the final newline.\n- **To do:** **Run the retrospective ($how-did-it-go)**; then write the Handoff ($call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** keep HOME, CODEX_HOME and DESKMATE_DATA_DIR in the isolated temporary environment; use Codex only and continue in the current resumed session.\n\n## Checks\n- manual-probe exact content: `python3 -I -c 'from pathlib import Path; actual = Path('\"'\"'/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project/manual-probe.txt'\"'\"').read_bytes(); expected = b'\"'\"'Dedicated non-sensitive C14 Codex acceptance project.\\n'\"'\"'; assert actual == expected, repr(actual); print(\"exact content OK (including final newline)\")'`\n",
+          "metadata": {
+            "provider": "codex",
+            "revision": 2,
+            "schema_version": 1,
+            "session_id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6"
+          }
+        }
+      ],
+      "handoffs": [],
+      "events": [
+        {
+          "date": "2026-11-11",
+          "time": "10:56",
+          "weekday": "wed",
+          "event": "session-start",
+          "detail": "",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        },
+        {
+          "date": "2026-11-11",
+          "time": "11:50",
+          "weekday": "wed",
+          "event": "whats-on-today",
+          "detail": "Prova manuale C14 Codex nel solo ambiente temporaneo corrente. Esegui la ricostruzione mattutina dai dati isolati; restiamo in questa sessione, senza avviare altre sessioni/provider. Il lavoro di oggi e verificare manual-probe.txt nel progetto corrente e salvare poi un checkpoint. Non creare ancora scheda, lezioni o Handoff. Risposta breve.",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        },
+        {
+          "date": "2026-11-11",
+          "time": "13:22",
+          "weekday": "wed",
+          "event": "checkpoint",
+          "detail": "Salva un checkpoint reale per il progetto corrente, stato active. Verifica manual-probe.txt e inserisci un Check di sola lettura sul suo contenuto esatto. Registra setup e mattina completati, discovery e trust verificati dall operatore; prossimo passo: verificare resume Codex, poi retrospettiva e Handoff. Usa l ID nativo corrente e card write con revisione attesa. Non avviare altre sessioni/provider. Risposta breve.",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        },
+        {
+          "date": "2026-11-11",
+          "time": "14:23",
+          "weekday": "wed",
+          "event": "session-end",
+          "detail": "",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        },
+        {
+          "date": "2026-11-11",
+          "time": "15:08",
+          "weekday": "wed",
+          "event": "session-start",
+          "detail": "",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        },
+        {
+          "date": "2026-11-11",
+          "time": "15:08",
+          "weekday": "wed",
+          "event": "checkpoint",
+          "detail": "Questa sessione e stata riaperta con codex resume dopo uscita completa. Prima di salvare, verifica che ID nativo corrente e cartella coincidano con la scheda esistente e che il Check passi. Aggiorna il checkpoint tramite card write: resume Codex verificato, prossimo passo retrospettiva e Handoff. Rimuovi la precedente indicazione di attendere autorizzazione al resume, ora autorizzato ed eseguito. Mantieni stato active e il Check del file. Non avviare altre sessioni/provider. Risposta breve con ID e revisione.",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        },
+        {
+          "date": "2026-11-11",
+          "time": "15:10",
+          "weekday": "wed",
+          "event": "study-later",
+          "detail": "Verifica degli hook Codex: distinguere logging sintetico, delivery nativa e trust delle definizioni. Aggiungi soltanto questo argomento alla lista isolata. Risposta breve.",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        },
+        {
+          "date": "2026-11-11",
+          "time": "15:15",
+          "weekday": "wed",
+          "event": "how-did-it-go",
+          "detail": "Esegui la retrospettiva della sola prova C14 nei dati isolati. Inizia dalle evidenze durevoli, mostra tutti i candidati e le raccomandazioni, poi fermati per la selezione prima di leggere messaggi. Non avviare sessioni/provider e non consultare progetti personali. Risposta breve.",
+          "session": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+          "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "codex"
+        }
+      ]
+    },
+    "metrics": {
+      "providers": {
+        "claude": {
+          "events": {},
+          "sessions": []
+        },
+        "codex": {
+          "events": {
+            "checkpoint": 2,
+            "how-did-it-go": 1,
+            "session-end": 1,
+            "session-start": 2,
+            "study-later": 1,
+            "whats-on-today": 1
+          },
+          "sessions": [
+            {
+              "provider": "codex",
+              "id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+              "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+              "start": "2026-11-11T09:22:20+00:00",
+              "end": "2026-11-11T14:15:21+00:00",
+              "usage": {
+                "thread_token_usage": {
+                  "cache_write_input_tokens": 0,
+                  "cached_input_tokens": 1652096,
+                  "input_tokens": 1712601,
+                  "output_tokens": 9398,
+                  "reasoning_output_tokens": 1464,
+                  "total_tokens": 1721999
+                },
+                "tokens_used": 1721999
+              },
+              "status": "ok",
+              "warnings": [],
+              "usage_source": "cached-snapshot",
+              "usage_as_of": "2026-11-11T14:11:08+00:00"
+            }
+          ]
+        }
+      },
+      "usage_source": "metadata-and-cached-snapshots",
+      "note": "Raw native counters remain separate by Provider; snapshots may be stale and are not refreshed here."
+    },
+    "candidates": [
+      {
+        "key": "codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+        "provider": "codex",
+        "id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+        "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+        "start": "2026-11-11T09:22:20+00:00",
+        "end": "2026-11-11T14:15:21+00:00",
+        "usage": {
+          "thread_token_usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 1652096,
+            "input_tokens": 1712601,
+            "output_tokens": 9398,
+            "reasoning_output_tokens": 1464,
+            "total_tokens": 1721999
+          },
+          "tokens_used": 1721999
+        },
+        "status": "ok",
+        "warnings": [],
+        "sources": [
+          "activity-log",
+          "project-card",
+          "native-metadata",
+          "cached-snapshot"
+        ],
+        "events": [
+          "session-start",
+          "whats-on-today",
+          "checkpoint",
+          "session-end",
+          "session-start",
+          "checkpoint",
+          "study-later",
+          "how-did-it-go"
+        ],
+        "card": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/data/projects/project-4b1ff03d0781/project-card.md",
+        "usage_source": "cached-snapshot",
+        "usage_as_of": "2026-11-11T14:11:08+00:00",
+        "reasons": [
+          "Logged Daily loop activity: checkpoint, how-did-it-go, session-end, session-start, study-later, whats-on-today",
+          "Owns a shared Project card; compare its Checkpoint with the Handoff"
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "key": "codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+        "provider": "codex",
+        "id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+        "reasons": [
+          "Logged Daily loop activity: checkpoint, how-did-it-go, session-end, session-start, study-later, whats-on-today",
+          "Owns a shared Project card; compare its Checkpoint with the Handoff"
+        ]
+      }
+    ],
+    "selected": [],
+    "deltas": [],
+    "warnings": []
+  },
+  "delta_before_timestamp_correction": {
+    "schema_version": 1,
+    "provider": "codex",
+    "id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+    "status": "degraded",
+    "warnings": [
+      "Saved Checkpoint is unreadable or invalid; coverage starts at session start."
+    ],
+    "checkpoint": null,
+    "messages": [
+      {
+        "role": "user",
+        "timestamp": "2026-11-11T09:56:47.563000+00:00",
+        "text": "$setup  Questa e una prova manuale C14 autorizzata, solo Codex, in ambiente temporaneo non sensibile. Usa esclusivamente HOME, CODEX_HOME e DESKMATE_DATA_DIR gia configurati sotto /private/tmp/deskmate-c14-codex-20261111-57yyvc_9. Esegui setup con --provider codex --default-provider codex --non-interactive, conserva nome, lingua e reminders.channels=[]. Non avviare altre sessioni o provider, non leggere credenziali o progetti personali. Non fare checkpoint ora. Conferma la discovery effettiva delle cinque skill dal catalogo runtime, senza dedurla dai symlink, e riporta l ID nativo corrente. Risposte brevi in italiano."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:09:00.102000+00:00",
+        "text": "Uso `checkpoint`: confronto ID nativo e cartella con la scheda, eseguo il Check e salvo l’aggiornamento con la revisione attesa."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:09:43.198000+00:00",
+        "text": "C14 acceptance, ID e cartella coincidono con la scheda; Check superato e conservato.\n\nCheckpoint salvato con `card write`, revisione `1 → 2`, stato `active`. Resume Codex verificato; rimossa l’attesa di autorizzazione. Prossimi passi: retrospettiva e Handoff.\n\nID: `01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`. `$call-it-a-day` userà la scheda aggiornata."
+      },
+      {
+        "role": "user",
+        "timestamp": "2026-11-11T14:10:55.511000+00:00",
+        "text": "$study-later Verifica degli hook Codex: distinguere logging sintetico, delivery nativa e trust delle definizioni. Aggiungi soltanto questo argomento alla lista isolata. Risposta breve."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:10:57.638000+00:00",
+        "text": "Uso `study-later` per aggiungere soltanto questo argomento alla lista isolata."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:11:07.337000+00:00",
+        "text": "Aggiunto alla lista isolata:\n\n- [ ] 2026-11-11 — **Verifica degli hook Codex: distinguere logging sintetico, delivery nativa e trust delle definizioni.** — Emerso nella prova manuale C14 dopo setup, checkpoint nativi e verifica del resume Codex.\n\nArgomenti aperti: **1**."
+      },
+      {
+        "role": "user",
+        "timestamp": "2026-11-11T14:15:12.958000+00:00",
+        "text": "$how-did-it-go Esegui la retrospettiva della sola prova C14 nei dati isolati. Inizia dalle evidenze durevoli, mostra tutti i candidati e le raccomandazioni, poi fermati per la selezione prima di leggere messaggi. Non avviare sessioni/provider e non consultare progetti personali. Risposta breve."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:15:15.564000+00:00",
+        "text": "Uso `how-did-it-go` per esaminare le evidenze durevoli della sola prova C14. Mostrerò tutti i candidati e le raccomandazioni, poi mi fermerò per la selezione prima di leggere messaggi."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:15:41.182000+00:00",
+        "text": "C14 acceptance, periodo **9–11 novembre 2026**.\n\nEvidenze durevoli: scheda rev. `2`, stato `active`; setup, mattina e resume registrati come completati. Il log mostra uscita alle 14:23 e riapertura alle 15:08. Handoff assente; nessuna lezione precedente.\n\n**Candidati completi: uno**\n\n- `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`\n  Cartella: `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project`\n  Attività: 11/11, 10:22–15:15 CET. Nessun metadato mancante segnalato.\n  **Raccomandata:** contiene il ciclo C14 e possiede la scheda.\n\nMetriche Codex da snapshot dell’11/11 alle 15:11 CET, potenzialmente arretrato; nessun dato Claude.\n\nNessun messaggio letto. Selezioni questa sessione oppure **nessuna**, continuando dalle sole evidenze durevoli?"
+      },
+      {
+        "role": "user",
+        "timestamp": "2026-11-11T14:20:19.438000+00:00",
+        "text": "Seleziono soltanto codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6 per questa retrospettiva di test. Leggi il delta con i limiti configurati, senza approfondimenti o altre sessioni, e mostra osservazioni e limiti delle evidenze. Non salvare ancora lessons.md: attendi il mio riscontro."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:20:21.720000+00:00",
+        "text": "Leggo solo il delta della sessione selezionata, con i limiti configurati e senza approfondimenti. Presenterò osservazioni e limiti delle evidenze; attenderò il tuo riscontro prima di salvare `lessons.md`."
+      },
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:20:42.189000+00:00",
+        "text": "C14 acceptance, letto solo il delta di `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6`.\n\n- **Continuità riuscita:** log di uscita 14:23 e riapertura 15:08; scheda rev. `2` e risposta delle 15:09 confermano stesso ID, cartella e Check superato.\n- **Avanzamento coerente:** scheda e log registrano mattina, due checkpoint e argomento di studio. Handoff ancora assente: manca il confronto tra piano serale e risultato.\n- **Lettura controllata:** alle 15:15 la retrospettiva si è fermata alla selezione; il delta è stato richiesto dopo la tua scelta.\n- **Ritmo e ostacoli:** risulta una sola sessione Codex riaperta; nessun blocco nella scheda. Rilavorazioni, attese effettive e abitudini ricorrenti non sono determinabili da questa prova.\n\n**Limiti:** configurazione di **12 messaggi / 6.000 caratteri**; inclusi 12 messaggi e 3.877 caratteri, omessi 12 messaggi e 3.949 caratteri. Copertura **parziale e troncata**. L’adattatore segnala il checkpoint come illeggibile/non valido e parte dall’inizio sessione: il confine del delta non è verificato, pur essendo disponibile la scheda durevole.\n\nMetriche Codex da snapshot dell’11/11 alle 15:15:45 CET, potenzialmente arretrato; nessun confronto con Claude. Nessun esperimento precedente registrato.\n\nPropongo di ripetere il controllo ID/cartella/Check a ogni resume e verificare il riconoscimento del confine checkpoint nei prossimi delta.\n\n`lessons.md` non modificato. Attendo il tuo riscontro."
+      }
+    ],
+    "limits": {
+      "max_messages": 12,
+      "max_characters": 6000
+    },
+    "included_messages": 12,
+    "omitted_messages": 13,
+    "characters": 4789,
+    "omitted_characters": 4475,
+    "truncated": true,
+    "coverage": {
+      "origin": "session-start",
+      "status": "partial",
+      "counts": "readable conversation messages only; corrupt records are not counted"
+    }
+  },
+  "delta_after_timestamp_correction": {
+    "schema_version": 1,
+    "provider": "codex",
+    "id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+    "status": "ok",
+    "warnings": [],
+    "checkpoint": {
+      "timestamp": "2026-11-11T14:23:20+00:00",
+      "source": "project-card",
+      "precision": "second"
+    },
+    "messages": [
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T14:23:42.268000+00:00",
+        "text": "C14 acceptance, nuovo checkpoint salvato con `card write`: revisione **2 → 3**, stato `active`, Check conservato e superato.\n\nTimestamp: `2026-11-11T15:23:20+01:00`. Registrati problema `CET` e correzione dei soli dati di prova; codice invariato.\n\nRetrospettiva ripresa sulla sola sessione autorizzata:\n\n- Confine riconosciuto dalla scheda, precisione al secondo, stato `ok`.\n- Limiti: **12 messaggi / 6.000 caratteri**.\n- Nessun messaggio successivo al nuovo checkpoint: **0 inclusi, 0 omessi**, nessun troncamento; copertura completa dal confine.\n\n`lessons.md` invariato."
+      }
+    ],
+    "limits": {
+      "max_messages": 12,
+      "max_characters": 6000
+    },
+    "included_messages": 1,
+    "omitted_messages": 0,
+    "characters": 573,
+    "omitted_characters": 0,
+    "truncated": false,
+    "coverage": {
+      "origin": "checkpoint",
+      "status": "full",
+      "counts": "readable conversation messages only; corrupt records are not counted"
+    }
+  },
+  "native_usage_before_resume": {
+    "provider": "codex",
+    "schema_version": 1,
+    "sessions": {
+      "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6": {
+        "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+        "end": "2026-11-11T12:23:07+00:00",
+        "id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+        "provider": "codex",
+        "start": "2026-11-11T09:22:20+00:00",
+        "status": "ok",
+        "usage": {
+          "thread_token_usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 1055616,
+            "input_tokens": 1110541,
+            "output_tokens": 7182,
+            "reasoning_output_tokens": 1351,
+            "total_tokens": 1117723
+          },
+          "tokens_used": 1117723
+        },
+        "warnings": []
+      }
+    }
+  },
+  "native_usage_final": {
+    "provider": "codex",
+    "schema_version": 1,
+    "sessions": {
+      "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6": {
+        "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project",
+        "end": "2026-11-11T14:31:37+00:00",
+        "id": "01a1c9ea-5895-7262-ab1c-e7a3ebe266d6",
+        "provider": "codex",
+        "start": "2026-11-11T09:22:20+00:00",
+        "status": "ok",
+        "usage": {
+          "thread_token_usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 3639296,
+            "input_tokens": 3735123,
+            "output_tokens": 20570,
+            "reasoning_output_tokens": 4101,
+            "total_tokens": 3755693
+          },
+          "tokens_used": 3755693
+        },
+        "warnings": []
+      }
+    }
+  },
+  "finding": {
+    "id": "C14-CODEX-01",
+    "status": "open",
+    "summary": "Native checkpoint skill emitted a CET timestamp that the Session delta reader rejects.",
+    "impact": "Delta falls back to session start with an explicit warning and retains configured bounds.",
+    "diagnosis": {
+      "native_timestamp": "2026-11-11 15:09 CET",
+      "metadata_matches": true,
+      "card_readable": true,
+      "native_timestamp_rejected": true,
+      "iso_offset_timestamp_accepted": {
+        "timestamp": "2026-11-11T14:09:00+00:00",
+        "source": "project-card",
+        "precision": "second"
+      },
+      "source_code_changed": false
+    },
+    "workaround": "Asked the native checkpoint skill to save a new revision with an ISO 8601 timestamp including a numeric offset; rerun recognized the boundary without warnings.",
+    "implementation_fixed": false
+  },
+  "source_files_verified_unchanged": 92,
+  "temporary_auth_reference_removed": true,
+  "not_executed": [
+    "Claude native group",
+    "Cross-Provider native group",
+    "Desktop/calendar delivery",
+    "iTerm launch submission (resume used native CLI after verifying the Deskmate route)"
+  ],
+  "c14_complete": false
+}

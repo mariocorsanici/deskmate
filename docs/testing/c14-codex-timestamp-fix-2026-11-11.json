@@ -1,0 +1,239 @@
+{
+  "base_commit": "24b431f",
+  "project_folder": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression",
+  "cli_version": "0.167.0",
+  "candidate_files": {
+    "tools/checkpoints.py": "ff17d282ea8fb74d1f2674a827b5cbbe58e953cc412c5281aab01930b1cc8734",
+    "tools/project_cards.py": "f72e8d61823ee360a823529e2c8c1b86e2788a2904ccf9c9288d0baa89403de7",
+    "tools/session_delta.py": "1165c260f8da0fb03e4e2714b348e7d8cd419a9f59093f0fed4f67fa3dd4bc4d",
+    "skills/checkpoint/SKILL.md": "3af37ef3be7954f10c1b7bf4c422f8697b2d07a5bec029d512f7cfc05a46bed0"
+  },
+  "full_suite": {
+    "tests": 253,
+    "result": "passed",
+    "seconds": 98.537
+  },
+  "focused_suites": {
+    "python_3_14": 47,
+    "python_3_9": 47
+  },
+  "review": "approved, no findings",
+  "status": "passed",
+  "finding_id": "C14-CODEX-01",
+  "finding_status": "resolved",
+  "session_id": "01a1cb36-325e-7de3-99e9-2952c94610bd",
+  "native_process_exit_code": 0,
+  "completed_native_turns": [
+    {
+      "completed_at": "2026-11-11T15:34:10.676Z",
+      "answer": "C14 acceptance, salvato come `active`. Contenuto esatto di `manual-probe.txt` verificato; Check di sola lettura aggiunto e superato.\n\nProssimo passo: retrospettiva del lavoro di prova.\n\nSalvato nella scheda progetto: `/call-it-a-day` la userà."
+    },
+    {
+      "completed_at": "2026-11-11T15:42:50.101Z",
+      "answer": "C14 acceptance, raccolta del **2026-11-11**, senza leggere messaggi.\n\nLa scheda corrente è `active`, revisione 1, con Check esatto e retrospettiva da svolgere. Il log conferma checkpoint e richiesta attuale; manca un Handoff del progetto corrente.\n\nTutti i candidati, nelle cartelle isolate sotto `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/`:\n\n| Provider:ID | Cartella | Ultima attività UTC | Snapshot UTC |\n|---|---|---|---|\n| `codex:01a1cb36-325e-7de3-99e9-2952c94610bd` | `project-timestamp-regression` | 15:42:34 | 15:34:10 |\n| `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6` | `project` | 14:31:37 | 14:31:37 |\n\nEntrambi: stato `ok`, nessun metadato mancante segnalato. Snapshot potenzialmente arretrati; nessun candidato Claude.\n\nRaccomando **solo la prima**, perché è la sessione corrente del progetto richiesto. Confermi questa selezione, oppure scegli nessuna?"
+    },
+    {
+      "completed_at": "2026-11-11T15:43:39.834Z",
+      "answer": "C14 acceptance, verifica della sola `codex:01a1cb36-325e-7de3-99e9-2952c94610bd`:\n\n- **Checkpoint riconosciuto:** `2026-11-11T15:33:47+00:00`, fonte `project-card`, precisione al secondo.\n- **Copertura:** `origin=checkpoint`, `status=full`; riguarda il periodo successivo al confine.\n- **Limiti configurati:** 12 messaggi / 6.000 caratteri.\n- **Inclusi:** 6 messaggi, 2.064 caratteri. **Omissioni:** 0 messaggi e 0 caratteri; nessun troncamento.\n- **Stato:** `ok`; nessun avviso.\n\nIl delta documenta l’arresto per la selezione e la successiva autorizzazione esplicita. Nessun’altra conversazione letta; `lessons.md` e Handoff invariati."
+    }
+  ],
+  "checkpoint_prompt_without_format_hints": "$checkpoint Salva lo stato del progetto corrente come active. Verifica manual-probe.txt e aggiungi un Check di sola lettura sul suo contenuto esatto. Prossimo passo: eseguire una retrospettiva del lavoro di prova. Usa soltanto i dati isolati configurati in HOME, CODEX_HOME e DESKMATE_DATA_DIR; resta in questa sessione, senza leggere credenziali o altri progetti. Risposta breve con esito del salvataggio.",
+  "native_clock_and_retrospective_calls": [
+    {
+      "timestamp": "2026-11-11T15:33:47.586Z",
+      "input": "text(await tools.exec_command({cmd:\"python3 -c 'from datetime import datetime, timezone; print(datetime.now(timezone.utc).isoformat(timespec=\\\"seconds\\\"))'\",\"max_output_tokens\":1000}));\n"
+    },
+    {
+      "timestamp": "2026-11-11T15:42:34.958Z",
+      "input": "text(await tools.exec_command({cmd:\"deskmate retrospective --since 2026-11-11 --format json\",\"max_output_tokens\":15000}));\n"
+    },
+    {
+      "timestamp": "2026-11-11T15:43:31.800Z",
+      "input": "text(await tools.exec_command({cmd:\"deskmate retrospective --since 2026-11-11 --format json --select codex:01a1cb36-325e-7de3-99e9-2952c94610bd\",\"max_output_tokens\":16000}));\n"
+    }
+  ],
+  "native_checkpoint": "---\nname: project-card\ndescription: Isolated checkpoint timestamp regression trial and retrospective.\ntype: project\ndeskmate: {\"provider\":\"codex\",\"revision\":1,\"schema_version\":1,\"session_id\":\"01a1cb36-325e-7de3-99e9-2952c94610bd\"}\n---\n\n# Timestamp regression trial\n\n- Working folder: /private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression\n- Branch: not applicable; this folder is not a Git repository.\n- Reference file: manual-probe.txt\n\n## Status\nCheckpoint 2026-11-11T15:33:47+00:00, session `01a1cb36-325e-7de3-99e9-2952c94610bd`, folder `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression`.\n- **State:** active\n- **Where you are:** The project folder contains 1 file, manual-probe.txt, verified as exactly 43 bytes: \"C14 checkpoint timestamp regression probe.\" followed by a single LF newline. No Git repository is present, so branch, commit and uncommitted-file counts do not apply.\n- **To do:** **Conduct a retrospective of the trial work.**\n- **Waiting on:** nothing\n- **Before you start:** Use only the isolated data configured by HOME, CODEX_HOME and DESKMATE_DATA_DIR; remain in this session and do not read credentials or other projects.\n\n## Checks\n- manual-probe.txt exact bytes: `python3 -c 'from pathlib import Path; assert Path('\"'\"'/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression/manual-probe.txt'\"'\"').read_bytes() == b'\"'\"'C14 checkpoint timestamp regression probe.\\n'\"'\"', '\"'\"'manual-probe.txt content mismatch'\"'\"''`\n",
+  "public_delta_after_checkpoint": {
+    "schema_version": 1,
+    "provider": "codex",
+    "id": "01a1cb36-325e-7de3-99e9-2952c94610bd",
+    "status": "ok",
+    "warnings": [],
+    "checkpoint": {
+      "timestamp": "2026-11-11T15:33:47+00:00",
+      "source": "project-card",
+      "precision": "second"
+    },
+    "messages": [
+      {
+        "role": "assistant",
+        "timestamp": "2026-11-11T15:34:09.157000+00:00",
+        "text": "C14 acceptance, salvato come `active`. Contenuto esatto di `manual-probe.txt` verificato; Check di sola lettura aggiunto e superato.\n\nProssimo passo: retrospettiva del lavoro di prova.\n\nSalvato nella scheda progetto: `/call-it-a-day` la userà."
+      }
+    ],
+    "limits": {
+      "max_messages": 12,
+      "max_characters": 6000
+    },
+    "included_messages": 1,
+    "omitted_messages": 0,
+    "characters": 243,
+    "omitted_characters": 0,
+    "truncated": false,
+    "coverage": {
+      "origin": "checkpoint",
+      "status": "full",
+      "counts": "readable conversation messages only; corrupt records are not counted"
+    }
+  },
+  "public_selected_retrospective_verification": {
+    "selected": [
+      "codex:01a1cb36-325e-7de3-99e9-2952c94610bd"
+    ],
+    "deltas": [
+      {
+        "schema_version": 1,
+        "provider": "codex",
+        "id": "01a1cb36-325e-7de3-99e9-2952c94610bd",
+        "status": "ok",
+        "warnings": [],
+        "checkpoint": {
+          "timestamp": "2026-11-11T15:33:47+00:00",
+          "source": "project-card",
+          "precision": "second"
+        },
+        "messages": [
+          {
+            "role": "assistant",
+            "timestamp": "2026-11-11T15:34:09.157000+00:00",
+            "text": "C14 acceptance, salvato come `active`. Contenuto esatto di `manual-probe.txt` verificato; Check di sola lettura aggiunto e superato.\n\nProssimo passo: retrospettiva del lavoro di prova.\n\nSalvato nella scheda progetto: `/call-it-a-day` la userà."
+          },
+          {
+            "role": "user",
+            "timestamp": "2026-11-11T15:42:22.302000+00:00",
+            "text": "$how-did-it-go Esegui una retrospettiva del lavoro di prova del progetto corrente nei soli dati C14 isolati. Mostra i candidati con i metadati e fermati per la selezione prima di leggere messaggi. Per questa prova interessa la sessione corrente; non leggere conversazioni degli altri progetti. Risposta breve."
+          },
+          {
+            "role": "assistant",
+            "timestamp": "2026-11-11T15:42:24.304000+00:00",
+            "text": "Uso la skill `how-did-it-go` per raccogliere i metadati nei soli dati C14 isolati. Mostrerò i candidati e mi fermerò prima di leggere messaggi."
+          },
+          {
+            "role": "assistant",
+            "timestamp": "2026-11-11T15:42:45.627000+00:00",
+            "text": "C14 acceptance, raccolta del **2026-11-11**, senza leggere messaggi.\n\nLa scheda corrente è `active`, revisione 1, con Check esatto e retrospettiva da svolgere. Il log conferma checkpoint e richiesta attuale; manca un Handoff del progetto corrente.\n\nTutti i candidati, nelle cartelle isolate sotto `/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/`:\n\n| Provider:ID | Cartella | Ultima attività UTC | Snapshot UTC |\n|---|---|---|---|\n| `codex:01a1cb36-325e-7de3-99e9-2952c94610bd` | `project-timestamp-regression` | 15:42:34 | 15:34:10 |\n| `codex:01a1c9ea-5895-7262-ab1c-e7a3ebe266d6` | `project` | 14:31:37 | 14:31:37 |\n\nEntrambi: stato `ok`, nessun metadato mancante segnalato. Snapshot potenzialmente arretrati; nessun candidato Claude.\n\nRaccomando **solo la prima**, perché è la sessione corrente del progetto richiesto. Confermi questa selezione, oppure scegli nessuna?"
+          },
+          {
+            "role": "user",
+            "timestamp": "2026-11-11T15:43:27.261000+00:00",
+            "text": "Seleziono soltanto codex:01a1cb36-325e-7de3-99e9-2952c94610bd. Leggi il delta con i limiti configurati e riporta il confine del Checkpoint riconosciuto, la copertura, le omissioni e gli eventuali avvisi. Questa e una verifica mirata: termina dopo l analisi, senza aggiornare lessons.md o Handoff e senza leggere altre conversazioni."
+          },
+          {
+            "role": "assistant",
+            "timestamp": "2026-11-11T15:43:29.664000+00:00",
+            "text": "Leggo solo il delta della sessione selezionata con i limiti configurati. Riporterò confine, copertura, omissioni e avvisi, senza modificare `lessons.md` o Handoff."
+          },
+          {
+            "role": "assistant",
+            "timestamp": "2026-11-11T15:43:35.420000+00:00",
+            "text": "C14 acceptance, verifica della sola `codex:01a1cb36-325e-7de3-99e9-2952c94610bd`:\n\n- **Checkpoint riconosciuto:** `2026-11-11T15:33:47+00:00`, fonte `project-card`, precisione al secondo.\n- **Copertura:** `origin=checkpoint`, `status=full`; riguarda il periodo successivo al confine.\n- **Limiti configurati:** 12 messaggi / 6.000 caratteri.\n- **Inclusi:** 6 messaggi, 2.064 caratteri. **Omissioni:** 0 messaggi e 0 caratteri; nessun troncamento.\n- **Stato:** `ok`; nessun avviso.\n\nIl delta documenta l’arresto per la selezione e la successiva autorizzazione esplicita. Nessun’altra conversazione letta; `lessons.md` e Handoff invariati."
+          }
+        ],
+        "limits": {
+          "max_messages": 12,
+          "max_characters": 6000
+        },
+        "included_messages": 7,
+        "omitted_messages": 0,
+        "characters": 2700,
+        "omitted_characters": 0,
+        "truncated": false,
+        "coverage": {
+          "origin": "checkpoint",
+          "status": "full",
+          "counts": "readable conversation messages only; corrupt records are not counted"
+        }
+      }
+    ],
+    "warnings": []
+  },
+  "actual_hook_log_rows": [
+    {
+      "date": "2026-11-11",
+      "time": "16:33",
+      "weekday": "wed",
+      "event": "session-start",
+      "detail": "",
+      "session": "01a1cb36-325e-7de3-99e9-2952c94610bd",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "16:33",
+      "weekday": "wed",
+      "event": "checkpoint",
+      "detail": "Salva lo stato del progetto corrente come active. Verifica manual-probe.txt e aggiungi un Check di sola lettura sul suo contenuto esatto. Prossimo passo: eseguire una retrospettiva del lavoro di prova. Usa soltanto i dati isolati configurati in HOME, CODEX_HOME e DESKMATE_DATA_DIR; resta in questa sessione, senza leggere credenziali o altri progetti. Risposta breve con esito del salvataggio.",
+      "session": "01a1cb36-325e-7de3-99e9-2952c94610bd",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "16:42",
+      "weekday": "wed",
+      "event": "how-did-it-go",
+      "detail": "Esegui una retrospettiva del lavoro di prova del progetto corrente nei soli dati C14 isolati. Mostra i candidati con i metadati e fermati per la selezione prima di leggere messaggi. Per questa prova interessa la sessione corrente; non leggere conversazioni degli altri progetti. Risposta breve.",
+      "session": "01a1cb36-325e-7de3-99e9-2952c94610bd",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "16:44",
+      "weekday": "wed",
+      "event": "session-end",
+      "detail": "",
+      "session": "01a1cb36-325e-7de3-99e9-2952c94610bd",
+      "cwd": "/private/tmp/deskmate-c14-codex-20261111-57yyvc_9/project-timestamp-regression",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "codex"
+    }
+  ],
+  "destination_suite": {
+    "tests": 253,
+    "result": "passed",
+    "seconds": 104.827
+  },
+  "temporary_auth_reference_removed": true,
+  "previous_lessons_and_handoff_unchanged": true,
+  "post_exit_probe_environment": {
+    "initial_result": "Read-only open of the closed native paginated history returned SQLITE_CANTOPEN while WAL/SHM sidecars were absent, including outside the outer sandbox.",
+    "diagnostic": "A diagnostic mode=rw connection performing only SELECT recreated SQLite sidecars; subsequent mode=ro reads worked on both Python versions.",
+    "scope": "Separate SQLite lifecycle observation, not repaired by this timestamp fix. The initial unavailable-history warning is retained here; native live regression passed before this diagnostic."
+  },
+  "c14_complete": false,
+  "remaining": [
+    "Claude native group",
+    "Cross-Provider native group"
+  ]
+}

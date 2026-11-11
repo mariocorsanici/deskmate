@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** synthetic implementation verified; native acceptance pending (quota hold).
+**Implementation:** synthetic implementation verified; Codex native execution recorded; Claude/cross-Provider acceptance pending and post-exit SQLite access needs triage.
 **Owner:** `/root`, started 2026-11-10 from `b10d282`.
 
 - [x] Every skill, hook, reminder and documented command uses the provider-neutral interface.
@@ -23,3 +23,6 @@
 C14 independent implementation follows Task 6 of the existing core-completion plan. See `docs/testing/daily-loop.md` for the final command contract, automated/instruction scenarios, explicit native matrix and tracker disposition. Native checkboxes remain open; no personal installation, native request, push or merge.
 
 Synthetic validation: 248/248 full-suite tests on Python 3.14.6; 27/27 Daily-loop and transfer scenarios on Python 3.9.6; ResourceWarnings as errors. One independent whole-feature review; both Important findings fixed with RED/GREEN regressions. No new review findings deferred. Destination full suite passed before the local checkpoint commit; see Git history for its identity.
+
+
+2026-11-11: Codex native Daily loop executed. C14-CODEX-01 fixed with shared timestamp validation and system-generated UTC skill output; 253/253 full tests, 47/47 card/delta tests on both Python versions, one independent review without findings, and a fresh native Checkpoint/selected-retrospective regression passed. See `docs/testing/c14-codex-timestamp-fix-2026-11-11.md`. Separate C14-CODEX-02 records cold read-only SQLite history access after CLI exit; it is not fixed here. Claude/cross-Provider groups remain on hold and C14 stays open.

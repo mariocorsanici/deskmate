@@ -13,6 +13,9 @@ import re
 import sys
 import tempfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from checkpoints import checkpoint_boundary
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -168,6 +171,7 @@ def write(card: Path, legacy: Path, args) -> int:
         raise ValueError('expected revision must be nonnegative and session ID non-empty')
     candidate = Path(args.source).expanduser().read_bytes().decode('utf-8')
     parse(candidate)  # Validate before creating storage, including future metadata.
+    checkpoint_boundary(candidate)
     read_card(card)
     if legacy_kind(legacy, card) == 'regular':
         raise ValueError('legacy card requires migration; run deskmate card migrate')

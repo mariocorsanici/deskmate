@@ -33,6 +33,14 @@ Writers submit a complete UTF-8 document with `bin/deskmate card write <project-
 
 Skills call the stable `bin/deskmate` command for Checks, session summaries, statistics, logging and session launch rather than depending on the individual tools that implement them.
 
+Checkpoint skills obtain a UTC ISO 8601 timestamp with seconds from the system.
+`card write` validates any Status Checkpoint timestamp with the same parser used
+by Session deltas before publishing. Invalid timestamps return exit `2` without
+replacing the card or increasing its revision. Existing ISO offsets and legacy
+local minute timestamps remain supported; cards without a Checkpoint remain
+writable. An invalid older card still produces an explicit warning and a bounded
+delta starting at session start.
+
 ## Work session routing
 
 `bin/deskmate work-session --folder /path/to/project` continues a Project with

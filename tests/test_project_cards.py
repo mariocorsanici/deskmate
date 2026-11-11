@@ -88,6 +88,43 @@ class ProjectCardsTest(unittest.TestCase):
         card.write_text(card.read_text().replace('"schema_version":1', '"schema_version":2'))
         self.assertEqual(self.card('list').returncode, 2)
 
+    def test_invalid_checkpoint_timestamp_is_rejected_before_initial_publication(self):
+        for stamp in ('2026-11-11 15:09 CET', '2026-07-11 15:09 CEST',
+                      '2026-02-30T14:09:00Z', '2026-11-11T14:09:00+25:00'):
+            with self.subTest(timestamp=stamp):
+                case = ProjectCardsTest()
+                case.setUp()
+                try:
+                    case.source.write_text('# Demo\n\n## Status\nCheckpoint ' + stamp +
+                                           ', session `session-1`, folder `' + str(case.project) + '`.\n')
+                    result = case.write()
+                    self.assertEqual(result.returncode, 2, result.stdout)
+                    self.assertIn('Checkpoint', result.stderr)
+                    self.assertIn('ISO', result.stderr)
+                    self.assertFalse((case.home / 'data').exists())
+                    self.assertFalse((case.home / '.claude').exists())
+                finally:
+                    case.doCleanups()
+
+    def test_invalid_checkpoint_update_preserves_card_revision_and_link(self):
+        self.assertEqual(self.write().returncode, 0)
+        info = self.locate()
+        card = pathlib.Path(info['path'])
+        before = card.read_bytes()
+        link = self.legacy().readlink()
+        self.source.write_text('# Demo\n\n## Status\nCheckpoint 2026-11-11 15:09 CET, '
+                               'session `session-1`, folder `' + str(self.project) + '`.\n')
+        result = self.write(1)
+        self.assertEqual(result.returncode, 2, result.stdout)
+        self.assertEqual(card.read_bytes(), before)
+        self.assertEqual(self.locate()['metadata']['revision'], 1)
+        self.assertEqual(self.legacy().readlink(), link)
+
+    def test_malformed_checkpoint_line_is_rejected_before_publication(self):
+        self.source.write_text('# Demo\n\n## Status\nCheckpoint yesterday, session missing.\n')
+        self.assertEqual(self.write().returncode, 2)
+        self.assertFalse((self.home / 'data').exists())
+
     def test_invalid_paths_and_write_arguments_create_no_storage(self):
         for path in (self.home / 'missing', self.source):
             self.assertEqual(self.card('locate', path).returncode, 2)

@@ -18,11 +18,11 @@ Run inside a project's work session, when you stop working on it (at the end of 
 
 3. **Check before writing.** Every fact that a command can confirm (branch, commits ahead of origin, uncommitted files, PR state, CI, services running) is checked now, not taken from memory of the conversation.
 
-4. **Compose the status.** In a separate temporary UTF-8 candidate file, preserve the card content and replace the `## Status` section of the card (add it if missing) with:
+4. **Compose the status.** Obtain the current UTC timestamp from the system with `python3 -c 'from datetime import datetime, timezone; print(datetime.now(timezone.utc).isoformat(timespec="seconds"))'`. Copy its ISO 8601 result, including seconds and the numeric offset, into `<timestamp>` below. In a separate temporary UTF-8 candidate file, preserve the card content and replace the `## Status` section of the card (add it if missing) with:
 
    ```markdown
    ## Status
-   Checkpoint <YYYY-MM-DD HH:MM>, session `<session-id>`, folder `<folder>`.
+   Checkpoint <timestamp>, session `<session-id>`, folder `<folder>`.
    - **State:** active | paused | standby | closed
    - **Where you are:** facts, with numbers (tests, PRs, commits, what is not committed or not pushed)
    - **To do:** concrete actions in order, the first in bold
@@ -47,7 +47,7 @@ Run inside a project's work session, when you stop working on it (at the end of 
    deskmate card write "<project-folder>" --expected-revision <revision-read> --provider <claude|codex> --session-id "<current-session-id>" --from "<candidate-file>"
    ```
 
-   Exit `0` confirms the save. On exit `3`, stdout contains the current card: reread it, reconcile your changes with its Status and Checks, and retry using its current revision. On exit `2`, report the validation or migration error and stop without claiming the card was saved. Write through this command; direct edits through either the shared path or the Claude symlink bypass concurrency protection.
+   Exit `0` confirms the save. The command validates the Status Checkpoint timestamp with the same parser used by Session deltas before publishing. On exit `3`, stdout contains the current card: reread it, reconcile your changes with its Status and Checks, and retry using its current revision. On exit `2`, report the validation or migration error and stop without claiming the card was saved. Write through this command; direct edits through either the shared path or the Claude symlink bypass concurrency protection.
 
 6. **Resume rating.** If `config.json` has `experiments.fresh_sessions` and the Provider plus native ID has no earlier checkpoint today in `<data>/log.csv`, ask one question: "How did the restart go this morning? **1** picked up straight away · **2** I had to explain something again · **3** it worked on stale or wrong context". Record the answer with `deskmate log-event resume-rating <1|2|3> "<session-id>" "<folder>" --provider <claude|codex>`. Skip it if the user does not want to answer.
 
