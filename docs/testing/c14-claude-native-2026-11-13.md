@@ -122,3 +122,7 @@ C14-CLAUDE-01 eligibility/discovery is repaired after the source snapshot above;
 see the [repair evidence](c14-claude-resume-fix-2026-11-13.md). The actual native
 fixture dry-run now succeeds. Repaired terminal submission and remaining native
 acceptance are separate checks; C14 is still open.
+
+The subsequent [real Deskmate resume](c14-claude-native-resume-2026-11-13.md)
+now verifies actual terminal submission, matching native identity and full exit,
+with the isolated transport adaptation recorded explicitly.

@@ -1,0 +1,133 @@
+{
+  "date": "2026-11-13",
+  "status": "completed",
+  "provider": "claude",
+  "cli_version": "2.1.323 (Claude Code)",
+  "corrected_source": {
+    "path": "/private/tmp/deskmate-c14-claude-fix-20261113-5hlu73nk/source",
+    "base": "3fe01e79f4b0e2e2e672ae208905f998e7b19069",
+    "staged_diff_sha256": "9f3dce10046ef2a2f543458aab9f99cf454754732445b97e0f7643cbc2e827b0",
+    "unchanged_after_run": true
+  },
+  "fixture": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0",
+  "session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+  "launch_id": "7a0b081e2e6946ca8a9c6708edbdfa7f",
+  "process": {
+    "pid": 62903,
+    "tty": "ttys004",
+    "argv": "claude --resume 85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+    "exit_code": 0
+  },
+  "integration_update": {
+    "first_attempt": "deskmate setup: Existing skill is not owned by Deskmate: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/call-it-a-day; move or rename it\nClaude Code: included (2.1.323 (Claude Code))\nCodex CLI: excluded (not found)\nexit=2\n",
+    "remove_original": "Deskmate integrations removed; personal data preserved: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data\nexit=0\n",
+    "setup_corrected": "Claude Code: included (2.1.323 (Claude Code))\nCodex CLI: excluded (not found)\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/call-it-a-day\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/checkpoint\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/how-did-it-go\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/setup\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/study-later\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/whats-on-today\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/settings.json\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.local/bin/deskmate\nMigration backups and recovery journal: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/backups/install/22138eea9b7e4f23a8f4814e927b4d8a\nclaude: logging verified (isolated synthetic hook; native approval pending)\nClaude discovers shared skills with native /skill syntax.\nReview normal project trust and hook approvals. Native lifecycle hooks confirm Work session ownership; unconfirmed launches stay pending.\nDeskmate ready: ~/.local/bin/deskmate. Open a new shell or run export PATH=\"$HOME/.local/bin:$PATH\".\nexit=0\n",
+    "config_unchanged": true,
+    "card_unchanged": true
+  },
+  "dry_run": "resume Work session with claude: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project (ok)\n",
+  "work_session": "resume Work session with claude: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project (pending)\nwarning: Terminal command submitted; native hook confirmation is pending. Review hook trust if it remains pending.\n",
+  "test_adaptation": {
+    "kind": "osascript transport wrapper in fixture PATH only; not a product feature",
+    "wrapper": "#!/bin/zsh -f\n# C14 TEST ADAPTATION ONLY (not a product feature): transport the fixture's isolated\n# HOME/PATH/data into the command Deskmate submits to a new iTerm tab.\nL=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/evidence/resume/osascript-transport.log\nscript=$(cat)\nprint -r -- \"--- $(date -u +%FT%TZ) argv: $*\" >> $L\nif [ \"$1\" = \"-\" ] && [ $# -eq 2 ] && [[ \"$2\" != /dev/* ]]; then\n  cmd=\"export HOME=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home PATH=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.local/bin:/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/pathbin:/usr/bin:/bin:/usr/sbin:/sbin DESKMATE_DATA_DIR=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data; unset CLAUDE_CONFIG_DIR CODEX_HOME CLAUDECODE CLAUDE_CODE_ENTRYPOINT; $2; echo \\\"claude exited rc=\\$?\\\"\"\n  print -r -- \"transported: $cmd\" >> $L\n  print -r -- \"$script\" | /usr/bin/osascript - \"$cmd\"\nelse\n  print -r -- \"$script\" | /usr/bin/osascript \"$@\"\nfi\n",
+    "log": "--- 2026-11-13T12:56:01Z argv: - printf '\\033]0;%s\\007' project; cd /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project && CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1 /usr/bin/env DESKMATE_LAUNCH_ID=7a0b081e2e6946ca8a9c6708edbdfa7f DESKMATE_DATA_DIR=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data claude --resume 85b0fc6e-17b9-4d11-a788-c47ee19232eb\ntransported: export HOME=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home PATH=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.local/bin:/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/pathbin:/usr/bin:/bin:/usr/sbin:/sbin DESKMATE_DATA_DIR=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data; unset CLAUDE_CONFIG_DIR CODEX_HOME CLAUDECODE CLAUDE_CODE_ENTRYPOINT; printf '\\033]0;%s\\007' project; cd /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project && CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1 /usr/bin/env DESKMATE_LAUNCH_ID=7a0b081e2e6946ca8a9c6708edbdfa7f DESKMATE_DATA_DIR=/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data claude --resume 85b0fc6e-17b9-4d11-a788-c47ee19232eb; echo \"claude exited rc=$?\"\n",
+    "removed_from_path_after_run": true
+  },
+  "authentication": {
+    "temporary_keychain_link": [
+      {
+        "temporary_keychain_link": "created",
+        "at": "2026-11-13T12:55:47Z"
+      },
+      {
+        "temporary_keychain_link": "removed",
+        "at": "2026-11-13T12:58:24Z"
+      }
+    ],
+    "credential_values_read": false
+  },
+  "hook_rows": [
+    {
+      "date": "2026-11-13",
+      "time": "13:56",
+      "weekday": "fri",
+      "event": "session-start",
+      "detail": "",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "13:57",
+      "weekday": "fri",
+      "event": "session-end",
+      "detail": "",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    }
+  ],
+  "launch_journal_final": {
+    "attempts": [
+      {
+        "created_at": "2026-11-13T12:56:00.711680+00:00",
+        "ended": true,
+        "expected_revision": 2,
+        "launch_id": "7a0b081e2e6946ca8a9c6708edbdfa7f",
+        "mode": "resume",
+        "native_session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "provider": "claude",
+        "requested_session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "state": "confirmed"
+      }
+    ],
+    "schema_version": 1
+  },
+  "card": {
+    "before_revision": 2,
+    "after_revision": 3,
+    "revision_bump_source": "ownership confirmation (claim_ownership_locked writes revision+1)",
+    "owner_preserved": true,
+    "body_unchanged": true
+  },
+  "confirming_request": "❯ Prova C14 di resume tramite Deskmate. Esegui deskmate check nella cartella corrente e riportami il risultato, l'ID nativo di questa sessione e la cartella corrente. Non modificare file e non avviare altre sessioni o provider. Risposta breve.                             \n  Ran 1 shell command   \n⏺ C14 acceptance, deskmate check è terminato con exit 0: il Check probe content della scheda \"C14 Claude acceptance\" (stato active) risulta ok. \n  - ID nativo di questa sessione: 85b0fc6e-17b9-4d11-a788-c47ee19232eb, lo stesso registrato nella scheda. \n  - Cartella corrente: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project, la stessa della scheda. \n  Non ho modificato file e non ho avviato altre sessioni. \n✻ Brewed for 11s · done 13:57 \n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯  \n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏸ manual mode on · ? for shortcuts \n",
+  "approvals": {
+    "initial_mode": "auto",
+    "mode_cycle": "after 1:   ⏵⏵ auto mode on (shift+tab to cycle) \nafter 2:   ⏵⏵ accept edits on (shift+tab to cycle) \nafter 3:   ⏸ plan mode on (shift+tab to cycle) \nafter 4:   ⏵⏵ auto mode on (shift+tab to cycle) \nafter 5:   ⏸ manual mode on · ? for shortcuts \n",
+    "mode_used": "manual",
+    "org_forces_auto": false,
+    "prompt": "  Da aggiungere a study-later.md? Scegli tu quali, oppure nessuno: \n  1. Come Claude Code indicizza le sessioni (sessions-index.json rispetto alle trascrizioni .jsonl). \n  2. Come funziona la scrittura delle schede con --expected-revision, cioè la protezione dalle modifiche contemporanee. \n  Dopo la chiusura: la voce già aperta in study-later.md, cioè la differenza tra hook sincroni e asincroni in Claude Code. \n✻ Cogitated for 39s · done 11:05 \n❯ Nessuno, grazie.                                                                                                                                                                                                                                                              \n⏺ Va bene, C14 acceptance: non aggiungo niente a study-later.md. \n  Buona serata. Lunedì riparti da /whats-on-today. \n✻ Worked for 7s · done 11:05 \n❯ Prova C14 di resume tramite Deskmate. Esegui deskmate check nella cartella corrente e riportami il risultato, l'ID nativo di questa sessione e la cartella corrente. Non modificare file e non avviare altre sessioni o provider. Risposta breve.                             \n  Running deskmate check and showing session ID and folder \n  ⎿  $ deskmate check; echo \"EXIT=$?\"; echo \"SID=$CLAUDE_CODE_SESSION_ID\"; pwd \n────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n Bash command \n Tip: auto mode handles these prompts for you — choose \"switch to auto mode\" below \n Run deskmate check and show session ID and folder \n╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌\n deskmate check; echo \"EXIT=$?\"; echo \"SID=$CLAUDE_CODE_SESSION_ID\"; pwd \n╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌\n A variable in this command can't be checked before it runs \n Do you want to proceed? \n ❯ 1. Yes \n   2. Yes, and switch to auto mode · auto mode handles these prompts for you \n   3. No \n Esc to cancel · Tab to amend \n",
+    "coordinator_keystroke": "blocked by coordinator permission classifier; not delivered",
+    "approved_by": "human in visible panel (inferred: blocked keystroke, ~18s gap, mode stayed manual -> option 1)"
+  },
+  "exit_screen": "claude --resume 85b0fc6e-17b9-4d11-a788-c47ee19232eb \nclaude exited rc=0 \n<user>@<host> project %  \n",
+  "first_observations": [
+    "corrected-source setup exit 2: Existing skill is not owned by Deskmate (links into other checkout)",
+    "launch command uses iTerm default profile and does not carry HOME; unmodified launch would use personal configuration"
+  ],
+  "observations": [
+    "same-owner resume bumps card revision 2->3 without content change",
+    "iTerm tab used for launch remains open with fixture variables exported"
+  ],
+  "not_executed": [
+    "Codex / cross-Provider",
+    "desktop/calendar reminders",
+    "new-session launch path",
+    "focus of already-running tab"
+  ],
+  "source_tracker_patch_modified": false,
+  "push_or_merge": false,
+  "c14_complete": false
+}

@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** synthetic implementation verified; Codex native execution recorded; C14-CODEX-02 triaged as a documented bounded runtime limitation; Claude-only execution recorded; C14-CLAUDE-01 eligibility/discovery repair verified (263 full tests, 76 compatibility checks); remaining native launch and cross-Provider acceptance pending.
+**Implementation:** synthetic implementation verified; Codex native execution recorded; C14-CODEX-02 triaged as a documented bounded runtime limitation; Claude-only execution recorded; C14-CLAUDE-01 eligibility/discovery repair verified (263 full tests, 76 compatibility checks); real Claude Deskmate resume verified with isolated transport; cross-Provider acceptance pending.
 **Owner:** `/root`, started 2026-11-10 from `b10d282`.
 
 - [x] Every skill, hook, reminder and documented command uses the provider-neutral interface.
@@ -34,3 +34,5 @@ Synthetic validation: 248/248 full-suite tests on Python 3.14.6; 27/27 Daily-loo
 Repair verification: preparation full suite 263/263 (107.043s); system-Python routing/adapter/delta 76/76 (65.110s); independent review approved without findings. Actual native fixture public routing/discovery succeeds and data hashes are unchanged. This validates repaired eligibility, not an actual repaired iTerm launch.
 
 Destination verification of C14-CLAUDE-01 repair: 263/263 full tests passed in 109.403s before the local commit. Actual repaired terminal submission is being checked separately; cross-Provider requests remain held.
+
+Authenticated native follow-up after repair: Deskmate submitted a real iTerm launch and resumed the original Claude session; matching SessionStart confirmed the journal, read-only Check passed, exit 0 and SessionEnd ended the attempt. Owner/body unchanged; revision 2->3 is ownership confirmation. Manual-mode prompt observed; coordinator approval keystroke was denied and human approval inferred from execution. Test transport explicitly supplied isolated HOME/PATH; temporary auth link removed. See `docs/testing/c14-claude-native-resume-2026-11-13.md`. C14 remains open for cross-Provider/remaining observations; no push or merge.

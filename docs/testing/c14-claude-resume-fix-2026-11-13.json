@@ -2,7 +2,7 @@
   "date": "2026-11-13",
   "source_base": "3fe01e7",
   "finding": "C14-CLAUDE-01",
-  "status": "repair-verified",
+  "status": "verified-with-native-resume",
   "initial_repro": {
     "public_command": "work-session --folder <native fixture project> --dry-run",
     "exit_code": 4,
@@ -79,10 +79,27 @@
     }
   },
   "limits": [
-    "Actual repaired terminal submission has not been exercised.",
-    "Manual trust/permission prompts, desktop and calendar acceptance remain pending.",
     "Cross-provider native requests remain held pending explicit answer.",
     "Indexless sessions without a trustworthy native SessionStart and a unique existing transcript remain degraded/refused.",
-    "Fallback modification time is approximate freshness; native index metadata remains authoritative when present."
-  ]
+    "Fallback modification time is approximate freshness; native index metadata remains authoritative when present.",
+    "Visible folder-trust dialog, desktop/calendar and cross-provider acceptance remain unverified; manual-mode command approval was observed in the native follow-up."
+  ],
+  "repair_commit": "ecf9109",
+  "native_followup": {
+    "report": "c14-claude-native-resume-2026-11-13.md",
+    "status": "completed",
+    "same_native_id_and_folder": true,
+    "session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "launch_id": "7a0b081e2e6946ca8a9c6708edbdfa7f",
+    "exit_code": 0,
+    "journal_state": "confirmed",
+    "ended": true,
+    "card_revision_before": 2,
+    "card_revision_after": 3,
+    "owner_and_body_preserved": true,
+    "manual_permission_prompt_observed": true,
+    "approver_identity": "inferred from command execution after coordinator approval keystroke was denied",
+    "test_transport": "Fixture-local osascript wrapper forwards isolated HOME/PATH; not a product behavior claim.",
+    "temporary_auth_symlink_removed": true
+  }
 }

@@ -47,3 +47,19 @@ and cross-Provider native scenarios remain separate unfinished acceptance.
 C14 remains open; no push or merge is performed.
 
 Destination verification: **263/263 passed** in 109.403 seconds in the original feature worktree, ResourceWarnings as errors.
+
+## Authenticated native follow-up
+
+The [real resume follow-up](c14-claude-native-resume-2026-11-13.md) now verifies
+Deskmate submitting a real iTerm launch and resuming the same Claude native
+identity/folder. A SessionStart confirmed the launch journal; the unchanged
+owner/body received revision 3 (from 2) through ownership confirmation. The
+read-only Check passed; full exit returned 0 and SessionEnd marked the confirmed
+attempt ended. Manual-mode approval was observed; the approver is inferred, not
+directly identified. The temporary auth link was removed.
+
+The fixture used an explicitly documented osascript transport wrapper to pass
+its isolated HOME/PATH into iTerm. Production propagation of a custom HOME was
+not tested or added. No source changes were made during native verification.
+Implementation commit: `ecf9109`; Codex evidence commit: `3fe01e7`. Cross-Provider
+requests remain held and C14 stays open.
