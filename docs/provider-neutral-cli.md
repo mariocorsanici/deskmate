@@ -112,6 +112,12 @@ Before a Session delta crosses the Provider boundary, Deskmate applies local sec
 - The default Session delta limit is 12 messages and 6,000 characters. Limits are configurable and can be overridden for one command without mutating configuration.
 - A Session delta contains only messages after the latest Checkpoint, excludes metadata and raw tool outputs, retains useful early context plus the most recent context, and reports truncation, coverage and included or omitted counts.
 - Transcript extraction is best-effort. Failure produces a degraded switch from the Project card and Checks, and never blocks the rest of the Daily loop.
+- Native SQLite reads retain `mode=ro` and normal WAL coordination. On affected
+  runtimes, closed WAL databases without sidecars may be unavailable; expose
+  unavailable metadata/history rather than modifying native storage or using
+  `immutable=1`, which can miss committed live WAL records. Recovery is a
+  user-controlled normal native-runtime reopening, not a Deskmate database repair.
+  See [C14-CODEX-02 evidence](testing/c14-codex-sqlite-2026-11-13.md).
 - Retrospective analysis is progressive: inspect structured durable data first, list all candidate Work sessions, recommend at most five with reasons, let the user change the selection, then read bounded deltas and deepen one session at a time only when needed.
 - Logs gain a Provider column. Historical rows migrate as Claude, and Work session identity is the tuple of Provider plus native session ID.
 - Provider-specific raw analytics remain separate. Future normalized combined and comparative views may be added without rewriting raw history.

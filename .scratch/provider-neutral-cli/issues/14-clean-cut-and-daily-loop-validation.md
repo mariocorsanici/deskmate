@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** synthetic implementation verified; Codex native execution recorded; Claude/cross-Provider acceptance pending and post-exit SQLite access needs triage.
+**Implementation:** synthetic implementation verified; Codex native execution recorded; C14-CODEX-02 triaged as a documented bounded runtime limitation; Claude-only acceptance in progress and cross-Provider acceptance pending.
 **Owner:** `/root`, started 2026-11-10 from `b10d282`.
 
 - [x] Every skill, hook, reminder and documented command uses the provider-neutral interface.
@@ -26,3 +26,5 @@ Synthetic validation: 248/248 full-suite tests on Python 3.14.6; 27/27 Daily-loo
 
 
 2026-11-11: Codex native Daily loop executed. C14-CODEX-01 fixed with shared timestamp validation and system-generated UTC skill output; 253/253 full tests, 47/47 card/delta tests on both Python versions, one independent review without findings, and a fresh native Checkpoint/selected-retrospective regression passed. See `docs/testing/c14-codex-timestamp-fix-2026-11-11.md`. Separate C14-CODEX-02 records cold read-only SQLite history access after CLI exit; it is not fixed here. Claude/cross-Provider groups remain on hold and C14 stays open.
+
+2026-11-13: C14-CODEX-02 triaged with cold metadata/history reproductions inside and outside the sandbox. Keep strict read-only access and explicit degraded/unavailable coverage; no production reader change or unconditional cold-history reliability claim. Public-command regressions cover nonmutation, fixture-modeled lifecycle recovery and fresh live WAL. Full suite 255/255; adapter/delta suites 51/51 on system Python; reviewed evidence in `docs/testing/c14-codex-sqlite-2026-11-13.md` and JSON. Claude-only native acceptance authorized and launched separately on isolated source 8ab2f78; results pending. Cross-Provider requests remain held. C14 stays open; no push or merge.

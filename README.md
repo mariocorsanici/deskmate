@@ -164,6 +164,15 @@ Missing/unreadable history returns exit 0 with `status: degraded` and partial or
 unavailable coverage so the Daily loop can continue. Invalid limits/configuration
 return exit 2. This command performs local extraction only; `switch` applies redaction, preview and consent before cross-Provider transfer.
 
+Some SQLite runtimes cannot read a closed Codex WAL database after its `-wal`
+and `-shm` files have disappeared. This can affect session metadata as well as
+paginated history. Deskmate reports unavailable coverage and continues from the
+Project card and Checks; it does not repair or rewrite native storage. Reopening
+the relevant Codex runtime normally may make the history readable again while
+its SQLite sidecars exist. A failed read does not establish that history was
+deleted. See the [cold-WAL investigation](docs/testing/c14-codex-sqlite-2026-11-13.md)
+for the verified runtime, recovery limits and evidence.
+
 ## Experiments
 
 `experiments.fresh_sessions` in `config.json` can select new-session weekdays

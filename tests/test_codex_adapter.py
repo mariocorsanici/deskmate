@@ -1,6 +1,7 @@
 """Codex behavior through the stable command, with synthetic runtime storage."""
 
 import json
+import hashlib
 from contextlib import closing
 import os
 import pathlib
@@ -131,6 +132,92 @@ class CodexAdapterTest(unittest.TestCase):
         self.assertEqual(result["usage"], {"tokens_used": 450})
         self.assertEqual(result["messages"], [])
         self.assertTrue(result["warnings"])
+
+    def test_cold_wal_unavailability_is_explicit_and_native_files_are_preserved(self):
+        # Catch an unsafe read-write/immutable fallback or fabricated full coverage.
+        for database in ("state_5.sqlite", "thread_history_1.sqlite"):
+            with self.subTest(database=database):
+                case = CodexAdapterTest()
+                case.setUp()
+                try:
+                    case.write_paginated_session([
+                        {"type": "agentMessage", "text": "persisted native progress"}])
+                    project = case.home / "project"
+                    project.mkdir()
+                    with closing(sqlite3.connect(case.codex_home / "state_5.sqlite")) as state, state:
+                        state.execute("UPDATE threads SET cwd = ?", (str(project),))
+                    path = case.codex_home / database
+                    with closing(sqlite3.connect(path)) as writer:
+                        self.assertEqual(writer.execute("PRAGMA journal_mode=WAL").fetchone(), ("wal",))
+                    self.assertFalse(path.with_name(database + "-wal").exists())
+                    self.assertFalse(path.with_name(database + "-shm").exists())
+                    before = {p.name: p.read_bytes() for p in case.codex_home.iterdir()}
+
+                    # Probe an independent copy: do not warm the source fixture.
+                    # Some SQLite builds support cold WAL, so characterize that
+                    # capability independently rather than require their failure.
+                    probe = case.home / "cold-probe.sqlite"
+                    probe.write_bytes(path.read_bytes())
+                    table = "threads" if database == "state_5.sqlite" else "thread_items"
+                    try:
+                        with closing(sqlite3.connect(probe.as_uri() + "?mode=ro", uri=True)) as reader:
+                            reader.execute("SELECT count(*) FROM " + table).fetchone()
+                        cold_supported = True
+                    except sqlite3.OperationalError as error:
+                        self.assertIn("unable to open database file", str(error))
+                        cold_supported = False
+
+                    delta = case.command("session-delta", "--provider", "codex", "--session-id", SESSION_ID)
+                    if cold_supported:
+                        self.assertEqual(delta["status"], "ok")
+                        self.assertEqual([m["text"] for m in delta["messages"]], ["persisted native progress"])
+                    else:
+                        self.assertEqual(delta["status"], "degraded")
+                        self.assertEqual(delta["coverage"]["status"], "unavailable")
+                        self.assertEqual(delta["messages"], [])
+                        self.assertEqual(delta["included_messages"], 0)
+                        self.assertTrue(any("Project card and Checks" in warning for warning in delta["warnings"]))
+                        self.assertEqual({p.name: p.read_bytes() for p in case.codex_home.iterdir()}, before)
+                    self.assertEqual(path.read_bytes(), before[database])
+
+                    # Model native-runtime reopening, not a Deskmate rw fallback.
+                    with closing(sqlite3.connect(path)) as native_runtime:
+                        native_runtime.execute("SELECT count(*) FROM " + table).fetchone()
+                        recovered = case.command("session-delta", "--provider", "codex", "--session-id", SESSION_ID)
+                        self.assertEqual(recovered["status"], "ok")
+                        self.assertEqual(recovered["warnings"], [])
+                        self.assertEqual([m["text"] for m in recovered["messages"]], ["persisted native progress"])
+                finally:
+                    case.doCleanups()
+
+    def test_live_wal_reads_committed_progress_without_changing_native_files(self):
+        # immutable=1 would silently miss these committed, uncheckpointed rows.
+        self.write_paginated_session([])
+        state = self.codex_home / "state_5.sqlite"
+        history = self.codex_home / "thread_history_1.sqlite"
+        with closing(sqlite3.connect(state)) as native_state, closing(sqlite3.connect(history)) as native_history:
+            native_state.execute("PRAGMA journal_mode=WAL")
+            native_history.execute("PRAGMA journal_mode=WAL")
+            native_state.execute("UPDATE threads SET tokens_used = 987")
+            native_state.commit()
+            native_history.execute("INSERT INTO thread_items VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                   (SESSION_ID, "live-turn", "live-item", 1, 1792497660000,
+                                    json.dumps({"type": "agentMessage", "text": "fresh WAL-only progress"}), "agentMessage"))
+            native_history.commit()
+            self.assertGreater(history.with_name(history.name + "-wal").stat().st_size, 32)
+            before_names = {p.name for p in self.codex_home.iterdir()}
+            # SQLite may update SHM read marks during a read-only transaction;
+            # database pages and committed WAL bytes must remain unchanged.
+            before = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                      for p in self.codex_home.iterdir() if not p.name.endswith("-shm")}
+            result = self.command("session", "--provider", "codex", "--session-id", SESSION_ID)
+            self.assertEqual(result["status"], "ok")
+            self.assertEqual(result["usage"], {"tokens_used": 987})
+            self.assertEqual([m["text"] for m in result["messages"]], ["fresh WAL-only progress"])
+            after = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                     for p in self.codex_home.iterdir() if not p.name.endswith("-shm")}
+            self.assertEqual(after, before)
+            self.assertEqual({p.name for p in self.codex_home.iterdir()}, before_names)
 
     def test_malformed_sqlite_metadata_is_reported_as_degraded_json(self):
         self.write_paginated_session([])

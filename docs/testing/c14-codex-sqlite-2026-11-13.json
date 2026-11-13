@@ -1,0 +1,231 @@
+{
+  "finding": "C14-CODEX-02",
+  "date": "2026-11-13T09:07:33.828128+00:00",
+  "source_commit": "8ab2f78a817a9919428d75d56496f31adaf90fa4",
+  "python": "3.14.6 (main, Jul 10 2026, 16:28:36) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "sqlite": "3.51.0",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "observations": [
+    {
+      "database": "state_5.sqlite",
+      "before_files_sha256": {
+        "state_5.sqlite": "8e742163799e4afb93ef78003d12d7f55f8f3cfb73a48ad6e7163b3e2df24ca7",
+        "thread_history_1.sqlite": "452ee166c8893604a3283fe75ff5786f6e3fce55be57aec5ce2dc8415d605a9d"
+      },
+      "independent_copy_raw_cold_read": {
+        "error": "unable to open database file",
+        "error_name": "SQLITE_CANTOPEN",
+        "error_code": 14
+      },
+      "cold_session": {
+        "provider": "codex",
+        "id": "019a1234-0000-7000-8000-000000000001",
+        "cwd": null,
+        "start": null,
+        "end": null,
+        "usage": {},
+        "status": "degraded",
+        "warnings": [
+          "Codex Work session is unavailable; continue from the Project card and Checks."
+        ],
+        "messages": []
+      },
+      "cold_delta": {
+        "schema_version": 1,
+        "provider": "codex",
+        "id": "019a1234-0000-7000-8000-000000000001",
+        "status": "degraded",
+        "warnings": [
+          "Codex Work session is unavailable; continue from the Project card and Checks."
+        ],
+        "checkpoint": null,
+        "messages": [],
+        "limits": {
+          "max_messages": 12,
+          "max_characters": 6000
+        },
+        "included_messages": 0,
+        "omitted_messages": 0,
+        "characters": 0,
+        "omitted_characters": 0,
+        "truncated": false,
+        "coverage": {
+          "origin": "session-start",
+          "status": "unavailable",
+          "counts": "readable conversation messages only; corrupt records are not counted"
+        }
+      },
+      "after_files_sha256": {
+        "state_5.sqlite": "8e742163799e4afb93ef78003d12d7f55f8f3cfb73a48ad6e7163b3e2df24ca7",
+        "thread_history_1.sqlite": "452ee166c8893604a3283fe75ff5786f6e3fce55be57aec5ce2dc8415d605a9d"
+      },
+      "all_native_files_unchanged": true,
+      "recovery_model": "Fixture simulates normal native-runtime reopening with writable SQLite connection; no native CLI/model request executed. Not a Deskmate fallback.",
+      "recovered_delta": {
+        "schema_version": 1,
+        "provider": "codex",
+        "id": "019a1234-0000-7000-8000-000000000001",
+        "status": "ok",
+        "warnings": [],
+        "checkpoint": null,
+        "messages": [
+          {
+            "role": "assistant",
+            "timestamp": "2026-10-20T12:00:00+00:00",
+            "text": "persisted native progress"
+          }
+        ],
+        "limits": {
+          "max_messages": 12,
+          "max_characters": 6000
+        },
+        "included_messages": 1,
+        "omitted_messages": 0,
+        "characters": 25,
+        "omitted_characters": 0,
+        "truncated": false,
+        "coverage": {
+          "origin": "session-start",
+          "status": "full",
+          "counts": "readable conversation messages only; corrupt records are not counted"
+        }
+      }
+    },
+    {
+      "database": "thread_history_1.sqlite",
+      "before_files_sha256": {
+        "state_5.sqlite": "52ebbb91f714b78e89ed832fb69626ef74b43badc6667934b024b0c6e2e92508",
+        "thread_history_1.sqlite": "096e2bc7df16af8ca65d5dd86627e1f12706d47c641bb9e411a054a710616779"
+      },
+      "independent_copy_raw_cold_read": {
+        "error": "unable to open database file",
+        "error_name": "SQLITE_CANTOPEN",
+        "error_code": 14
+      },
+      "cold_session": {
+        "provider": "codex",
+        "id": "019a1234-0000-7000-8000-000000000001",
+        "cwd": "/private/var/folders/_s/72vcl2ps0l5f9mncz4qsvqvw0000gp/T/tmp2ov1l67a/project",
+        "start": "2026-10-20T12:00:00+00:00",
+        "end": "2026-10-20T12:01:00+00:00",
+        "usage": {
+          "tokens_used": 450
+        },
+        "status": "degraded",
+        "warnings": [
+          "Codex paginated history is unavailable or unsupported; continue from the Project card and Checks."
+        ],
+        "messages": []
+      },
+      "cold_delta": {
+        "schema_version": 1,
+        "provider": "codex",
+        "id": "019a1234-0000-7000-8000-000000000001",
+        "status": "degraded",
+        "warnings": [
+          "Codex paginated history is unavailable or unsupported; continue from the Project card and Checks."
+        ],
+        "checkpoint": null,
+        "messages": [],
+        "limits": {
+          "max_messages": 12,
+          "max_characters": 6000
+        },
+        "included_messages": 0,
+        "omitted_messages": 0,
+        "characters": 0,
+        "omitted_characters": 0,
+        "truncated": false,
+        "coverage": {
+          "origin": "session-start",
+          "status": "unavailable",
+          "counts": "readable conversation messages only; corrupt records are not counted"
+        }
+      },
+      "after_files_sha256": {
+        "state_5.sqlite": "52ebbb91f714b78e89ed832fb69626ef74b43badc6667934b024b0c6e2e92508",
+        "thread_history_1.sqlite": "096e2bc7df16af8ca65d5dd86627e1f12706d47c641bb9e411a054a710616779"
+      },
+      "all_native_files_unchanged": true,
+      "recovery_model": "Fixture simulates normal native-runtime reopening with writable SQLite connection; no native CLI/model request executed. Not a Deskmate fallback.",
+      "recovered_delta": {
+        "schema_version": 1,
+        "provider": "codex",
+        "id": "019a1234-0000-7000-8000-000000000001",
+        "status": "ok",
+        "warnings": [],
+        "checkpoint": null,
+        "messages": [
+          {
+            "role": "assistant",
+            "timestamp": "2026-10-20T12:00:00+00:00",
+            "text": "persisted native progress"
+          }
+        ],
+        "limits": {
+          "max_messages": 12,
+          "max_characters": 6000
+        },
+        "included_messages": 1,
+        "omitted_messages": 0,
+        "characters": 25,
+        "omitted_characters": 0,
+        "truncated": false,
+        "coverage": {
+          "origin": "session-start",
+          "status": "full",
+          "counts": "readable conversation messages only; corrupt records are not counted"
+        }
+      }
+    }
+  ],
+  "outside_sandbox_probe": {
+    "command": "python3 /private/tmp/deskmate-c14-sqlite-probe-20261113.py",
+    "sandbox_permissions": "require_escalated",
+    "exit_code": 0,
+    "directory_writable": true,
+    "DELETE_rows": [
+      [
+        42
+      ]
+    ],
+    "WAL_error": "unable to open database file",
+    "WAL_error_name": "SQLITE_CANTOPEN",
+    "WAL_sidecars_before": false,
+    "WAL_sidecars_after": false,
+    "script": "import pathlib,sqlite3,tempfile,json,os,sys\nfrom contextlib import closing\nroot=pathlib.Path(tempfile.mkdtemp(prefix=\"deskmate-c14-cold-\"))\nresult={\"python\":sys.version,\"sqlite\":sqlite3.sqlite_version,\"root\":str(root),\"observations\":[]}\nfor mode in (\"DELETE\",\"WAL\"):\n path=root/(mode+\".sqlite\")\n with closing(sqlite3.connect(path)) as db:\n  db.execute(\"CREATE TABLE example(value)\")\n  db.execute(\"INSERT INTO example VALUES (42)\")\n  db.commit()\n  db.execute(\"PRAGMA journal_mode=\"+mode)\n observation={\"mode\":mode,\"before\":sorted(p.name for p in root.iterdir()),\"directory_writable\":os.access(root,os.W_OK)}\n try:\n  with closing(sqlite3.connect(path.as_uri()+\"?mode=ro\",uri=True)) as db:\n   observation[\"rows\"]=db.execute(\"SELECT * FROM example\").fetchall()\n except sqlite3.Error as error:\n  observation.update(error=str(error),error_name=getattr(error,\"sqlite_errorname\",None))\n observation[\"after\"]=sorted(p.name for p in root.iterdir())\n result[\"observations\"].append(observation)\nprint(json.dumps(result,indent=2))\n"
+  },
+  "mutation_evidence": "c14-codex-sqlite-mutations-2026-11-13.json",
+  "tests": {
+    "baseline_full_suite": "253/253 passed in 112.846s; Python 3.14.6; -Werror::ResourceWarning",
+    "final_full_suite": "255/255 passed in 100.052s, Python 3.14.6 / SQLite 3.51.0, ResourceWarnings as errors, PYTHONDONTWRITEBYTECODE=1",
+    "focused_system_python": "51/51 passed in 23.541s, Python 3.9.6 / SQLite 3.51.0, ResourceWarnings as errors, PYTHONDONTWRITEBYTECODE=1",
+    "cache_policy": "PYTHONDONTWRITEBYTECODE=1; generated stale adapter bytecode removed from disposable clone before recapture. Mutation checks use fresh PYTHONPYCACHEPREFIX per variant.",
+    "commands": {
+      "full": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest discover -s tests -q",
+      "compatibility": "PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -B -Werror::ResourceWarning -m unittest tests.test_codex_adapter tests.test_session_delta -q",
+      "diff": "git diff --check"
+    }
+  },
+  "limits": [
+    "No real native Codex model requests in this triage; original native observation remains in 2026-11-11 evidence.",
+    "Both installed Python versions use SQLite 3.51.0; precise Apple SQLite/VFS implementation cause not established.",
+    "Cold history remains unavailable on affected runtimes; this documents bounded degradation, not reliable cold-read support."
+  ],
+  "invalidated_harness_attempt": {
+    "reason": "Same-size, same-second source restore left mode=rw mutation in adapter_codex bytecode. marshal inspection confirmed cached ?mode=rw despite restored ?mode=ro source. Removed only disposable adapter cache and repeated mutations with isolated cache prefixes + disabled writes, then regenerated this evidence.",
+    "rejected_capture": "Cold-labeled public reads returned ok/full and created sidecars; this was writable mutation behavior, not accepted cold-read evidence.",
+    "invalidated_full_suite": "255 tests in 103.113s; 2 failing subtests of test_cold_wal_unavailability_is_explicit_and_native_files_are_preserved (state_5.sqlite and thread_history_1.sqlite), expected degraded but got ok due to stale rw bytecode.",
+    "resolution": "Original source verified restored; both new tests pass after cache removal and again after isolated mutation checks. Fresh full-suite rerun recorded separately."
+  },
+  "review": {
+    "status": "approved after correction",
+    "critical": 0,
+    "important": 0,
+    "minor": 0,
+    "resolved_findings": [
+      "Invalidated stale read-write mutation-bytecode evidence; regenerated under unchanged read-only source with isolated/disabled caches.",
+      "Qualified explicit sidecar-repair prohibition to allow normal SQLite read-only coordination."
+    ]
+  }
+}
