@@ -171,6 +171,56 @@ class WorkSessionsTest(unittest.TestCase):
         self.assertEqual((result['mode'], result['provider']), ('new', 'codex'))
         self.assertEqual(card.read_bytes(), before)
 
+    def test_indexless_claude_resume_uses_native_lifecycle_identity_without_reading_messages(self):
+        self.card('claude')
+        native = self.home / '.claude/projects/demo/native-123.jsonl'
+        native.parent.mkdir(parents=True)
+        native.write_bytes(b'\xff PRIVATE CONVERSATION MUST NOT BE READ\n')
+        self.hook_payload(self.env, 'claude', 'native-123', 'SessionStart', None, 0)
+        before = self.tree()
+        result = self.route('--dry-run')
+        self.assertEqual((result['mode'], result['provider'], result['session_id']),
+                         ('resume', 'claude', 'native-123'))
+        self.assertEqual(result['cwd'], str(self.project.resolve()))
+        self.assertEqual(self.tree(), before)
+
+    def test_indexless_claude_requires_unique_matching_folder_and_existing_native_file(self):
+        self.card('claude')
+        native = self.home / '.claude/projects/demo/native-123.jsonl'
+        native.parent.mkdir(parents=True)
+        self.hook_payload(self.env, 'claude', 'native-123', 'SessionStart', None, 0)
+        self.assertEqual(self.route('--dry-run', code=4)['reason'], 'session_unavailable')
+        native.write_text('UNREAD CONVERSATION\n')
+        self.hook_payload(self.env, 'claude', 'native-123', 'SessionStart', self.home, 0)
+        before = self.tree()
+        self.assertEqual(self.route('--dry-run', code=4)['reason'], 'session_unavailable')
+        self.assertEqual(self.tree(), before)
+
+    def test_indexed_claude_folder_cannot_be_overridden_by_lifecycle_fallback(self):
+        self.card('claude')
+        self.native('claude', folder=self.home)
+        self.hook_payload(self.env, 'claude', 'native-123', 'SessionStart', None, 0)
+        self.assertEqual(self.route('--dry-run', code=4)['reason'], 'session_unavailable')
+
+    def test_indexless_claude_rejects_ambiguous_native_files(self):
+        self.card('claude')
+        for directory in ('one', 'two'):
+            native = self.home / '.claude/projects' / directory / 'native-123.jsonl'
+            native.parent.mkdir(parents=True)
+            native.write_text('UNREAD CONVERSATION\n')
+        self.hook_payload(self.env, 'claude', 'native-123', 'SessionStart', None, 0)
+        self.assertEqual(self.route('--dry-run', code=4)['reason'], 'session_unavailable')
+
+    def test_indexless_claude_does_not_trust_other_provider_or_broken_log(self):
+        self.card('claude')
+        native = self.home / '.claude/projects/demo/native-123.jsonl'
+        native.parent.mkdir(parents=True)
+        native.write_text('UNREAD CONVERSATION\n')
+        self.hook_payload(self.env, 'codex', 'native-123', 'SessionStart', None, 0)
+        self.assertEqual(self.route('--dry-run', code=4)['reason'], 'session_unavailable')
+        (self.data / 'log.csv').write_text('invalid schema\n')
+        self.assertEqual(self.route('--dry-run', code=4)['reason'], 'session_unavailable')
+
     def test_missing_provider_never_falls_back(self):
         self.card()
         (self.binaries / 'claude').unlink()

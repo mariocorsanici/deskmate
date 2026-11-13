@@ -104,6 +104,7 @@ Before a Session delta crosses the Provider boundary, Deskmate applies local sec
 - One Project card is stored in shared Deskmate data for each project. Existing Claude cards are backed up and migrated; the prior Claude location becomes a link to the shared card.
 - A project key combines a readable directory slug with a hash of the canonical project path.
 - Project cards remain Markdown with a restricted, validated metadata header containing schema version, revision and session ownership fields.
+- Claude session discovery and routing remain metadata-only. Native indexes are authoritative; indexless runtimes can use recorded native lifecycle identity plus a unique existing transcript. Conflicting canonical folders, missing identity evidence or ambiguous native files do not authorize resume. Unindexed activity uses hook times and native file modification time; file time is an approximate freshness signal, not transcript-derived activity.
 - Card writes use a lock and atomic replacement. Revision checks detect stale writers, which reread rather than silently overwrite.
 - Flexible shell Checks remain for this release under the current read-only convention, Provider sandbox and timeout. Structured check types and an allowlist are future hardening.
 - A normal resume uses the Provider recorded by the Project card. If it is unavailable, Deskmate offers to create a new Work session with an available Provider and never silently changes Providers.

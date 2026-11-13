@@ -1,4 +1,5 @@
 import datetime as dt
+import csv
 import json
 import os
 import pathlib
@@ -81,6 +82,54 @@ class ClaudeAdapterTest(unittest.TestCase):
         self.assertEqual(session['status'], 'degraded')
         self.assertTrue(session['warnings'])
         self.assertNotIn('CANARY', json.dumps(session))
+
+    def test_indexless_discovery_uses_lifecycle_metadata_without_reading_conversation(self):
+        native = self.projects / 'native-123.jsonl'
+        native.write_bytes(b'\xff CANARY private conversation\n')
+        code, envelope = self.run_cli('hook-event', '--provider', 'claude', input_text=json.dumps({
+            'hook_event_name': 'SessionStart', 'session_id': 'native-123',
+            'cwd': str(self.home)}))
+        self.assertEqual(code, 0, envelope)
+        records = self.record('sessions', '--provider', 'claude', '--since', '2020-01-01',
+                              '--messages', '0', '--format', 'json')
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]['id'], 'native-123')
+        self.assertEqual(records[0]['cwd'], str(self.home.resolve()))
+        self.assertEqual(records[0]['status'], 'ok')
+        self.assertIsNotNone(records[0]['start'])
+        self.assertNotIn('messages', records[0])
+        self.assertNotIn('CANARY', json.dumps(records))
+
+    def test_indexless_discovery_without_identity_evidence_stays_explicitly_degraded(self):
+        self.transcript([{'type': 'user', 'cwd': str(self.home), 'sessionId': 'native-123',
+                          'message': {'content': 'CANARY conversation'}}])
+        records = self.record('sessions', '--provider', 'claude', '--since', '2020-01-01',
+                              '--messages', '0', '--format', 'json')
+        self.assertIsNone(records[0]['cwd'])
+        self.assertEqual(records[0]['status'], 'degraded')
+        self.assertTrue(records[0]['warnings'])
+        self.assertNotIn('CANARY', json.dumps(records))
+
+    def test_indexless_discovery_preserves_recent_activity_after_an_older_session_start(self):
+        code, envelope = self.run_cli('hook-event', '--provider', 'claude', input_text=json.dumps({
+            'hook_event_name': 'SessionStart', 'session_id': 'native-123',
+            'cwd': str(self.home)}))
+        self.assertEqual(code, 0, envelope)
+        log = self.home / 'data/log.csv'
+        with log.open(newline='') as handle:
+            reader = csv.DictReader(handle)
+            fields, rows = reader.fieldnames, list(reader)
+        rows[0]['date'], rows[0]['time'] = '2020-01-01', '10:00'
+        with log.open('w', newline='') as handle:
+            writer = csv.DictWriter(handle, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(rows)
+        self.transcript([{'type': 'user', 'message': {'content': 'CANARY recent conversation'}}])
+        records = self.record('sessions', '--provider', 'claude', '--since', '2026-01-01',
+                              '--messages', '0', '--format', 'json')
+        self.assertEqual([record['id'] for record in records], ['native-123'])
+        self.assertEqual(records[0]['cwd'], str(self.home.resolve()))
+        self.assertNotIn('CANARY', json.dumps(records))
 
     def test_bounded_sessions_and_missing_session_keep_daily_loop_available(self):
         self.transcript([{'type': 'user', 'timestamp': self.timestamp,

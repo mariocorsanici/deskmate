@@ -11,6 +11,7 @@ import shlex
 import subprocess
 import tempfile
 import copy
+import csv
 import fcntl
 
 
@@ -29,8 +30,43 @@ def timestamp(value):
         return None
 
 
+def lifecycle_metadata():
+    """Recover native identity from recorded hooks without opening transcripts."""
+    import activity_log
+    try:
+        _, rows, _ = activity_log.read_log(activity_log.data_root() / 'log.csv')
+    except (OSError, UnicodeError, ValueError, csv.Error):
+        return {}
+    sessions = {}
+    for row in rows:
+        if row['provider'] != 'claude' or row['event'] not in ('session-start', 'session-end'):
+            continue
+        identity, cwd = row['session'], row['cwd']
+        if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', identity):
+            continue
+        try:
+            when = dt.datetime.fromisoformat(row['date'] + 'T' + row['time']).astimezone()
+            folder = pathlib.Path(cwd)
+            if not folder.is_absolute():
+                continue
+            folder = str(folder.resolve())
+        except (OSError, ValueError, OverflowError, RuntimeError):
+            continue
+        known = sessions.setdefault(identity, {'folders': set(), 'starts': [], 'times': []})
+        known['folders'].add(folder)
+        known['times'].append(when)
+        if row['event'] == 'session-start':
+            known['starts'].append(when)
+    return {identity: {
+        'provider': 'claude', 'id': identity, 'cwd': next(iter(known['folders'])),
+        'start': min(known['starts']).isoformat(), 'end': max(known['times']).isoformat(),
+        'usage': {}, 'status': 'ok', 'warnings': [],
+    } for identity, known in sessions.items()
+        if len(known['folders']) == 1 and known['starts']}
+
+
 def discover(since: str) -> list[dict]:
-    """Use indexes and file metadata only; never open conversation transcripts."""
+    """Use indexes, native hooks and file metadata; never open transcripts."""
     threshold = dt.datetime.combine(dt.date.fromisoformat(since), dt.time()).timestamp()
     records = {}
     indexed = set()
@@ -63,19 +99,32 @@ def discover(since: str) -> list[dict]:
                                 'cwd': cwd, 'start': start,
                                 'end': end, 'usage': {}, 'status': 'degraded' if warnings else 'ok',
                                 'warnings': warnings}
+    paths = {}
     for path in sorted(projects().glob('*/*.jsonl')):
         if path.stem in indexed or not path.is_file():
             continue
+        paths.setdefault(path.stem, []).append(path)
+    lifecycle = lifecycle_metadata() if paths else {}
+    for identity, matches in paths.items():
         try:
-            modified = path.stat().st_mtime
+            modified = max(path.stat().st_mtime for path in matches)
         except OSError:
+            continue
+        native = lifecycle.get(identity) if len(matches) == 1 else None
+        if native is not None:
+            # SessionStart may predate today's work. File activity remains a
+            # metadata-only signal when a runtime provides no native index.
+            latest = max(timestamp(native['end']), modified)
+            native['end'] = dt.datetime.fromtimestamp(latest, dt.timezone.utc).isoformat()
+            if timestamp(native['end']) >= threshold:
+                records[identity] = native
             continue
         if modified >= threshold:
             end = dt.datetime.fromtimestamp(modified, dt.timezone.utc).isoformat()
-            records[path.stem] = {'provider': 'claude', 'id': path.stem,
+            records[identity] = {'provider': 'claude', 'id': identity,
                                   'cwd': None, 'start': None, 'end': end, 'usage': {},
                                   'status': 'degraded', 'warnings': [
-                                      'Session index unavailable; transcript metadata not read.']}
+                                      'Session index or unambiguous lifecycle metadata unavailable; transcript metadata not read.']}
     return sorted(records.values(), key=lambda item: item['end'])
 
 
@@ -202,8 +251,10 @@ def resume_available(session_id: str, folder: str | None = None) -> bool:
             if not isinstance(entries, list):
                 continue
             for entry in entries:
-                if not isinstance(entry, dict) or entry.get('isSidechain') or entry.get('sessionId') != session_id:
+                if not isinstance(entry, dict) or entry.get('sessionId') != session_id:
                     continue
+                if entry.get('isSidechain'):
+                    return False
                 cwd = entry.get('projectPath')
                 if not isinstance(cwd, str) or not pathlib.Path(cwd).is_absolute():
                     return False
@@ -214,9 +265,12 @@ def resume_available(session_id: str, folder: str | None = None) -> bool:
             continue
     if matches:
         return len(matches) == 1 and (folder is None or matches[0] == pathlib.Path(folder).resolve())
-    # Native folder-key encoding is lossy (a-b and a_b can share a key).
-    # Without trusted index metadata, filenames cannot prove project identity.
-    return False
+    # Native folder-key encoding is lossy. Require independent canonical-folder
+    # evidence from a native SessionStart hook and a unique existing transcript.
+    paths = [path for path in projects().glob(f'*/{session_id}.jsonl') if path.is_file()]
+    native = lifecycle_metadata().get(session_id) if len(paths) == 1 else None
+    return native is not None and (folder is None or
+                                   native['cwd'] == str(pathlib.Path(folder).resolve()))
 
 
 def launch(folder: str, session_id: str | None = None, prompt: str | None = None,

@@ -44,9 +44,11 @@ delta starting at session start.
 ## Work session routing
 
 `bin/deskmate work-session --folder /path/to/project` continues a Project with
-its recorded Provider and native Work session. Claude routing requires trustworthy
-native index metadata: an indexless transcript filename cannot prove folder
-identity, because legacy folder encoding can collide. Without an owned Work session,
+its recorded Provider and native Work session. Claude routing verifies canonical
+folder identity using its native index or, when the index is absent, recorded
+SessionStart metadata and a unique existing native transcript. A transcript
+filename alone cannot prove folder identity, because legacy folder encoding can
+collide. Discovery and routing do not read conversation contents. Without an owned Work session,
 it starts with the configured Default provider. Add `--dry-run` to inspect the
 decision without opening a terminal or changing state; prefix the command with
 `--json` for a structured result inside the standard command envelope.

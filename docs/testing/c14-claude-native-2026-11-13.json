@@ -1,0 +1,1264 @@
+{
+  "date": "2026-11-13",
+  "source_commit": "8ab2f78a817a9919428d75d56496f31adaf90fa4",
+  "branch": "feature/codex-cli-support",
+  "workspace": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0",
+  "project_folder": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+  "provider": "claude",
+  "cli_version": "2.1.323 (Claude Code)",
+  "python": "3.14.7 (/opt/homebrew/bin/python3 via test PATH)",
+  "status": "completed-with-open-finding",
+  "previous_evidence": "docs/testing/c14-codex-native-2026-11-11.json",
+  "session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+  "auxiliary_sessions": [
+    {
+      "id": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+      "authenticated": false,
+      "note": "onboarding skipped with Ctrl+C; /exit rc 0; only session-start/end hooks"
+    },
+    {
+      "id": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+      "authenticated": false,
+      "note": "/setup -> 'Not logged in · Please run /login'; only session-start/end hooks"
+    }
+  ],
+  "native_processes": [
+    {
+      "mode": "new",
+      "args": "new",
+      "started": "2026-11-13T09:05:25Z"
+    },
+    {
+      "mode": "new",
+      "exit_code": 0,
+      "ended": "2026-11-13T09:14:45Z"
+    },
+    {
+      "mode": "new",
+      "args": "new",
+      "started": "2026-11-13T09:14:54Z"
+    },
+    {
+      "mode": "new",
+      "note": "CLAUDE_CONFIG_DIR attempt interrupted with ^C at login menu by operator; wrapper killed, no exit record",
+      "ended": "2026-11-13T09:22:02Z"
+    },
+    {
+      "mode": "new",
+      "args": "new",
+      "started": "2026-11-13T09:22:03Z"
+    },
+    {
+      "temporary_keychain_link": "created",
+      "at": "2026-11-13T09:55:56Z"
+    },
+    {
+      "mode": "new",
+      "args": "new",
+      "started": "2026-11-13T09:56:19Z"
+    },
+    {
+      "mode": "new",
+      "exit_code": 0,
+      "ended": "2026-11-13T10:01:12Z"
+    },
+    {
+      "mode": "resume",
+      "args": "resume 85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "started": "2026-11-13T10:01:23Z"
+    },
+    {
+      "mode": "resume",
+      "exit_code": 0,
+      "ended": "2026-11-13T10:06:22Z"
+    },
+    {
+      "temporary_keychain_link": "removed",
+      "at": "2026-11-13T10:06:28Z"
+    }
+  ],
+  "driver": "Visible iTerm2 split driven by AppleScript (write text / read contents); wrapper run-claude.sh records exit codes",
+  "isolation": {
+    "home": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home",
+    "data": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data",
+    "path": "home/.local/bin, pathbin (claude, python3 only), system dirs",
+    "codex_on_path": false,
+    "reminder_channels": []
+  },
+  "authentication": {
+    "first_observation": "Isolated HOME: onboarding login menu; macOS 'Keychain Not Found' dialog (Cancel / Reset To Defaults); operator told to Cancel",
+    "attempts": [
+      "HOME only: unauthenticated (b69d73d3, ea3fe3ce)",
+      "CLAUDE_CONFIG_DIR isolated: login menu, interrupted by operator"
+    ],
+    "workaround": "owner-approved temporary symlink home/Library/Keychains -> ~/Library/Keychains; created 2026-11-13T09:55:56Z, removed after last native exit (~10:06Z)",
+    "credential_values_read": false,
+    "isolated_credentials_json_bytes": 2,
+    "account_label": "Claude Team"
+  },
+  "permission_mode": {
+    "observed": "auto (CLI default; organization configuration notice)",
+    "bypass_used": false,
+    "manual_prompts_seen": 0,
+    "folder_trust": "recorded accepted in isolated .claude.json without a dialog seen by the coordinator"
+  },
+  "setup": {
+    "first": "Claude Code: included (2.1.323 (Claude Code))\nCodex CLI: excluded (not found)\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/lessons.md\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/study-later.md\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/call-it-a-day\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/checkpoint\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/how-did-it-go\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/setup\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/study-later\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/skills/whats-on-today\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.claude/settings.json\nUpdated: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/home/.local/bin/deskmate\nMigration backups and recovery journal: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/backups/install/f8ee66d791b1467aa96366f3698ac134\nclaude: logging verified (isolated synthetic hook; native approval pending)\nClaude discovers shared skills with native /skill syntax.\nReview normal project trust and hook approvals. Native lifecycle hooks confirm Work session ownership; unconfirmed launches stay pending.\nDeskmate ready: ~/.local/bin/deskmate. Open a new shell or run export PATH=\"$HOME/.local/bin:$PATH\".\nexit=0\n",
+    "second": "Claude Code: included (2.1.323 (Claude Code))\nCodex CLI: excluded (not found)\nclaude: logging verified (isolated synthetic hook; native approval pending)\nClaude discovers shared skills with native /skill syntax.\nReview normal project trust and hook approvals. Native lifecycle hooks confirm Work session ownership; unconfirmed launches stay pending.\nDeskmate ready: ~/.local/bin/deskmate. Open a new shell or run export PATH=\"$HOME/.local/bin:$PATH\".\nexit=0\n",
+    "second_run_snapshot_identical": true,
+    "config_preserved": {
+      "schema_version": 1,
+      "name": "C14 acceptance",
+      "language": "it",
+      "providers": {
+        "installed": [
+          "claude"
+        ],
+        "default": "claude"
+      },
+      "reminders": {
+        "morning": "09:00",
+        "evening": "17:00",
+        "days": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri"
+        ],
+        "channels": []
+      }
+    },
+    "backups": [
+      "f8ee66d791b1467aa96366f3698ac134"
+    ]
+  },
+  "native_setup_answer": "exit 0 for ./install.sh --provider claude --default-provider claude --non-interactive; preferences unchanged; synthetic verification reported as synthetic",
+  "skill_discovery": {
+    "status": "passed",
+    "method": "Typed each /name in the native slash picker and captured the listed entry",
+    "raw": "=== /whats-on-today\n  - Comando: deskmate è in ~/.local/bin. Apri una nuova shell oppure esegui export PATH=\"$HOME/.local/bin:$PATH\". \n  Non ho avviato altre sessioni né altri provider. \n  ID nativo di questa sessione: 85b0fc6e-17b9-4d11-a788-c47ee19232eb \n✻ Churned for 19s · done 10:56 \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯  \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n=== /study-later\n  - Comando: deskmate è in ~/.local/bin. Apri una nuova shell oppure esegui export PATH=\"$HOME/.local/bin:$PATH\". \n  Non ho avviato altre sessioni né altri provider. \n  ID nativo di questa sessione: 85b0fc6e-17b9-4d11-a788-c47ee19232eb \n  ❯ /study-later                Adds a topic to the study list in the selected Deskmate data directory. (user) \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /study-later \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n=== /checkpoint\n  Non ho avviato altre sessioni né altri provider. \n  ❯ /checkpoint                 End of a work session - writes where the project stands in its project card, so /call-it-a-day reads \n                                it instead of the transcript. (user) \n    /rewind (checkpoint)        Restore the code and/or conversation to a previous point                  \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /checkpoint \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n=== /how-did-it-go\n  - Comando: deskmate è in ~/.local/bin. Apri una nuova shell oppure esegui export PATH=\"$HOME/.local/bin:$PATH\". \n  Non ho avviato altre sessioni né altri provider. \n  ID nativo di questa sessione: 85b0fc6e-17b9-4d11-a788-c47ee19232eb \n  ❯ /how-did-it-go              Retrospective on organisation and method over the last few days; updates lessons.md. (user) \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /how-did-it-go \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n=== /call-it-a-day\n  ❯ /call-it-a-day              End of the day - collects shared Project cards and active Work sessions and writes the handoff for \n                                tomorrow. (user) \n    /checkpoint                 End of a work session - writes where the project stands in its project card, so /call-it-a-day reads \n                                it instead of the transcript. (user)                                      \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /call-it-a-day \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n=== /setup\n  ❯ /setup                      Install, update or remove Deskmate integrations for Claude Code and Codex CLI, with migration backups \n                                and logging verification. (user) \n    /terminal-setup             Enable iTerm2 clipboard access for /copy \n    /auto-mode-setup            Teach auto mode about your environment, plus optional rule tweaks         \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /setup \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n=== /whats-on-today (retry, first capture timing too early)\n  ID nativo di questa sessione: 85b0fc6e-17b9-4d11-a788-c47ee19232eb \n  ❯ /whats-on-today             Start of the day - rereads the handoff, checks what changed and reopens the sessions. (user) \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /whats-on-today \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n"
+  },
+  "actual_hook_log_rows": [
+    {
+      "date": "2026-11-13",
+      "time": "10:14",
+      "weekday": "fri",
+      "event": "session-start",
+      "detail": "",
+      "session": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:14",
+      "weekday": "fri",
+      "event": "session-end",
+      "detail": "",
+      "session": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:22",
+      "weekday": "fri",
+      "event": "session-start",
+      "detail": "",
+      "session": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:55",
+      "weekday": "fri",
+      "event": "session-end",
+      "detail": "",
+      "session": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:56",
+      "weekday": "fri",
+      "event": "session-start",
+      "detail": "",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:58",
+      "weekday": "fri",
+      "event": "whats-on-today",
+      "detail": "Prova manuale C14 Claude-only nel solo ambiente temporaneo corrente. Esegui la ricostruzione mattutina dai dati isolati; restiamo in questa sessione, senza avviare altre sessioni o provider. Il lavoro di oggi è verificare manual-probe.txt nel progetto corrente e salvare poi un checkpoint. Non creare ancora scheda, lezioni o Handoff. Risposta breve.",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "3",
+      "input_tokens": "4863",
+      "cache_tokens": "140411",
+      "output_tokens": "1409",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:59",
+      "weekday": "fri",
+      "event": "study-later",
+      "detail": "Differenza tra hook sincroni e asincroni in Claude Code",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "2",
+      "input_tokens": "972",
+      "cache_tokens": "101474",
+      "output_tokens": "398",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:59",
+      "weekday": "fri",
+      "event": "checkpoint",
+      "detail": "Salva un checkpoint reale per il progetto corrente, stato active. Verifica manual-probe.txt e inserisci un Check di sola lettura sul suo contenuto esatto. Registra setup e mattina completati e discovery delle skill verificata dal catalogo nativo; prossimo passo: verificare il resume Claude, poi retrospettiva e Handoff. Non avviare altre sessioni o provider. Risposta breve.",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "5",
+      "input_tokens": "5748",
+      "cache_tokens": "274140",
+      "output_tokens": "2512",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "11:01",
+      "weekday": "fri",
+      "event": "session-end",
+      "detail": "",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "11:01",
+      "weekday": "fri",
+      "event": "session-start",
+      "detail": "",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "11:01",
+      "weekday": "fri",
+      "event": "checkpoint",
+      "detail": "Ho chiuso completamente la CLI e ripreso questa sessione con claude --resume. Verifica che ID nativo e cartella correnti coincidano con quelli della scheda, che la scheda appartenga a questa sessione Claude e che il Check passi. Il resume nativo è riuscito; il routing Deskmate (deskmate work-session --dry-run) invece ha rifiutato con session_unavailable perché manca sessions-index.json: registralo come difetto aperto C14-CLAUDE-01. Prossimo passo: retrospettiva, poi Handoff. Non avviare altre sessioni o provider. Risposta breve.",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "4",
+      "input_tokens": "7704",
+      "cache_tokens": "248988",
+      "output_tokens": "2215",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "11:02",
+      "weekday": "fri",
+      "event": "how-did-it-go",
+      "detail": "Retrospettiva della prova manuale C14 Claude-only di oggi.",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "6",
+      "input_tokens": "11760",
+      "cache_tokens": "444017",
+      "output_tokens": "4047",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "11:04",
+      "weekday": "fri",
+      "event": "call-it-a-day",
+      "detail": "Chiusura della giornata di prova C14 Claude-only nel solo ambiente isolato. Non avviare altre sessioni o provider.",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "4",
+      "input_tokens": "4789",
+      "cache_tokens": "332713",
+      "output_tokens": "2609",
+      "schema_version": "1",
+      "provider": "claude"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "11:06",
+      "weekday": "fri",
+      "event": "session-end",
+      "detail": "",
+      "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+      "turns": "",
+      "input_tokens": "",
+      "cache_tokens": "",
+      "output_tokens": "",
+      "schema_version": "1",
+      "provider": "claude"
+    }
+  ],
+  "usage_snapshot_final": {
+    "provider": "claude",
+    "schema_version": 1,
+    "sessions": {
+      "85b0fc6e-17b9-4d11-a788-c47ee19232eb": {
+        "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "end": "2026-11-13T10:05:51.406Z",
+        "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "provider": "claude",
+        "start": "2026-11-13T09:56:34.773Z",
+        "status": "ok",
+        "usage": {
+          "cache_creation_input_tokens": 51907,
+          "cache_read_input_tokens": 1742262,
+          "input_tokens": 72,
+          "output_tokens": 14467,
+          "turns": 29
+        },
+        "warnings": []
+      }
+    }
+  },
+  "answers": {
+    "whats_on_today": "⏺ Buongiorno, C14 acceptance. Ho ricostruito la mattina dai dati isolati e restiamo in questa sessione, senza aprire altre schede. \n  - Handoff: non c'è nessun handoff.md, quindi non c'è un passaggio di consegne da ieri sera. Non ne ho creato uno. \n  - Passi mancati: ieri (giovedì 12) non risulta un call-it-a-day nel log. Nemmeno l'esito dei promemoria è registrato. \n  - Stato: non ci sono schede di progetto e deskmate check non ha niente da controllare. Non c'è niente in attesa e niente in stand-by.\n  - Sessioni: risultano 3 sessioni Claude di oggi, compresa questa (85b0fc6e-17b9-4d11-a788-c47ee19232eb). I loro dettagli sono \n    incompleti perché l'indice delle sessioni non è disponibile, quindi non ho letto le trascrizioni. \n  - Ordine di oggi: 1) verificare manual-probe.txt; 2) salvare il /checkpoint. \n    - Il file contiene una sola riga: \"Dedicated non-sensitive C14 Claude acceptance project.\" \n  - Metodo: non ci sono esperimenti in corso in lessons.md. \n  - Da studiare: non ci sono voci aperte. \n  - Comandi disponibili: \n    - /whats-on-today: inizio giornata. Rilegge il passaggio di consegne, controlla cosa è cambiato e riapre le sessioni. \n    - /call-it-a-day: fine giornata. Raccoglie schede e sessioni e scrive il passaggio di consegne per domani. \n    - /how-did-it-go: retrospettiva sul metodo degli ultimi giorni. Aggiorna lessons.md. \n    - /study-later: aggiunge un argomento alla lista da studiare. \n    - /setup: installa, aggiorna o rimuove Deskmate. \n    - /checkpoint alla fine di ogni sessione di lavoro, così il passaggio di consegne di stasera è pronto. \n  Vuoi che proceda con il checkpoint? \n✻ Sautéed for 16s · done 10:59 \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /checkpoint \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n",
+    "study_later": "✻ Sautéed for 16s · done 10:59 \n❯ /study-later Differenza tra hook sincroni e asincroni in Claude Code                                                                 \n  Ran 1 shell command  \n⏺ L'argomento è nella lista da studiare. Ho aggiunto questa riga a study-later.md: \n  - [ ] 2026-11-13 — **Differenza tra hook sincroni e asincroni in Claude Code** — Emersa nella prova manuale C14 Claude-only, durante \n  la verifica degli hook installati da Deskmate (verifica nativa ancora in sospeso). \n  Voci aperte: 1. \n✻ Brewed for 6s · done 10:59 \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /checkpoint \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n",
+    "checkpoint_rev2": "  Verifiche dopo il resume: \n  - ID nativo: 85b0fc6e-17b9-4d11-a788-c47ee19232eb, uguale a quello della scheda. \n  - Cartella: coincide con quella della scheda. \n  - Proprietà: la scheda appartiene a Claude e a questa sessione. \n  - Log: log.csv registra fine e nuovo avvio della stessa sessione alle 11:01. \n  - Check: il Check su manual-probe.txt passa. \n  Stato: active \n  - A che punto sei: \n    - Setup, mattina, discovery delle skill e manual-probe.txt sono a posto. \n    - Il resume nativo di Claude funziona. \n    - Il progetto non è un repository git, quindi non c'è niente da committare. \n  - Difetto aperto C14-CLAUDE-01: il comando deskmate work-session --dry-run rifiuta con session_unavailable perché manca \n    sessions-index.json. \n    - Il rifiuto me l'hai riportato tu; io non ho rieseguito il comando. \n    - Ho controllato che il file manca davvero: ci sono solo le trascrizioni .jsonl. \n    - Anche deskmate sessions mostra queste sessioni come incomplete. \n  - Da fare: retrospettiva (/how-did-it-go), poi Handoff (/call-it-a-day). \n  - In attesa di: niente. \n  - Prima di iniziare: niente. \n  Salvato nella scheda di progetto, /call-it-a-day la userà. \n✻ Brewed for 22s · done 11:02 \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ /how-did-it-go \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n",
+    "retrospective_phase1": "⏺ C14 acceptance, ho raccolto le prove durevoli dall'11/11 a oggi. lessons.md non ha ancora voci, quindi il periodo copre gli ultimi 3 \n  giorni. \n  Cosa risulta, senza leggere le conversazioni: \n  - Scheda: ce n'è una, revisione 2, di proprietà di claude:85b0fc6e. Dice: stato active, difetto aperto C14-CLAUDE-01, prossimo passo \n    retrospettiva e poi Handoff. \n  - Handoff: non ce n'è nessuno nel periodo. \n  - Log: tutta l'attività è di oggi (venerdì 13). Non ci sono righe per l'11 e il 12: niente call-it-a-day e niente esiti dei \n    promemoria. \n  - Sessioni: 3 sessioni Claude avviate, una ripresa dopo l'uscita dalla CLI (alle 11:01). Nessuna sessione Codex. \n  - Metriche Claude: vengono da un'istantanea delle 10:01:59 UTC, che potrebbe essere già superata. \n    - Questa sessione: 18 turni, 7.222 token in output, 901k token letti dalla cache. \n    - Le altre due sessioni non hanno dati, perché manca sessions-index.json. È lo stesso problema di C14-CLAUDE-01. \n  Sessioni candidate, tutte nella cartella del progetto e tutte con dati incompleti: \n  1. claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb, 10:56–11:02. Consigliata: contiene tutto il ciclo di oggi e possiede la scheda. \n  2. claude:ea3fe3ce-83bd-48bc-b365-74b83834ad74, 10:22–10:55. Consigliata: 33 minuti di lavoro, ma il log non dice cosa è stato fatto.\n  3. claude:b69d73d3-6bad-4b8a-ba7c-3d0421c1db64, 10:14–10:14. Consigliata ma di poco interesse: si è aperta e chiusa nello stesso \n     minuto. \n  Quali sessioni vuoi che legga? Puoi scegliere una o più delle tre, oppure nessuna. In quel caso proseguo solo con le prove durevoli e\n  segno le lacune. \n✻ Churned for 12s · done 11:02 \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Leggi solo la sessione 85b0fc6e \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n",
+    "call_it_a_day": "      19  - **Da fare:** \n      20    - **Salvare nella scheda l'output esatto di `deskmate work-session --dry-run`.** \n      21    - Aggiungere alla scheda un Check di sola lettura per C14-CLAUDE-01. \n  ⎿  Allowed by auto mode \n⏺ C14 acceptance, ho scritto l'Handoff per lunedì 2026-11-16 in data/handoff.md. Non c'era un handoff precedente da archiviare. \n  - Sessioni aperte: 1, C14 Claude acceptance (stato active). Il Check delle 11:04 è ok. \n  - Prima cosa lunedì: salvare nella scheda l'output esatto di deskmate work-session --dry-run. Poi aggiungere un Check per \n    C14-CLAUDE-01 e correggerlo. \n    - Finché il difetto è aperto, work-session rifiuterà il resume. Nell'Handoff ho indicato claude --resume 85b0fc6e-… come \n      alternativa. \n  - Sessioni lette dalla trascrizione: nessuna. \n    - Per questa sessione mi è bastata la scheda, perché dopo il checkpoint ha eseguito solo comandi Deskmate. \n    - Le sessioni b69d73d3 e ea3fe3ce non hanno una scheda e non le ho lette, come avevi chiesto. Nell'Handoff sono segnate come \n      lacuna. \n  Da aggiungere a study-later.md? Scegli tu quali, oppure nessuno: \n  1. Come Claude Code indicizza le sessioni (sessions-index.json rispetto alle trascrizioni .jsonl). \n  2. Come funziona la scrittura delle schede con --expected-revision, cioè la protezione dalle modifiche contemporanee. \n  Dopo la chiusura: la voce già aperta in study-later.md, cioè la differenza tra hook sincroni e asincroni in Claude Code. \n✻ Cogitated for 39s · done 11:05 \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n❯ Aggiungi entrambi gli argomenti a study-later.md \n───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n  ⏵⏵ auto mode on (shift+tab to cycle) \n"
+  },
+  "native_command_calls_from_transcript": [
+    "2026-11-13T10:02:34.750Z {\"command\": \"cd /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project; deskmate retrospective --since 2026-11-11 --format json; echo \\\"EXIT=$?\\\"\", \"description\": \"Collect durable retrospective evidence since Nov 11\"}",
+    "2026-11-13T10:03:10.372Z {\"command\": \"cd /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project; deskmate retrospective --since 2026-11-11 --select claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb --format json | python3 -I -c 'import json,sys;d=json.load(sys.stdin);print(json.dumps({k:d[k] for k in (\\\"phase\\\",\\\"selected\\\",\\\"deltas\\\",\\\"warnings\\\")},ensure_ascii=False,indent=1)[:12000])'; echo \\\"EXIT=${PIPESTATUS[0]}\\\"\", \"d"
+  ],
+  "card_revision_1": "---\nname: project-card\ndescription: C14 Claude-only manual acceptance project for Deskmate (isolated temporary environment).\ntype: project\ndeskmate: {\"provider\":\"claude\",\"revision\":1,\"schema_version\":1,\"session_id\":\"85b0fc6e-17b9-4d11-a788-c47ee19232eb\"}\n---\n\n# C14 Claude acceptance\n\n- **Folder:** `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`\n- **Branch:** none (not a git repository)\n- **Reference docs:** `manual-probe.txt`\n\n## Status\nCheckpoint 2026-11-13T09:59:59+00:00, session `85b0fc6e-17b9-4d11-a788-c47ee19232eb`, folder `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`.\n- **State:** active\n- **Where you are:** setup completed (Claude only, Default provider claude, non-interactive, exit 0; synthetic hook verification passed). Morning rebuild completed (no handoff, no cards, 0 checks). Skill discovery verified: /setup, /whats-on-today, /study-later and /checkpoint resolved through the native Claude skill catalog. `manual-probe.txt` verified: 1 line, 55 bytes, sha256 cd8af8b8…84eb82. Not a git repo: nothing to commit or push.\n- **To do:** **verify Claude resume of this session**; then retrospective (/how-did-it-go); then Handoff (/call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** nothing\n\n## Checks\n- probe content: `test \"$(cat '/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project/manual-probe.txt')\" = 'Dedicated non-sensitive C14 Claude acceptance project.' && echo ok`\n",
+  "card_revision_2": "---\nname: project-card\ndescription: C14 Claude-only manual acceptance project for Deskmate (isolated temporary environment).\ntype: project\ndeskmate: {\"provider\":\"claude\",\"revision\":2,\"schema_version\":1,\"session_id\":\"85b0fc6e-17b9-4d11-a788-c47ee19232eb\"}\n---\n\n# C14 Claude acceptance\n\n- **Folder:** `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`\n- **Branch:** none (not a git repository)\n- **Reference docs:** `manual-probe.txt`\n\n## Status\nCheckpoint 2026-11-13T10:01:46+00:00, session `85b0fc6e-17b9-4d11-a788-c47ee19232eb`, folder `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`.\n- **State:** active\n- **Where you are:** setup completed (Claude only, Default provider claude, non-interactive, exit 0; synthetic hook verification passed). Morning rebuild completed. Skill discovery verified through the native Claude skill catalog. `manual-probe.txt` verified (1 line, 55 bytes); probe Check passes. Native Claude resume verified: after a full CLI exit, `claude --resume` reopened session 85b0fc6e in the same folder (log.csv session-end/session-start 11:01); card revision 1 owned by claude/85b0fc6e. Not a git repo: nothing to commit or push.\n- **Open defect C14-CLAUDE-01:** `deskmate work-session --dry-run` refuses with `session_unavailable` because `sessions-index.json` is missing from the Claude project directory (confirmed absent; only the .jsonl transcripts exist), although native resume works. `deskmate sessions` reports the same sessions as degraded (\"Session index unavailable\").\n- **To do:** **retrospective (/how-did-it-go)**; then Handoff (/call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** nothing\n\n## Checks\n- probe content: `test \"$(cat '/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project/manual-probe.txt')\" = 'Dedicated non-sensitive C14 Claude acceptance project.' && echo ok`\n",
+  "delta_after_rev1": {
+    "schema_version": 1,
+    "provider": "claude",
+    "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "status": "ok",
+    "warnings": [],
+    "checkpoint": {
+      "timestamp": "2026-11-13T09:59:59+00:00",
+      "source": "project-card",
+      "precision": "second"
+    },
+    "messages": "omitted from evidence",
+    "limits": {
+      "max_messages": 12,
+      "max_characters": 6000
+    },
+    "included_messages": 2,
+    "omitted_messages": 0,
+    "characters": 1265,
+    "omitted_characters": 0,
+    "truncated": false,
+    "coverage": {
+      "origin": "checkpoint",
+      "status": "full",
+      "counts": "readable conversation messages only; corrupt records are not counted"
+    }
+  },
+  "resume_route_first_observation": "Cannot resume claude: session_unavailable. Ownership is unchanged.\nChoose an explicit new Work session with --new --provider claude.\n",
+  "resume_route_after_full_exit": "Cannot resume claude: session_unavailable. Ownership is unchanged.\nChoose an explicit new Work session with --new --provider claude.\n",
+  "retrospective_candidates": {
+    "schema_version": 1,
+    "since": "2026-11-11",
+    "phase": "selection",
+    "durable": {
+      "cards": [
+        {
+          "path": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/projects/project-9241f593c06b/project-card.md",
+          "text": "---\nname: project-card\ndescription: C14 Claude-only manual acceptance project for Deskmate (isolated temporary environment).\ntype: project\ndeskmate: {\"provider\":\"claude\",\"revision\":2,\"schema_version\":1,\"session_id\":\"85b0fc6e-17b9-4d11-a788-c47ee19232eb\"}\n---\n\n# C14 Claude acceptance\n\n- **Folder:** `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`\n- **Branch:** none (not a git repository)\n- **Reference docs:** `manual-probe.txt`\n\n## Status\nCheckpoint 2026-11-13T10:01:46+00:00, session `85b0fc6e-17b9-4d11-a788-c47ee19232eb`, folder `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`.\n- **State:** active\n- **Where you are:** setup completed (Claude only, Default provider claude, non-interactive, exit 0; synthetic hook verification passed). Morning rebuild completed. Skill discovery verified through the native Claude skill catalog. `manual-probe.txt` verified (1 line, 55 bytes); probe Check passes. Native Claude resume verified: after a full CLI exit, `claude --resume` reopened session 85b0fc6e in the same folder (log.csv session-end/session-start 11:01); card revision 1 owned by claude/85b0fc6e. Not a git repo: nothing to commit or push.\n- **Open defect C14-CLAUDE-01:** `deskmate work-session --dry-run` refuses with `session_unavailable` because `sessions-index.json` is missing from the Claude project directory (confirmed absent; only the .jsonl transcripts exist), although native resume works. `deskmate sessions` reports the same sessions as degraded (\"Session index unavailable\").\n- **To do:** **retrospective (/how-did-it-go)**; then Handoff (/call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** nothing\n\n## Checks\n- probe content: `test \"$(cat '/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project/manual-probe.txt')\" = 'Dedicated non-sensitive C14 Claude acceptance project.' && echo ok`\n",
+          "metadata": {
+            "provider": "claude",
+            "revision": 2,
+            "schema_version": 1,
+            "session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb"
+          }
+        }
+      ],
+      "handoffs": [],
+      "events": [
+        {
+          "date": "2026-11-13",
+          "time": "10:14",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:14",
+          "weekday": "fri",
+          "event": "session-end",
+          "detail": "",
+          "session": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:22",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:55",
+          "weekday": "fri",
+          "event": "session-end",
+          "detail": "",
+          "session": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:56",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:58",
+          "weekday": "fri",
+          "event": "whats-on-today",
+          "detail": "Prova manuale C14 Claude-only nel solo ambiente temporaneo corrente. Esegui la ricostruzione mattutina dai dati isolati; restiamo in questa sessione, senza avviare altre sessioni o provider. Il lavoro di oggi è verificare manual-probe.txt nel progetto corrente e salvare poi un checkpoint. Non creare ancora scheda, lezioni o Handoff. Risposta breve.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "3",
+          "input_tokens": "4863",
+          "cache_tokens": "140411",
+          "output_tokens": "1409",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:59",
+          "weekday": "fri",
+          "event": "study-later",
+          "detail": "Differenza tra hook sincroni e asincroni in Claude Code",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "2",
+          "input_tokens": "972",
+          "cache_tokens": "101474",
+          "output_tokens": "398",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:59",
+          "weekday": "fri",
+          "event": "checkpoint",
+          "detail": "Salva un checkpoint reale per il progetto corrente, stato active. Verifica manual-probe.txt e inserisci un Check di sola lettura sul suo contenuto esatto. Registra setup e mattina completati e discovery delle skill verificata dal catalogo nativo; prossimo passo: verificare il resume Claude, poi retrospettiva e Handoff. Non avviare altre sessioni o provider. Risposta breve.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "5",
+          "input_tokens": "5748",
+          "cache_tokens": "274140",
+          "output_tokens": "2512",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:01",
+          "weekday": "fri",
+          "event": "session-end",
+          "detail": "",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:01",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:01",
+          "weekday": "fri",
+          "event": "checkpoint",
+          "detail": "Ho chiuso completamente la CLI e ripreso questa sessione con claude --resume. Verifica che ID nativo e cartella correnti coincidano con quelli della scheda, che la scheda appartenga a questa sessione Claude e che il Check passi. Il resume nativo è riuscito; il routing Deskmate (deskmate work-session --dry-run) invece ha rifiutato con session_unavailable perché manca sessions-index.json: registralo come difetto aperto C14-CLAUDE-01. Prossimo passo: retrospettiva, poi Handoff. Non avviare altre sessioni o provider. Risposta breve.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "4",
+          "input_tokens": "7704",
+          "cache_tokens": "248988",
+          "output_tokens": "2215",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:02",
+          "weekday": "fri",
+          "event": "how-did-it-go",
+          "detail": "Retrospettiva della prova manuale C14 Claude-only di oggi.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "3",
+          "input_tokens": "8345",
+          "cache_tokens": "209757",
+          "output_tokens": "1290",
+          "schema_version": "1",
+          "provider": "claude"
+        }
+      ]
+    },
+    "metrics": {
+      "providers": {
+        "claude": {
+          "events": {
+            "checkpoint": 2,
+            "how-did-it-go": 1,
+            "session-end": 3,
+            "session-start": 4,
+            "study-later": 1,
+            "whats-on-today": 1
+          },
+          "sessions": [
+            {
+              "provider": "claude",
+              "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+              "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+              "start": "2026-11-13T09:56:34.773Z",
+              "end": "2026-11-13T10:03:30.662762+00:00",
+              "usage": {
+                "cache_creation_input_tokens": 43721,
+                "cache_read_input_tokens": 1175289,
+                "input_tokens": 54,
+                "output_tokens": 9101,
+                "turns": 22
+              },
+              "status": "degraded",
+              "warnings": [
+                "Session index unavailable; transcript metadata not read."
+              ],
+              "usage_source": "cached-snapshot",
+              "usage_as_of": "2026-11-13T10:03:10.843Z"
+            },
+            {
+              "provider": "claude",
+              "id": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+              "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+              "start": null,
+              "end": "2026-11-13T09:14:45.685103+00:00",
+              "usage": {},
+              "status": "degraded",
+              "warnings": [
+                "Session index unavailable; transcript metadata not read."
+              ]
+            },
+            {
+              "provider": "claude",
+              "id": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+              "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+              "start": null,
+              "end": "2026-11-13T09:55:02.272808+00:00",
+              "usage": {},
+              "status": "degraded",
+              "warnings": [
+                "Session index unavailable; transcript metadata not read."
+              ]
+            }
+          ]
+        },
+        "codex": {
+          "events": {},
+          "sessions": []
+        }
+      },
+      "usage_source": "metadata-and-cached-snapshots",
+      "note": "Raw native counters remain separate by Provider; snapshots may be stale and are not refreshed here."
+    },
+    "candidates": [
+      {
+        "key": "claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "provider": "claude",
+        "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "start": "2026-11-13T09:56:34.773Z",
+        "end": "2026-11-13T10:03:30.662762+00:00",
+        "usage": {
+          "cache_creation_input_tokens": 43721,
+          "cache_read_input_tokens": 1175289,
+          "input_tokens": 54,
+          "output_tokens": 9101,
+          "turns": 22
+        },
+        "status": "degraded",
+        "warnings": [
+          "Session index unavailable; transcript metadata not read."
+        ],
+        "sources": [
+          "activity-log",
+          "project-card",
+          "native-metadata",
+          "cached-snapshot"
+        ],
+        "events": [
+          "session-start",
+          "whats-on-today",
+          "study-later",
+          "checkpoint",
+          "session-end",
+          "session-start",
+          "checkpoint",
+          "how-did-it-go"
+        ],
+        "card": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/projects/project-9241f593c06b/project-card.md",
+        "usage_source": "cached-snapshot",
+        "usage_as_of": "2026-11-13T10:03:10.843Z",
+        "reasons": [
+          "Logged Daily loop activity: checkpoint, how-did-it-go, session-end, session-start, study-later, whats-on-today",
+          "Owns a shared Project card; compare its Checkpoint with the Handoff",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "provider": "claude",
+        "id": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "start": null,
+        "end": "2026-11-13T09:14:45.685103+00:00",
+        "usage": {},
+        "status": "degraded",
+        "warnings": [
+          "Session index unavailable; transcript metadata not read."
+        ],
+        "sources": [
+          "activity-log",
+          "native-metadata"
+        ],
+        "events": [
+          "session-start",
+          "session-end"
+        ],
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "provider": "claude",
+        "id": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "start": null,
+        "end": "2026-11-13T09:55:02.272808+00:00",
+        "usage": {},
+        "status": "degraded",
+        "warnings": [
+          "Session index unavailable; transcript metadata not read."
+        ],
+        "sources": [
+          "activity-log",
+          "native-metadata"
+        ],
+        "events": [
+          "session-start",
+          "session-end"
+        ],
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "key": "claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "provider": "claude",
+        "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "reasons": [
+          "Logged Daily loop activity: checkpoint, how-did-it-go, session-end, session-start, study-later, whats-on-today",
+          "Owns a shared Project card; compare its Checkpoint with the Handoff",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "provider": "claude",
+        "id": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "provider": "claude",
+        "id": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      }
+    ],
+    "selected": [],
+    "deltas": [],
+    "warnings": []
+  },
+  "retrospective_selected_rerun": {
+    "schema_version": 1,
+    "since": "2026-11-11",
+    "phase": "analysis",
+    "durable": {
+      "cards": [
+        {
+          "path": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/projects/project-9241f593c06b/project-card.md",
+          "text": "---\nname: project-card\ndescription: C14 Claude-only manual acceptance project for Deskmate (isolated temporary environment).\ntype: project\ndeskmate: {\"provider\":\"claude\",\"revision\":2,\"schema_version\":1,\"session_id\":\"85b0fc6e-17b9-4d11-a788-c47ee19232eb\"}\n---\n\n# C14 Claude acceptance\n\n- **Folder:** `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`\n- **Branch:** none (not a git repository)\n- **Reference docs:** `manual-probe.txt`\n\n## Status\nCheckpoint 2026-11-13T10:01:46+00:00, session `85b0fc6e-17b9-4d11-a788-c47ee19232eb`, folder `/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project`.\n- **State:** active\n- **Where you are:** setup completed (Claude only, Default provider claude, non-interactive, exit 0; synthetic hook verification passed). Morning rebuild completed. Skill discovery verified through the native Claude skill catalog. `manual-probe.txt` verified (1 line, 55 bytes); probe Check passes. Native Claude resume verified: after a full CLI exit, `claude --resume` reopened session 85b0fc6e in the same folder (log.csv session-end/session-start 11:01); card revision 1 owned by claude/85b0fc6e. Not a git repo: nothing to commit or push.\n- **Open defect C14-CLAUDE-01:** `deskmate work-session --dry-run` refuses with `session_unavailable` because `sessions-index.json` is missing from the Claude project directory (confirmed absent; only the .jsonl transcripts exist), although native resume works. `deskmate sessions` reports the same sessions as degraded (\"Session index unavailable\").\n- **To do:** **retrospective (/how-did-it-go)**; then Handoff (/call-it-a-day).\n- **Waiting on:** nothing\n- **Before you start:** nothing\n\n## Checks\n- probe content: `test \"$(cat '/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project/manual-probe.txt')\" = 'Dedicated non-sensitive C14 Claude acceptance project.' && echo ok`\n",
+          "metadata": {
+            "provider": "claude",
+            "revision": 2,
+            "schema_version": 1,
+            "session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb"
+          }
+        }
+      ],
+      "handoffs": [],
+      "events": [
+        {
+          "date": "2026-11-13",
+          "time": "10:14",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:14",
+          "weekday": "fri",
+          "event": "session-end",
+          "detail": "",
+          "session": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:22",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:55",
+          "weekday": "fri",
+          "event": "session-end",
+          "detail": "",
+          "session": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:56",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:58",
+          "weekday": "fri",
+          "event": "whats-on-today",
+          "detail": "Prova manuale C14 Claude-only nel solo ambiente temporaneo corrente. Esegui la ricostruzione mattutina dai dati isolati; restiamo in questa sessione, senza avviare altre sessioni o provider. Il lavoro di oggi è verificare manual-probe.txt nel progetto corrente e salvare poi un checkpoint. Non creare ancora scheda, lezioni o Handoff. Risposta breve.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "3",
+          "input_tokens": "4863",
+          "cache_tokens": "140411",
+          "output_tokens": "1409",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:59",
+          "weekday": "fri",
+          "event": "study-later",
+          "detail": "Differenza tra hook sincroni e asincroni in Claude Code",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "2",
+          "input_tokens": "972",
+          "cache_tokens": "101474",
+          "output_tokens": "398",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "10:59",
+          "weekday": "fri",
+          "event": "checkpoint",
+          "detail": "Salva un checkpoint reale per il progetto corrente, stato active. Verifica manual-probe.txt e inserisci un Check di sola lettura sul suo contenuto esatto. Registra setup e mattina completati e discovery delle skill verificata dal catalogo nativo; prossimo passo: verificare il resume Claude, poi retrospettiva e Handoff. Non avviare altre sessioni o provider. Risposta breve.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "5",
+          "input_tokens": "5748",
+          "cache_tokens": "274140",
+          "output_tokens": "2512",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:01",
+          "weekday": "fri",
+          "event": "session-end",
+          "detail": "",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:01",
+          "weekday": "fri",
+          "event": "session-start",
+          "detail": "",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "",
+          "input_tokens": "",
+          "cache_tokens": "",
+          "output_tokens": "",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:01",
+          "weekday": "fri",
+          "event": "checkpoint",
+          "detail": "Ho chiuso completamente la CLI e ripreso questa sessione con claude --resume. Verifica che ID nativo e cartella correnti coincidano con quelli della scheda, che la scheda appartenga a questa sessione Claude e che il Check passi. Il resume nativo è riuscito; il routing Deskmate (deskmate work-session --dry-run) invece ha rifiutato con session_unavailable perché manca sessions-index.json: registralo come difetto aperto C14-CLAUDE-01. Prossimo passo: retrospettiva, poi Handoff. Non avviare altre sessioni o provider. Risposta breve.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "4",
+          "input_tokens": "7704",
+          "cache_tokens": "248988",
+          "output_tokens": "2215",
+          "schema_version": "1",
+          "provider": "claude"
+        },
+        {
+          "date": "2026-11-13",
+          "time": "11:02",
+          "weekday": "fri",
+          "event": "how-did-it-go",
+          "detail": "Retrospettiva della prova manuale C14 Claude-only di oggi.",
+          "session": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+          "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+          "turns": "3",
+          "input_tokens": "8345",
+          "cache_tokens": "209757",
+          "output_tokens": "1290",
+          "schema_version": "1",
+          "provider": "claude"
+        }
+      ]
+    },
+    "metrics": {
+      "providers": {
+        "claude": {
+          "events": {
+            "checkpoint": 2,
+            "how-did-it-go": 1,
+            "session-end": 3,
+            "session-start": 4,
+            "study-later": 1,
+            "whats-on-today": 1
+          },
+          "sessions": [
+            {
+              "provider": "claude",
+              "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+              "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+              "start": "2026-11-13T09:56:34.773Z",
+              "end": "2026-11-13T10:03:30.662762+00:00",
+              "usage": {
+                "cache_creation_input_tokens": 43721,
+                "cache_read_input_tokens": 1175289,
+                "input_tokens": 54,
+                "output_tokens": 9101,
+                "turns": 22
+              },
+              "status": "degraded",
+              "warnings": [
+                "Session index unavailable; transcript metadata not read."
+              ],
+              "usage_source": "cached-snapshot",
+              "usage_as_of": "2026-11-13T10:03:10.843Z"
+            },
+            {
+              "provider": "claude",
+              "id": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+              "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+              "start": null,
+              "end": "2026-11-13T09:14:45.685103+00:00",
+              "usage": {},
+              "status": "degraded",
+              "warnings": [
+                "Session index unavailable; transcript metadata not read."
+              ]
+            },
+            {
+              "provider": "claude",
+              "id": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+              "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+              "start": null,
+              "end": "2026-11-13T09:55:02.272808+00:00",
+              "usage": {},
+              "status": "degraded",
+              "warnings": [
+                "Session index unavailable; transcript metadata not read."
+              ]
+            }
+          ]
+        },
+        "codex": {
+          "events": {},
+          "sessions": []
+        }
+      },
+      "usage_source": "metadata-and-cached-snapshots",
+      "note": "Raw native counters remain separate by Provider; snapshots may be stale and are not refreshed here."
+    },
+    "candidates": [
+      {
+        "key": "claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "provider": "claude",
+        "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "start": "2026-11-13T09:56:34.773Z",
+        "end": "2026-11-13T10:03:30.662762+00:00",
+        "usage": {
+          "cache_creation_input_tokens": 43721,
+          "cache_read_input_tokens": 1175289,
+          "input_tokens": 54,
+          "output_tokens": 9101,
+          "turns": 22
+        },
+        "status": "degraded",
+        "warnings": [
+          "Session index unavailable; transcript metadata not read."
+        ],
+        "sources": [
+          "activity-log",
+          "project-card",
+          "native-metadata",
+          "cached-snapshot"
+        ],
+        "events": [
+          "session-start",
+          "whats-on-today",
+          "study-later",
+          "checkpoint",
+          "session-end",
+          "session-start",
+          "checkpoint",
+          "how-did-it-go"
+        ],
+        "card": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/data/projects/project-9241f593c06b/project-card.md",
+        "usage_source": "cached-snapshot",
+        "usage_as_of": "2026-11-13T10:03:10.843Z",
+        "reasons": [
+          "Logged Daily loop activity: checkpoint, how-did-it-go, session-end, session-start, study-later, whats-on-today",
+          "Owns a shared Project card; compare its Checkpoint with the Handoff",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "provider": "claude",
+        "id": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "start": null,
+        "end": "2026-11-13T09:14:45.685103+00:00",
+        "usage": {},
+        "status": "degraded",
+        "warnings": [
+          "Session index unavailable; transcript metadata not read."
+        ],
+        "sources": [
+          "activity-log",
+          "native-metadata"
+        ],
+        "events": [
+          "session-start",
+          "session-end"
+        ],
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "provider": "claude",
+        "id": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "cwd": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "start": null,
+        "end": "2026-11-13T09:55:02.272808+00:00",
+        "usage": {},
+        "status": "degraded",
+        "warnings": [
+          "Session index unavailable; transcript metadata not read."
+        ],
+        "sources": [
+          "activity-log",
+          "native-metadata"
+        ],
+        "events": [
+          "session-start",
+          "session-end"
+        ],
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "key": "claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "provider": "claude",
+        "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+        "reasons": [
+          "Logged Daily loop activity: checkpoint, how-did-it-go, session-end, session-start, study-later, whats-on-today",
+          "Owns a shared Project card; compare its Checkpoint with the Handoff",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "provider": "claude",
+        "id": "ea3fe3ce-83bd-48bc-b365-74b83834ad74",
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      },
+      {
+        "key": "claude:b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "provider": "claude",
+        "id": "b69d73d3-6bad-4b8a-ba7c-3d0421c1db64",
+        "reasons": [
+          "Logged Daily loop activity: session-end, session-start",
+          "Incomplete metadata; clarify the session only if relevant"
+        ]
+      }
+    ],
+    "selected": [
+      "claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb"
+    ],
+    "warnings": [],
+    "delta_summary": {
+      "schema_version": 1,
+      "provider": "claude",
+      "id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+      "status": "ok",
+      "warnings": [],
+      "checkpoint": {
+        "timestamp": "2026-11-13T10:01:46+00:00",
+        "source": "project-card",
+        "precision": "second"
+      },
+      "limits": {
+        "max_messages": 12,
+        "max_characters": 6000
+      },
+      "included_messages": 5,
+      "omitted_messages": 0,
+      "characters": 5405,
+      "omitted_characters": 0,
+      "truncated": false,
+      "coverage": {
+        "origin": "checkpoint",
+        "status": "full",
+        "counts": "readable conversation messages only; corrupt records are not counted"
+      }
+    }
+  },
+  "lessons": "# Lessons\n\nRetrospectives, latest at the bottom.\n\n## 2026-11-13 (periodo 2026-11-11 → 2026-11-13)\n**Cosa ha funzionato:** ciclo lineare in una sola sessione (claude:85b0fc6e): setup → mattina → /study-later → checkpoint (10:59, rev. 1) → resume nativo → checkpoint (11:01, rev. 2), 2–5 turni per passo; richieste con limiti espliciti, nessun chiarimento necessario.\n**Da migliorare:**\n- Difetto C14-CLAUDE-01: senza `sessions-index.json` `deskmate work-session` rifiuta il resume (`session_unavailable`) mentre `claude --resume` funziona; sessioni segnate incomplete e 2 sessioni su 3 senza metriche.\n- Nessun handoff né `call-it-a-day` l'11 e il 12: la mattina è partita senza consegne.\n- Il rifiuto di `work-session --dry-run` è riportato dall'utente, senza output registrato.\n- Lacuna: sessione claude:ea3fe3ce (10:22–10:55) non letta per scelta.\n**Esperimenti precedenti:** nessuno (prima voce).\n**Esperimenti in corso:**\n- Difetto con prova: per ogni difetto aperto, output esatto del comando che fallisce nella scheda e un Check di sola lettura che dica se è ancora aperto (per C14-CLAUDE-01: `test -f …/sessions-index.json`).\n- Chiudere ogni giorno di prova con `/call-it-a-day`, così la mattina dopo parte da un handoff.\n- Una sola sessione per prova, quando lo scopo lo permette.\n",
+  "handoff": "# Handoff per lunedì 2026-11-16\n\nScritto venerdì 2026-11-13 alle 11:04, nella sessione Claude `85b0fc6e-17b9-4d11-a788-c47ee19232eb`.\n\n## In breve\n- C14 Claude acceptance: per sbloccarlo serve correggere il difetto C14-CLAUDE-01 (manca `sessions-index.json`) e poi riprovare il resume con Deskmate.\n\n## 1. C14 Claude acceptance\nRiprendi: `deskmate work-session --folder \"/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project\"` (Provider registrato: Claude, sessione `85b0fc6e-17b9-4d11-a788-c47ee19232eb`). Attenzione: finché C14-CLAUDE-01 è aperto, questo comando rifiuta con `session_unavailable`. Nel frattempo funziona `claude --resume 85b0fc6e-17b9-4d11-a788-c47ee19232eb` dalla cartella del progetto.\n- **A che punto sei:**\n  - Il setup solo Claude è riuscito (exit 0), come la verifica sintetica dell'hook.\n  - Anche la mattina, la discovery delle skill e `manual-probe.txt` sono a posto.\n  - Il resume nativo di Claude funziona.\n  - La scheda è alla revisione 2, di proprietà di Claude e della sessione 85b0fc6e.\n  - Fatte oggi anche la retrospettiva (`lessons.md`) e questo Handoff.\n  - Il progetto non è un repository git: niente da committare.\n- **Check delle 11:04:** `probe content` ok.\n- **Difetto aperto C14-CLAUDE-01:** manca `sessions-index.json` nella cartella Claude del progetto (l'ho ricontrollato alle 11:04: c'è ancora solo la trascrizione `.jsonl`). Per questo `deskmate work-session --dry-run` rifiuta con `session_unavailable` (rifiuto riportato dall'utente, output non registrato). Per la stessa ragione `deskmate sessions` segna come incomplete tutte e 3 le sessioni di oggi.\n- **Da fare:**\n  - **Salvare nella scheda l'output esatto di `deskmate work-session --dry-run`.**\n  - Aggiungere alla scheda un Check di sola lettura per C14-CLAUDE-01.\n  - Correggere il difetto e verificare di nuovo il resume tramite Deskmate.\n- **In attesa di:** niente.\n- **Prima di iniziare:** niente.\n\n## Chiuse oggi\n- Nessun lavoro chiuso. Completati i passi della prova: setup, mattina, study-later, checkpoint, resume nativo, retrospettiva, Handoff.\n\n## Lacune\n- Le sessioni Claude `b69d73d3-6bad-4b8a-ba7c-3d0421c1db64` (10:14) e `ea3fe3ce-83bd-48bc-b365-74b83834ad74` (10:22–10:55) non hanno una scheda. Non le ho lette, per tua scelta durante la retrospettiva. Quindi non so che lavoro contengano.\n\nIn stand-by: nessuno.\n",
+  "study_later": "# Study later\n\nTopics to study after closing time.\n- [ ] 2026-11-13 — **Differenza tra hook sincroni e asincroni in Claude Code** — Emersa nella prova manuale C14 Claude-only, durante la verifica degli hook installati da Deskmate (verifica nativa ancora in sospeso).\n",
+  "finding": {
+    "id": "C14-CLAUDE-01",
+    "status": "open",
+    "summary": "Claude resume availability and session metadata depend only on projects/*/sessions-index.json, which Claude Code 2.1.323 did not create; deskmate work-session refuses resume with session_unavailable while native claude --resume works; sessions/retrospective report Claude sessions as degraded.",
+    "code": "tools/adapter_claude.py resume_available; tools/work_sessions.py plan_session"
+  },
+  "minor_observations": [
+    "Claude-only setup creates home/.codex/.deskmate-integration.lock",
+    "Claude Code installed native copy, ~/.local/bin/claude and URL handler app inside isolated HOME",
+    "Retrospective described idle unauthenticated ea3fe3ce as '33 minuti di lavoro'",
+    "Handoff states dry-run output unrecorded (true inside test session; recorded here)",
+    "Native hooks fire and log for unauthenticated sessions"
+  ],
+  "source_files_verified_unchanged": true,
+  "temporary_auth_reference_removed": true,
+  "tracker_and_c14_checkboxes_modified": false,
+  "not_executed": [
+    "Cross-Provider native group (suspended)",
+    "C14-CODEX-02 (open, handled separately)",
+    "Desktop/calendar delivery (channels disabled)",
+    "iTerm launch via deskmate work-session (routing refused, C14-CLAUDE-01)",
+    "Manual permission prompts and visible folder-trust dialog (auto mode default)"
+  ],
+  "c14_complete": false
+}

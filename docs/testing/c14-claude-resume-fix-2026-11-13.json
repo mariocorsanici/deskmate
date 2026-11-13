@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-13",
+  "source_base": "3fe01e7",
+  "finding": "C14-CLAUDE-01",
+  "status": "repair-verified",
+  "initial_repro": {
+    "public_command": "work-session --folder <native fixture project> --dry-run",
+    "exit_code": 4,
+    "reason": "session_unavailable"
+  },
+  "diagnosis": "Index-only metadata eligibility rejected a real indexless Claude Code 2.1.323 session. Native lifecycle hooks independently identify its canonical folder.",
+  "commands": {
+    "routing": {
+      "argv": [
+        "/private/tmp/deskmate-c14-claude-fix-20261113-5hlu73nk/source/bin/deskmate",
+        "work-session",
+        "--folder",
+        "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project",
+        "--dry-run"
+      ],
+      "exit_code": 0,
+      "stdout": "resume Work session with claude: /private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project (ok)\n",
+      "stderr": ""
+    },
+    "discovery": {
+      "argv": [
+        "/private/tmp/deskmate-c14-claude-fix-20261113-5hlu73nk/source/bin/deskmate",
+        "sessions",
+        "--provider",
+        "claude",
+        "--since",
+        "2026-11-13",
+        "--messages",
+        "0",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "[{\"provider\": \"claude\", \"id\": \"b69d73d3-6bad-4b8a-ba7c-3d0421c1db64\", \"cwd\": \"/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project\", \"start\": \"2026-11-13T10:14:00+01:00\", \"end\": \"2026-11-13T09:14:45.685103+00:00\", \"usage\": {}, \"status\": \"ok\", \"warnings\": []}, {\"provider\": \"claude\", \"id\": \"ea3fe3ce-83bd-48bc-b365-74b83834ad74\", \"cwd\": \"/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project\", \"start\": \"2026-11-13T10:22:00+01:00\", \"end\": \"2026-11-13T09:55:02.272808+00:00\", \"usage\": {}, \"status\": \"ok\", \"warnings\": []}, {\"provider\": \"claude\", \"id\": \"85b0fc6e-17b9-4d11-a788-c47ee19232eb\", \"cwd\": \"/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/project\", \"start\": \"2026-11-13T10:56:00+01:00\", \"end\": \"2026-11-13T10:06:21.804226+00:00\", \"usage\": {}, \"status\": \"ok\", \"warnings\": []}]\n",
+      "stderr": ""
+    }
+  },
+  "isolated_data_preserved": true,
+  "native_fixture_session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+  "native_model_requests_during_repair": false,
+  "native_terminal_submission_during_repair": false,
+  "regressions": {
+    "initial_red": "Two public tests failed: resume exit 4 and missing discovery cwd.",
+    "additional_red": "Recently active session after older SessionStart was omitted; file-metadata freshness signal restored."
+  },
+  "verification": {
+    "full_suite": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest discover -s tests -q",
+      "passed": 263,
+      "seconds": 107.043,
+      "exit_code": 0
+    },
+    "system_python": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -B -Werror::ResourceWarning -m unittest tests.test_work_sessions tests.test_claude_adapter tests.test_session_delta -q",
+      "passed": 76,
+      "seconds": 65.11,
+      "exit_code": 0
+    },
+    "review": {
+      "verdict": "approved",
+      "critical": 0,
+      "important": 0,
+      "minor": 0,
+      "independent_system_python_tests": {
+        "claude_adapter": 17,
+        "work_sessions": 32
+      }
+    },
+    "destination": {
+      "passed": 263,
+      "seconds": 109.403,
+      "exit_code": 0,
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest discover -s tests -q"
+    }
+  },
+  "limits": [
+    "Actual repaired terminal submission has not been exercised.",
+    "Manual trust/permission prompts, desktop and calendar acceptance remain pending.",
+    "Cross-provider native requests remain held pending explicit answer.",
+    "Indexless sessions without a trustworthy native SessionStart and a unique existing transcript remain degraded/refused.",
+    "Fallback modification time is approximate freshness; native index metadata remains authoritative when present."
+  ]
+}
