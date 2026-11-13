@@ -17,6 +17,7 @@ import shutil
 import sqlite3
 import subprocess
 import tempfile
+import provider_environment
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -27,7 +28,7 @@ ROLLOUT_KIND = re.compile(
 
 
 def codex_home():
-    return pathlib.Path(os.environ.get("CODEX_HOME", pathlib.Path.home() / ".codex"))
+    return provider_environment.codex_home()
 
 
 def timestamp(value):
@@ -350,12 +351,13 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
     result = {"provider": "codex", "mode": "resume" if session_id else "new", "argv": [],
               "cwd": str(pathlib.Path(folder).expanduser().resolve()),
               "session_id": session_id, "status": "ok", "warnings": []}
-    executable = shutil.which("codex")
+    try:
+        executable = provider_environment.executable('codex')
+    except ValueError as error:
+        result.update(status='error', warnings=[str(error)])
+        return result
     if not pathlib.Path(result["cwd"]).is_dir():
         result.update(status="error", warnings=["Project folder does not exist."])
-        return result
-    if executable is None:
-        result.update(status="error", warnings=["Codex CLI is unavailable; install it or choose another Provider explicitly."])
         return result
     if title and any(ord(char) < 32 or ord(char) == 127 for char in title):
         result.update(status="error", warnings=["Work session title must not contain control characters."])
@@ -371,30 +373,28 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
     if prompt is not None:
         argv.append(prompt)
     result["argv"] = argv
-    context = []
-    if launch_id is not None:
-        if not re.fullmatch(r'[a-f0-9]{32}', launch_id):
-            raise ValueError('Invalid Deskmate launch identity')
-        context = ['/usr/bin/env', 'DESKMATE_LAUNCH_ID=' + launch_id,
-                   'DESKMATE_DATA_DIR=' + str(pathlib.Path(os.environ.get(
-                       'DESKMATE_DATA_DIR', ROOT / 'data')).expanduser().resolve())]
-        if 'CODEX_HOME' in os.environ:
-            context.append('CODEX_HOME=' + str(pathlib.Path(os.environ['CODEX_HOME']).expanduser().resolve()))
+    try:
+        command = provider_environment.launch_command(argv, result['cwd'], ROOT, launch_id)
+    except (OSError, ValueError) as error:
+        result.update(status='error', warnings=[str(error)])
+        return result
     if dry_run:
         return result
-    command = "cd -- " + shlex.quote(result["cwd"]) + " && exec " + shlex.join([*context, *argv])
     script = '''on run argv
     set launchCommand to item 1 of argv
     set tabTitle to item 2 of argv
     tell application "iTerm"
-        if (count of windows) is 0 then create window with default profile
+        if (count of windows) is 0 then
+            set w to (create window with default profile command launchCommand)
+            tell current session of w to set name to tabTitle
+        else
         tell current window
-            create tab with default profile
+            create tab with default profile command launchCommand
             tell current session
                 set name to tabTitle
-                write text launchCommand
             end tell
         end tell
+        end if
         activate
     end tell
 end run

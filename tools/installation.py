@@ -22,6 +22,7 @@ import activity_log
 import adapter_codex
 import project_cards as cards
 import providers
+from provider_environment import claude_home
 import reminders
 from install_transaction import Transaction, file_state, recover, state
 
@@ -68,7 +69,7 @@ def legacy_cards(projects):
         _, key, card, legacy = cards.identity(folder)
         explicit[legacy] = (key, card)
     result = []
-    for legacy in sorted((Path.home() / '.claude/projects').glob('*/memory/project-card.md')):
+    for legacy in sorted((claude_home() / 'projects').glob('*/memory/project-card.md')):
         if legacy.is_symlink():
             target = legacy.resolve()
             if target.parent.parent != cards.data_root() / 'projects':
@@ -148,7 +149,7 @@ def installation_locks(data, new_cards=()):
             if directory.is_dir():
                 handle = stack.enter_context((directory / '.lock').open('a'))
                 fcntl.flock(handle, fcntl.LOCK_EX)
-        for directory in (Path.home() / '.claude', adapter_codex.codex_home()):
+        for directory in (claude_home(), adapter_codex.codex_home()):
             directory.mkdir(parents=True, exist_ok=True)
             handle = stack.enter_context((directory / '.deskmate-integration.lock').open('a'))
             fcntl.flock(handle, fcntl.LOCK_EX)
@@ -157,7 +158,7 @@ def installation_locks(data, new_cards=()):
 
 def native_paths(provider):
     if provider == 'claude':
-        return Path.home() / '.claude/settings.json', Path.home() / '.claude/skills'
+        return claude_home() / 'settings.json', claude_home() / 'skills'
     return adapter_codex.hooks_path(), Path.home() / '.agents/skills'
 
 
@@ -167,7 +168,8 @@ def owned_link(path, target):
 
 @contextlib.contextmanager
 def staged_environment(stage):
-    values = {'HOME': str(stage), 'CODEX_HOME': str(stage / '.codex'),
+    values = {'HOME': str(stage), 'CLAUDE_CONFIG_DIR': str(stage / '.claude'),
+              'CODEX_HOME': str(stage / '.codex'),
               'DESKMATE_DATA_DIR': str(stage / 'data')}
     original = {key: os.environ.get(key) for key in values}
     os.environ.update(values)
@@ -294,7 +296,10 @@ def reminder_plan(transaction, config, stage, remove=False):
                                        'reminders', 'plist', kind], env=environment).encode())
             value['EnvironmentVariables'] = {
                 'HOME': str(Path.home()), 'DESKMATE_DATA_DIR': str(cards.data_root()),
+                'CODEX_HOME': str(adapter_codex.codex_home()),
                 'PATH': str(Path(sys.executable).parent) + os.pathsep + os.environ.get('PATH', '/usr/bin:/bin')}
+            if 'CLAUDE_CONFIG_DIR' in os.environ:
+                value['EnvironmentVariables']['CLAUDE_CONFIG_DIR'] = str(claude_home())
             candidate = file_state(plistlib.dumps(value))
             if state(path) != candidate or not active:
                 actions.append((label, path, active, True))
@@ -428,7 +433,7 @@ def remove(args):
             purge = input('Purge personal data? [y/N] ').strip().lower() == 'y'
         if purge and input('Type DELETE to permanently purge personal data: ') != 'DELETE':
             raise ValueError('Data purge cancelled: exact confirmation DELETE is required')
-    protected = (Path.home(), ROOT, Path.home() / '.claude', Path.home() / '.agents',
+    protected = (Path.home(), ROOT, claude_home().resolve(), Path.home() / '.agents',
                  adapter_codex.codex_home().resolve(), Path.home() / 'Library/LaunchAgents',
                  Path.home() / '.local/bin')
     if purge and any(data == path or data in path.parents for path in protected):
@@ -444,7 +449,7 @@ def remove(args):
             actions = reminder_plan(transaction, {}, stage, remove=True)
             publish(transaction, actions)
         if purge:
-            for legacy in (Path.home() / '.claude/projects').glob('*/memory/project-card.md'):
+            for legacy in (claude_home() / 'projects').glob('*/memory/project-card.md'):
                 if legacy.is_symlink() and legacy.resolve().parent.parent == data / 'projects':
                     legacy.unlink()
             shutil.rmtree(data)

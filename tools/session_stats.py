@@ -16,10 +16,14 @@ import datetime as dt
 import json
 import os
 import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from provider_environment import claude_home
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
-PROJECTS = pathlib.Path.home() / ".claude" / "projects"
+PROJECTS = claude_home() / "projects"
 MIN_TURNS = 5  # fewer answers in a day: a quick look, not a work session
 
 

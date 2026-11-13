@@ -15,6 +15,7 @@ import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from checkpoints import checkpoint_boundary
+from provider_environment import claude_home
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,7 +32,7 @@ def identity(folder: str) -> tuple[Path, str, Path, Path]:
     key = slug + '-' + hashlib.sha256(str(project).encode()).hexdigest()[:12]
     card = data_root() / 'projects' / key / 'project-card.md'
     legacy_key = re.sub(r'[^a-zA-Z0-9]', '-', str(project))
-    legacy = Path.home() / '.claude/projects' / legacy_key / 'memory/project-card.md'
+    legacy = claude_home() / 'projects' / legacy_key / 'memory/project-card.md'
     return project, key, card, legacy
 
 

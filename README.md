@@ -53,6 +53,14 @@ it starts with the configured Default provider. Add `--dry-run` to inspect the
 decision without opening a terminal or changing state; prefix the command with
 `--json` for a structured result inside the standard command envelope.
 
+New terminal sessions use the absolute CLI selected in the calling environment,
+with explicit HOME, PATH, ZDOTDIR, Codex home and Deskmate data paths. Claude's
+`CLAUDE_CONFIG_DIR` is honored when set and remains unset when absent. zsh startup
+runs under the selected HOME/ZDOTDIR; verified paths are reapplied before the CLI
+starts. The iTerm profile supplies appearance and exit behavior. Its shell cannot
+silently select another CLI or native archive. Existing running tabs retain their
+own environment when focused.
+
 If the recorded Provider or session is unavailable, the command refuses to
 silently choose a replacement (exit 4). Make a deliberate new-session choice:
 
@@ -236,7 +244,8 @@ PATH block when needed; open a new shell or follow its printed export command.
 first install, Claude can discover that skill inside this repository.
 
 Data defaults to `<repo>/data`; `DESKMATE_DATA_DIR` selects another directory.
-`CODEX_HOME` selects the Codex hook configuration directory. Backups and the
+`CLAUDE_CONFIG_DIR` selects Claude configuration/storage (default `~/.claude`);
+`CODEX_HOME` selects Codex configuration/storage (default `~/.codex`). Backups and the
 recoverable migration journal live under `<data>/backups/install/`. Rerunning
 setup recovers an interrupted installation; if another writer changed a file,
 it stops and identifies the file and preserved backups. An unresolved legacy

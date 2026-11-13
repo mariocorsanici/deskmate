@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-13",
+  "base_commit": "f22022e",
+  "finding": "C14-ENV-01",
+  "status": "automated-and-review-verified",
+  "initial_red": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest tests.test_launch_environment -v",
+    "failed": 4,
+    "observations": [
+      "Claude new session used profile CLI and remained unconfirmed",
+      "Codex new/resume used wrong HOME",
+      "Custom-Claude resume returned session_unavailable"
+    ]
+  },
+  "startup_compatibility_red_green": "Non-login draft dropped startup marker; selected zsh startup plus post-startup pinning restores it.",
+  "selected_keys": [
+    "HOME",
+    "PATH",
+    "ZDOTDIR",
+    "CODEX_HOME",
+    "DESKMATE_DATA_DIR",
+    "CLAUDE_CONFIG_DIR when set",
+    "DESKMATE_LAUNCH_ID when correlated"
+  ],
+  "source_caller_secrets_serialized": false,
+  "verification": {
+    "full_suite": {
+      "passed": 277,
+      "seconds": 121.231,
+      "exit_code": 0,
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest discover -s tests -q"
+    },
+    "system_python": {
+      "passed": 118,
+      "seconds": 122.666,
+      "exit_code": 0,
+      "command": "PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -B -Werror::ResourceWarning -m unittest tests.test_launch_environment tests.test_claude_adapter tests.test_codex_adapter tests.test_work_sessions tests.test_installation -q"
+    },
+    "applescript_compilation": {
+      "compiled": 3,
+      "outside_sandbox": true,
+      "exit_code": 0,
+      "executed": false
+    },
+    "review": {
+      "verdict": "approved",
+      "critical": 0,
+      "important": 0,
+      "minor": 0,
+      "independent_fake_native_tests": 12
+    },
+    "native_without_wrapper": "pending",
+    "destination": {
+      "passed": 277,
+      "seconds": 124.183,
+      "exit_code": 0,
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest discover -s tests -q"
+    }
+  },
+  "cross_provider_native_requests": "held",
+  "c14_complete": false,
+  "implementation_hashes": {
+    "tools/provider_environment.py": "41bdd28e521d5124aa3acf1fbd1601f61f39c2521afe40fd4b3daa79e6a04ef5",
+    "tools/adapter_cli.py": "8d1bff72c72d6cbde96aa6a56d46469747fcc18c9bbfb9777cc9c4a35a9923c3",
+    "tools/adapter_claude.py": "96495d423de0b65ec4c63c766827761dbcdc4d3878c8bb5b1add9781b0d4bea5",
+    "tools/adapter_codex.py": "12b331d5c92f16c93e0a63dab781c4a5ed0947cbbe9eb35d692c12517067af8d",
+    "tools/project_cards.py": "babb436daf3ff6d6af6cfec3c517b3485900ce40b81533678a556f5ed07f99d2",
+    "tools/token_usage.py": "9a581874fa66618d727281729264cacc3015398773ddfeb5de1b8b4b9d022195",
+    "tools/session_stats.py": "ee661d57b9303c6ea861254477bd697f12fe1ea0643e27cc52c346715de9afbe",
+    "tools/installation.py": "d31fef18fc659eaa76e8c29a7f70ba8cbbc5c701e33e1f44e952735b98bbed08"
+  }
+}

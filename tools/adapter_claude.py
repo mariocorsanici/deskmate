@@ -13,13 +13,14 @@ import tempfile
 import copy
 import csv
 import fcntl
+import provider_environment
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def projects() -> pathlib.Path:
-    return pathlib.Path.home() / '.claude' / 'projects'
+    return provider_environment.claude_home() / 'projects'
 
 
 def timestamp(value):
@@ -285,6 +286,7 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
               'status': 'ok', 'warnings': []}
     terminal_submission = False
     try:
+        argv[0] = provider_environment.executable('claude')
         if not pathlib.Path(folder).is_dir():
             raise ValueError('Project folder does not exist.')
         if session_id is not None and not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', session_id):
@@ -294,15 +296,8 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
             raise ValueError('Terminal title must not contain control characters.')
         if any('\0' in argument for argument in argv):
             raise ValueError('Launch arguments must not contain NUL.')
-        context = []
-        if launch_id is not None:
-            if not re.fullmatch(r'[a-f0-9]{32}', launch_id):
-                raise ValueError('Invalid Deskmate launch identity')
-            context = ['/usr/bin/env', 'DESKMATE_LAUNCH_ID=' + launch_id,
-                       'DESKMATE_DATA_DIR=' + str(pathlib.Path(os.environ.get(
-                           'DESKMATE_DATA_DIR', ROOT / 'data')).expanduser().resolve())]
-            if 'CODEX_HOME' in os.environ:
-                context.append('CODEX_HOME=' + str(pathlib.Path(os.environ['CODEX_HOME']).expanduser().resolve()))
+        command = provider_environment.launch_command(
+            argv, folder, ROOT, launch_id, {'CLAUDE_CODE_DISABLE_TERMINAL_TITLE': '1'})
         if dry_run or os.environ.get('DESKMATE_DRY_RUN'):
             return result
         if session_id:
@@ -344,18 +339,19 @@ end run
                 result['focused'] = True
                 result['warnings'].append('Existing Work session tab brought to front.')
                 return result
-        command = ("printf '\\033]0;%s\\007' " + shlex.quote(title) + '; cd ' +
-                   shlex.quote(folder) + ' && CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1 ' +
-                   shlex.join([*context, *argv]))
         terminal_submission = True
-        subprocess.run(['osascript', '-', command], input='''on run argv
+        subprocess.run(['osascript', '-', command, title], input='''on run argv
 tell application "iTerm"
 activate
-if (count of windows) = 0 then create window with default profile
+if (count of windows) = 0 then
+set w to (create window with default profile command (item 1 of argv))
+tell current session of w to set name to (item 2 of argv)
+else
 tell current window
-set t to (create tab with default profile)
-tell current session of t to write text (item 1 of argv)
+set t to (create tab with default profile command (item 1 of argv))
+tell current session of t to set name to (item 2 of argv)
 end tell
+end if
 end tell
 end run
 ''', capture_output=True, text=True, timeout=10, check=True)
@@ -371,7 +367,7 @@ def hook_argv():
 
 
 def hooks_path():
-    return pathlib.Path.home() / '.claude/settings.json'
+    return provider_environment.claude_home() / 'settings.json'
 
 
 def verification_hook(session_id, cwd):
@@ -441,7 +437,7 @@ def configure_hooks(remove: bool = False) -> dict:
                     if event == 'PreToolUse':
                         entry['matcher'] = 'Skill'
                     hooks.setdefault(event, []).append(entry)
-            skills = [(source, pathlib.Path.home() / '.claude/skills' / source.name)
+            skills = [(source, provider_environment.claude_home() / 'skills' / source.name)
                       for source in sorted((ROOT / 'skills').iterdir())
                       if source.is_dir() and (source / 'SKILL.md').is_file()]
             for source, target in skills:

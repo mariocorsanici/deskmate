@@ -20,8 +20,15 @@ class ClaudeAdapterTest(unittest.TestCase):
         self.projects = self.home / '.claude/projects/demo'
         self.projects.mkdir(parents=True)
         self.timestamp = dt.datetime.now(dt.timezone.utc).isoformat()
+        native_bin = self.home / 'native-bin'
+        native_bin.mkdir()
+        self.native_cli = native_bin / 'claude'
+        self.native_cli.write_text('#!/bin/sh\necho "Claude Code 2.1.0"\n')
+        self.native_cli.chmod(0o755)
         self.env = {**os.environ, 'HOME': str(self.home),
-                    'DESKMATE_DATA_DIR': str(self.home / 'data')}
+                    'DESKMATE_DATA_DIR': str(self.home / 'data'),
+                    'PATH': str(native_bin) + os.pathsep + os.environ.get('PATH', os.defpath)}
+        self.env.pop('CLAUDE_CONFIG_DIR', None)
 
     def run_cli(self, *args, input_text=None):
         result = subprocess.run([sys.executable, str(ROOT / 'bin/deskmate'), '--json', *args],
@@ -145,12 +152,12 @@ class ClaudeAdapterTest(unittest.TestCase):
         prompt = 'Continue "quoted" $(touch CANARY) `touch CANARY`'
         plan = self.record('provider-launch', '--provider', 'claude', '--folder', str(self.home),
                            '--prompt', prompt, '--title', 'Demo', '--dry-run')
-        self.assertEqual(plan['argv'], ['claude', '--', prompt])
+        self.assertEqual(plan['argv'], [str(self.native_cli), '--', prompt])
         self.assertEqual(plan['mode'], 'new')
         self.assertIsNone(plan['session_id'])
         resume = self.record('provider-launch', '--provider', 'claude', '--folder', str(self.home),
                              '--session-id', 'native-123', '--dry-run')
-        self.assertEqual(resume['argv'], ['claude', '--resume', 'native-123'])
+        self.assertEqual(resume['argv'], [str(self.native_cli), '--resume', 'native-123'])
         self.assertEqual(resume['session_id'], 'native-123')
         self.assertEqual(list(self.home.glob('CANARY')), [])
 
@@ -158,17 +165,22 @@ class ClaudeAdapterTest(unittest.TestCase):
         binaries = self.home / 'bin'
         binaries.mkdir()
         output = self.home / 'captured.json'
+        native_output = self.home / 'native-argv.json'
+        native = binaries / 'claude'
+        native.write_text(f'#!{sys.executable}\nimport json,pathlib,sys\n'
+                          f'pathlib.Path({str(native_output)!r}).write_text(json.dumps(sys.argv[1:]))\n')
+        native.chmod(0o755)
         fake = binaries / 'osascript'
-        fake.write_text(f'#!{sys.executable}\nimport json, pathlib, sys\n'
+        fake.write_text(f'#!{sys.executable}\nimport json,pathlib,subprocess,sys\n'
                         f'pathlib.Path({str(output)!r}).write_text(json.dumps(sys.argv[1:]))\n'
-                        'sys.stdin.read()\n')
+                        "sys.stdin.read()\nsubprocess.run(['/bin/sh','-c',sys.argv[2]],check=True)\n")
         fake.chmod(0o755)
         self.env['PATH'] = str(binaries)
         prompt = 'a; touch CANARY $(touch CANARY)'
         plan = self.record('provider-launch', '--provider', 'claude', '--folder', str(self.home),
                            '--prompt', prompt, '--title', 'Demo')
-        command = json.loads(output.read_text())[-1]
-        self.assertIn("claude -- 'a; touch CANARY $(touch CANARY)'", command)
+        self.assertEqual(json.loads(output.read_text())[-1], 'Demo')
+        self.assertEqual(json.loads(native_output.read_text()), ['--', prompt])
         self.assertEqual(plan['status'], 'ok')
         self.assertFalse((self.home / 'CANARY').exists())
         fake.write_text('#!/bin/sh\nexit 7\n')

@@ -64,7 +64,8 @@ def verify_logging(provider):
         native = 'deskmate-integration-verification'
         command, payload = adapter(provider).verification_hook(native, directory)
         environment = {**os.environ, 'HOME': directory, 'DESKMATE_DATA_DIR': str(data),
-                       'CODEX_HOME': str(home / '.codex')}
+                       'CODEX_HOME': str(home / '.codex'),
+                       'CLAUDE_CONFIG_DIR': str(home / '.claude')}
         checked = subprocess.run([sys.executable, *command], input=json.dumps(payload),
                                  capture_output=True, text=True, env=environment,
                                  cwd=directory, timeout=10, check=False)

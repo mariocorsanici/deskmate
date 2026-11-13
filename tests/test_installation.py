@@ -64,6 +64,45 @@ class InstallationTest(unittest.TestCase):
     def succeeds(self, result):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_custom_claude_config_is_shared_by_installation_usage_and_removal(self):
+        self.providers('claude')
+        custom = self.home / "Claude ' custom"
+        custom.mkdir()
+        (custom / 'settings.json').write_text(json.dumps({'theme': 'dark'}))
+        standard = self.home / '.claude'
+        standard.mkdir()
+        sentinel = standard / 'settings.json'
+        sentinel.write_text('{"keep":"default configuration"}\n')
+        original = sentinel.read_bytes()
+        self.env['CLAUDE_CONFIG_DIR'] = str(custom)
+        self.succeeds(self.setup('--provider', 'claude', '--default-provider', 'claude'))
+        self.assertEqual(sentinel.read_bytes(), original)
+        self.assertTrue((custom / 'skills/checkpoint').is_symlink())
+        self.assertEqual(json.loads((custom / 'settings.json').read_text())['theme'], 'dark')
+        native = custom / 'projects/demo/native-custom.jsonl'
+        native.parent.mkdir(parents=True)
+        native.write_text('\n'.join(json.dumps(row) for row in [
+            {'type': 'user', 'cwd': str(self.home), 'timestamp': '2026-11-13T10:00:00Z',
+             'message': {'content': '<command-name>/checkpoint</command-name>'}},
+            {'type': 'assistant', 'timestamp': '2026-11-13T10:00:01Z',
+             'message': {'id': 'custom-turn', 'usage': {'input_tokens': 13, 'output_tokens': 5},
+                         'content': 'fixture'}}]) + '\n')
+        event = {'session_id': 'native-custom', 'cwd': str(self.home),
+                 'hook_event_name': 'UserPromptSubmit', 'prompt': '/checkpoint'}
+        self.succeeds(self.cli('hook-event', '--provider', 'claude', input_text=json.dumps(event)))
+        event['hook_event_name'] = 'Stop'
+        self.succeeds(self.cli('hook-event', '--provider', 'claude', input_text=json.dumps(event)))
+        with (self.home / 'data/log.csv').open(newline='') as handle:
+            rows = list(csv.DictReader(handle))
+        checkpoint = next(row for row in rows if row['event'] == 'checkpoint')
+        self.assertEqual(checkpoint['input_tokens'], '13')
+        self.assertEqual(checkpoint['output_tokens'], '5')
+        self.succeeds(self.cli('session-stats', '--since', '2026-01-01'))
+        self.succeeds(self.cli('remove', '--non-interactive'))
+        self.assertFalse((custom / 'skills/checkpoint').exists())
+        self.assertEqual(json.loads((custom / 'settings.json').read_text()), {'theme': 'dark', 'hooks': {}})
+        self.assertEqual(sentinel.read_bytes(), original)
+
     def legacy_card(self, name='Demo Project'):
         project = self.home / name
         project.mkdir()
@@ -535,6 +574,18 @@ p.write_text(json.dumps(active))
         self.succeeds(self.cli('remove', '--non-interactive'))
         self.assertTrue(agent.exists())
         self.assertTrue(calendar.exists())
+
+    def test_reminder_environment_keeps_the_selected_native_configuration(self):
+        self.providers('claude')
+        self.fake_launchctl()
+        self.env['CLAUDE_CONFIG_DIR'] = str(self.home / 'custom-claude')
+        self.config.write_text(json.dumps({'reminders': {'channels': ['mac']}}))
+        self.succeeds(self.setup())
+        import plistlib
+        agent = self.home / 'Library/LaunchAgents/com.deskmate.morning.plist'
+        environment = plistlib.loads(agent.read_bytes())['EnvironmentVariables']
+        self.assertEqual(environment['CLAUDE_CONFIG_DIR'], str(self.home / 'custom-claude'))
+        self.assertEqual(environment['CODEX_HOME'], str(self.home / '.codex'))
 
     def test_launch_failure_rolls_back_config_cards_logs_hooks_and_links(self):
         self.providers('claude')

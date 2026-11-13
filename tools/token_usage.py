@@ -22,11 +22,12 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import activity_log
 from adapter_claude import timestamp
+from provider_environment import claude_home
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
 LOG = DATA / "log.csv"
-PROJECTS = pathlib.Path.home() / ".claude" / "projects"
+PROJECTS = claude_home() / "projects"
 COLUMNS = ["date", "time", "weekday", "event", "detail", "session", "cwd",
            "turns", "input_tokens", "cache_tokens", "output_tokens"]
 # the transcript stores a typed command as "<command-message>…</command-message>\n<command-name>/name</command-name>"
