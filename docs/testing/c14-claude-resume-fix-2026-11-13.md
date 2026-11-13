@@ -63,3 +63,10 @@ its isolated HOME/PATH into iTerm. Production propagation of a custom HOME was
 not tested or added. No source changes were made during native verification.
 Implementation commit: `ecf9109`; Codex evidence commit: `3fe01e7`. Cross-Provider
 requests remain held and C14 stays open.
+
+## Selected environment correction
+
+The wrapper limitation above is addressed by implementation `31f3cc6`; see the
+[environment correction](c14-launch-environment-2026-11-13.md) and the subsequent
+[real native run without a wrapper](c14-launch-environment-native-2026-11-13.md).
+Earlier run observations remain historical evidence. C14 remains open.

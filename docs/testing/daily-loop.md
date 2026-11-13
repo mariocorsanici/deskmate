@@ -5,9 +5,9 @@ native execution and its timestamp correction are recorded; its cold SQLite
 finding is a [documented bounded limitation](c14-codex-sqlite-2026-11-13.md).
 [Claude-only native execution](c14-claude-native-2026-11-13.md) completed with
 C14-CLAUDE-01, a Deskmate resume refusal for an indexless runtime. The
-[repair evidence](c14-claude-resume-fix-2026-11-13.md) records routing repair and links the
-[real terminal resume](c14-claude-native-resume-2026-11-13.md), with its isolated
-test-transport adaptation. Cross-Provider requests remain held; a visible folder
+[repair evidence](c14-claude-resume-fix-2026-11-13.md) records routing repair. Its initial terminal follow-up used a fixture wrapper;
+the [launch-environment correction](c14-launch-environment-2026-11-13.md) now
+passes [real Claude resume without a wrapper](c14-launch-environment-native-2026-11-13.md). Cross-Provider requests remain held; a visible folder
 trust dialog, desktop notifications and calendar delivery remain unverified. Do not merge the feature into develop yet.
 
 ## Final entry points and migration
@@ -99,7 +99,7 @@ requests or changes to installed personal integration state.
 | Claude only | Setup twice, `/setup`, all five Daily-loop skills discovered, actual prompt/Stop delivery, matching Provider/session rows | Executed; see Claude evidence and repair follow-up |
 | Codex only | Setup twice, `$setup`, all five skills discovered, normal `/hooks` trust, actual prompt/Stop delivery | Executed; see current Codex evidence |
 | Both, each Default provider | Default-first reminders, unowned launch selects default, same shared skill/card content | Pending |
-| Same-Provider resume | Real launched native ID and folder match the saved card; default does not override ownership | Codex verified; repaired Claude Deskmate route, real iTerm resume and lifecycle verified with an isolated test transport |
+| Same-Provider resume | Real launched native ID and folder match the saved card; default does not override ownership | Original Codex group verified; Claude real iTerm resume/lifecycle and selected environment verified without a wrapper. Latest Codex launch-environment change has automated coverage only |
 | Claude → Codex | Saved card/current Checks/bounded delta preview, explicit overlap consent, new native ID, path-only transfer, consume/delete | Pending |
 | Codex → Claude | Same guarantees in reverse; no cross-Provider resume claim | Pending |
 | Source/history unavailable | Continue from card and Checks with explicit missing-context disclosure | Codex post-exit degradation observed (C14-CODEX-02); cross-Provider recovery pending |

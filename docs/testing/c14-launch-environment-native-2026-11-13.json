@@ -1,0 +1,114 @@
+{
+  "test": "C14-ENV-01 Claude-only native launch environment",
+  "date": "2026-11-13",
+  "status": "completed",
+  "c14_closed": false,
+  "cross_provider": "suspended (not executed)",
+  "codex_requests": 0,
+  "source_under_test": {
+    "path": "/private/tmp/deskmate-c14-launch-env-20261113-vh2knmgb/source",
+    "base": "f22022e",
+    "staged_impl_diff_sha256": "368fcbffa81a21c64288e9548f2ce3ca09d4ab2294edcf597832d9a4189f65bf",
+    "impl_files_hashed": 53,
+    "impl_hashes_identical_before_after": true,
+    "modified": false
+  },
+  "fixture": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0",
+  "claude_code": "2.1.323",
+  "sessions": {
+    "native_session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "launch_id": "64e50406658d4854b3a9e2ee38a67f62",
+    "pid": 86834,
+    "tty": "ttys005",
+    "iterm_session": "BBAA78EA-DE84-4AE2-8779-8C5D44162572"
+  },
+  "integration_repoint": {
+    "first_observation": "setup exit 2: Existing skill is not owned by Deskmate: .../skills/call-it-a-day; move or rename it",
+    "workaround": "remove --non-interactive from previous source (exit 0, data preserved), then setup from new source (exit 0, backup 363dd2600852471192e856b385bd0ef1)",
+    "data_identical": true
+  },
+  "caller_env": {
+    "HOME": "<fixture>/home",
+    "DESKMATE_DATA_DIR": "<fixture>/data",
+    "PATH": "<fixture>/home/.local/bin:<fixture>/pathbin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "CODEX_HOME": "<fixture>/home/.codex",
+    "ZDOTDIR": null,
+    "CLAUDE_CONFIG_DIR": null,
+    "osascript": "/usr/bin/osascript",
+    "wrappers": "none"
+  },
+  "dry_run": "resume Work session with claude: <fixture>/project (ok), exit 0",
+  "launch": {
+    "exit": 0,
+    "output": "(pending) Terminal command submitted; native hook confirmation is pending.",
+    "process_cwd": "<fixture>/project",
+    "argv": "<fixture>/home/.local/bin/claude --resume 85b0fc6e-17b9-4d11-a788-c47ee19232eb"
+  },
+  "process_env_external_ps_E_selected_keys": {
+    "HOME": "<fixture>/home",
+    "PATH": "<fixture>/home/.local/bin:<fixture>/pathbin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "ZDOTDIR": "<fixture>/home",
+    "CODEX_HOME": "<fixture>/home/.codex",
+    "DESKMATE_DATA_DIR": "<fixture>/data",
+    "CLAUDE_CONFIG_DIR": "absent"
+  },
+  "native_verification": {
+    "approval": "manual-mode prompt approved by the user in the panel (1. Yes); coordinator did not approve",
+    "tool_result_at": "2026-11-13T14:32:12Z",
+    "check": "probe content: ok",
+    "CHECK_EXIT": 0,
+    "deskmate": "<fixture>/home/.local/bin/deskmate",
+    "pwd": "<fixture>/project",
+    "CLAUDE_CODE_SESSION_ID": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "HOME": "<fixture>/home",
+    "PATH": "<fixture>/home/.local/bin:<fixture>/pathbin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "ZDOTDIR": "<fixture>/home",
+    "CODEX_HOME": "<fixture>/home/.codex",
+    "DESKMATE_DATA_DIR": "<fixture>/data",
+    "CLAUDE_CONFIG_DIR": "absent"
+  },
+  "hooks": {
+    "session_start": "2026-11-13 15:26 local, same id/cwd, provider=claude",
+    "session_end": "2026-11-13 15:33 local, same id/cwd, provider=claude"
+  },
+  "journal": {
+    "state": "confirmed",
+    "mode": "resume",
+    "expected_revision": 3,
+    "ended": true
+  },
+  "card": {
+    "owner": "claude:85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "body_identical": true,
+    "revision": "3 -> 4 (ownership confirmation)"
+  },
+  "exit": {
+    "process_absent": true,
+    "numeric_exit_code": "not observed (iTerm tab closed with the CLI)"
+  },
+  "cleanup": {
+    "keychain_link_created": "2026-11-13T14:26:46Z",
+    "keychain_link_removed": "2026-11-13T14:33:40Z",
+    "credentials_read": false,
+    "evidence_kept": "<fixture>/evidence/launch-env/"
+  },
+  "observations": [
+    "Re-pointing to another checkout still requires remove + setup.",
+    "Fixture HOME has no zsh rc files; personal ~/.zshrc not used because ZDOTDIR follows the selected HOME. Fixture rc files rewriting PATH not exercised.",
+    "Numeric CLI exit code is not observable on the iTerm command path."
+  ],
+  "not_executed": [
+    "new-session launch path",
+    "focus of an already-running tab",
+    "explicit CLAUDE_CONFIG_DIR",
+    "desktop/calendar reminders",
+    "Codex and cross-Provider steps"
+  ],
+  "changes": {
+    "source": false,
+    "tracker": false,
+    "personal_config": false,
+    "push": false,
+    "merge": false
+  }
+}

@@ -63,3 +63,22 @@ confirmation. Desktop/calendar delivery and cross-Provider acceptance remain
 separate pending observations. No personal integration, push or merge is changed.
 
 Original feature-worktree verification before commit: **277/277 passed** in 124.183 seconds, ResourceWarnings as errors. Native verification without a wrapper follows separately.
+
+## Native result without a transport wrapper
+
+The [Claude native follow-up](c14-launch-environment-native-2026-11-13.md)
+completed with the real `/usr/bin/osascript`, no PATH-local wrapper and no manual
+environment correction in the launched tab. External inspection and the native
+command both confirm the selected HOME/PATH/ZDOTDIR/CODEX_HOME/data, absent
+CLAUDE_CONFIG_DIR, same native ID and correct cwd. The read-only Check returned 0
+after the user approved the normal manual-mode prompt. Native SessionStart
+confirmed the journal; after `/exit`, the process is absent and SessionEnd marks
+the attempt ended. The CLI's own numeric exit status was not exposed by iTerm.
+Owner and card body are preserved; ownership confirmation advances revision 3
+to 4. The temporary auth link is removed. Implementation commit `31f3cc6` matches
+the reviewed/tested source hashes; no source was modified during the native run.
+
+The fixture had no zsh startup files, so startup PATH rewriting remains covered
+by public automated tests rather than this live run. Explicit custom Claude
+config and new/resume Codex are automated evidence, not new native model runs.
+Cross-Provider requests remain held; C14 is still open.

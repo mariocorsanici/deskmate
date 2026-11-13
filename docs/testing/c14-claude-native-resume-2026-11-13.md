@@ -68,3 +68,10 @@ person is inferred from timing and the blocked keystroke.
   exported in its shell.
 
 No source, tracker, patch, personal configuration, push or merge was changed.
+
+## Selected environment correction
+
+The wrapper limitation above is addressed by implementation `31f3cc6`; see the
+[environment correction](c14-launch-environment-2026-11-13.md) and the subsequent
+[real native run without a wrapper](c14-launch-environment-native-2026-11-13.md).
+Earlier run observations remain historical evidence. C14 remains open.

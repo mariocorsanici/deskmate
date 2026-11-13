@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** synthetic implementation verified; Codex native execution recorded; C14-CODEX-02 triaged as a documented bounded runtime limitation; Claude-only execution recorded; C14-CLAUDE-01 eligibility/discovery repair verified (263 full tests, 76 compatibility checks); real Claude Deskmate resume verified with isolated transport; cross-Provider acceptance pending.
+**Implementation:** synthetic and native Codex/Claude groups recorded; C14-CLAUDE-01 repaired; selected launch environment repaired in 31f3cc6 with 277 full tests and 118 compatibility checks, then verified natively on Claude without a wrapper. Cross-Provider acceptance and remaining platform observations pending.
 **Owner:** `/root`, started 2026-11-10 from `b10d282`.
 
 - [x] Every skill, hook, reminder and documented command uses the provider-neutral interface.
@@ -40,3 +40,5 @@ Authenticated native follow-up after repair: Deskmate submitted a real iTerm lau
 2026-11-13: Owner authorized correcting selected HOME/PATH/native-config propagation after the wrapper-based follow-up exposed C14-ENV-01. Shared environment selection and direct iTerm command submission are under verification on both adapters; custom Claude config consumers are aligned, ordinary selected zsh startup retained, and selected paths reapplied before native execution. Four initial public regressions observed RED, then GREEN; no real Codex/cross-Provider requests authorized. Actual Claude verification without an environment wrapper follows. See `docs/testing/c14-launch-environment-2026-11-13.md`.
 
 C14-ENV-01 automated verification: 277/277 preparation tests, 118/118 relevant system-Python tests, independent review approved and three actual AppleScript programs compiled outside the sandbox. Original-worktree full suite passed 277/277 in 124.183s before local repair commit. Native Claude proof without wrapper is recorded separately; cross-Provider requests remain held.
+
+C14-ENV-01 native acceptance completed: actual Deskmate/iTerm Claude resume used /usr/bin/osascript with no wrapper or in-tab exports. Process/native command confirmed selected HOME/PATH/ZDOTDIR/native roots and absent CLAUDE_CONFIG_DIR; Check exit 0 after the user approved the ordinary manual prompt. Start/end hooks and confirmed/ended journal match the original ID/cwd; owner/body preserved, revision 3->4 expected. CLI process exited; its numeric exit code was not observable. Temporary auth link removed, implementation hashes unchanged. Native evidence: `docs/testing/c14-launch-environment-native-2026-11-13.md`. Codex transport is automated coverage only in this repair; cross-Provider native requests remain held.
