@@ -61,6 +61,12 @@ starts. The iTerm profile supplies appearance and exit behavior. Its shell canno
 silently select another CLI or native archive. Existing running tabs retain their
 own environment when focused.
 
+Deskmate starts and resumes Codex with `--no-daemon`. A shared Codex app server
+retains the environment of its first client; reusing it could send native hooks
+to another launch's journal or data directory. A dedicated process keeps the
+selected paths and launch identity attached to the current Work session without
+changing hook trust, sandbox settings or native session storage.
+
 If the recorded Provider or session is unavailable, the command refuses to
 silently choose a replacement (exit 4). Make a deliberate new-session choice:
 

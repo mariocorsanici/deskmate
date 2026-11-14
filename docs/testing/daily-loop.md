@@ -1,14 +1,20 @@
 # Provider-neutral Daily-loop verification
 
-C14 began on 2026-11-10 from `b10d282`. **C14 remains incomplete.** Codex
-native execution and its timestamp correction are recorded; its cold SQLite
-finding is a [documented bounded limitation](c14-codex-sqlite-2026-11-13.md).
-[Claude-only native execution](c14-claude-native-2026-11-13.md) completed with
-C14-CLAUDE-01, a Deskmate resume refusal for an indexless runtime. The
-[repair evidence](c14-claude-resume-fix-2026-11-13.md) records routing repair. Its initial terminal follow-up used a fixture wrapper;
-the [launch-environment correction](c14-launch-environment-2026-11-13.md) now
-passes [real Claude resume without a wrapper](c14-launch-environment-native-2026-11-13.md). Cross-Provider requests remain held; a visible folder
-trust dialog, desktop notifications and calendar delivery remain unverified. Do not merge the feature into develop yet.
+**C14 Provider integration acceptance passed on 2026-11-14.** The
+[cross-Provider native report](c14-cross-provider-2026-11-14.md) completes both
+Default provider variants, both real switch directions, source/history-unavailable
+recovery and exact native launch/resume ownership. C14-CODEX-03 exposed a stale
+shared-daemon environment; dedicated Codex launches repair it and pass fresh
+native confirmation. The final suite passes 279/279, with 70/70 system-Python
+compatibility checks and an independent review without findings.
+
+Earlier Codex timestamp and Claude indexless-resume/environment corrections
+remain documented below. Cold read-only SQLite access remains a
+[bounded runtime limitation](c14-codex-sqlite-2026-11-13.md), with explicit
+unavailable coverage and card-plus-Checks continuation verified natively.
+Native macOS reminder display/responses were exercised with a documented bounded
+alert timeout. Calendar application import and launchd scheduling are separate
+platform follow-ups; no calendar import is claimed. No push or merge was made.
 
 ## Final entry points and migration
 
@@ -88,34 +94,35 @@ bounded process completion instead of treating EOF as a still-running failure.
 Final command results and independent review findings are recorded below after
 verification, without inferring native completion.
 
-## Native acceptance runbook — see current evidence above
+## Native acceptance matrix — completed Provider groups
 
 Use dedicated non-sensitive test projects and Work sessions, isolated data and
-native configuration. Obtain authorization lifting the quota hold before native
-requests or changes to installed personal integration state.
+native configuration. The owner authorized the 2026-11-14 native continuation, lifting the earlier
+quota hold for these tests. Personal integration state was not reinstalled.
 
 | Scenario | Evidence required | Status |
 | --- | --- | --- |
 | Claude only | Setup twice, `/setup`, all five Daily-loop skills discovered, actual prompt/Stop delivery, matching Provider/session rows | Executed; see Claude evidence and repair follow-up |
 | Codex only | Setup twice, `$setup`, all five skills discovered, normal `/hooks` trust, actual prompt/Stop delivery | Executed; see current Codex evidence |
-| Both, each Default provider | Default-first reminders, unowned launch selects default, same shared skill/card content | Pending |
-| Same-Provider resume | Real launched native ID and folder match the saved card; default does not override ownership | Original Codex group verified; Claude real iTerm resume/lifecycle and selected environment verified without a wrapper. Latest Codex launch-environment change has automated coverage only |
-| Claude → Codex | Saved card/current Checks/bounded delta preview, explicit overlap consent, new native ID, path-only transfer, consume/delete | Pending |
-| Codex → Claude | Same guarantees in reverse; no cross-Provider resume claim | Pending |
-| Source/history unavailable | Continue from card and Checks with explicit missing-context disclosure | Codex post-exit degradation observed (C14-CODEX-02); cross-Provider recovery pending |
+| Both, each Default provider | Default-first reminders, unowned launch selects default, same shared skill/card content | Passed: repeated setup/ordering plus two real unowned launches and matching native ownership |
+| Same-Provider resume | Real launched native ID and folder match the saved card; default does not override ownership | Passed: prior Claude proof plus fresh dedicated-process Codex exit/resume, native Check and exact launch-ID confirmation |
+| Claude → Codex | Saved card/current Checks/bounded delta preview, explicit overlap consent, new native ID, path-only transfer, consume/delete | Passed after C14-CODEX-03 repair; conversation-only marker recovered |
+| Codex → Claude | Same guarantees in reverse; no cross-Provider resume claim | Passed; post-Checkpoint marker recovered, live Check passed, new native identity confirmed |
+| Source/history unavailable | Continue from card and Checks with explicit missing-context disclosure | Passed natively: unavailable Claude runtime/history, zero-message transfer, explicit unavailable coverage and successful Codex Check |
 | Complete Daily loop | Actual morning → Checkpoint → selected retrospective → evening Handoff under each Provider | Both executed; original Claude run used a direct native-resume workaround |
-| macOS/calendar channels | Native notifications/responses and real calendar import behavior, recorded separately from model tests | Pending |
+| macOS/calendar channels | Native notifications/responses and real calendar import behavior, recorded separately from model tests | Native reminder scripts/display/responses passed with bounded timeout. Calendar import and launchd remain separate unverified follow-ups |
 
 Record date, native versions, Provider/session identities, actual commands,
 observed rows/card revisions and degraded outcomes without private conversation
-content. The fixture matrix does not substitute for any Pending row.
+content. The fixture matrix does not substitute for native evidence. The calendar and
+launchd follow-ups are not represented as Provider acceptance results.
 
 ## Temporary tracker disposition before merge
 
 The durable contract is [Provider-neutral CLI](../provider-neutral-cli.md);
 [ADR 0001](../adr/0001-provider-neutral-core.md) and
 [development workflow](../agents/development-workflow.md) remain authoritative.
-Keep `.scratch/provider-neutral-cli/` while native C14 acceptance is unfinished.
+Retain `.scratch/provider-neutral-cli/` until the integration change.
 Delete that entire temporary directory in the eventual integration change after
 preserving the native results and checking the evidence below. It is identified
 for removal, not an active post-merge documentation dependency.
@@ -139,7 +146,7 @@ Ticket-level stop directives are historical execution boundaries, not changes to
 the final architecture. The C12 decision to attribute desktop responses to the
 displayed Default provider with no native ID remains durable in README and its
 verification document. Preserve deferred findings in their existing evidence
-files until resolved; native acceptance stays pending regardless of checkbox
+files until resolved; acceptance is governed by the current native matrix, rather than checkbox
 counts on earlier tickets.
 
 
@@ -189,12 +196,22 @@ is silently claimed fixed or accepted by synthetic tests.
 Destination full suite passed on the existing feature worktree before its local checkpoint commit. Native acceptance remains pending.
 
 
-## Latest Codex native evidence — 2026-11-11
+## Codex native evidence — 2026-11-11 (historical)
 
 The Codex group ran setup/discovery/trust, actual skill and lifecycle logging,
 Checkpoint/full exit/resume, selected retrospective, lessons and evening Handoff.
 C14-CODEX-01 was then fixed and its fresh native regression passed without
 formatting hints. See [correction evidence](c14-codex-timestamp-fix-2026-11-11.md).
-The Pending table above records the original runbook; Codex execution is now
-recorded, while C14-CODEX-02 (post-exit SQLite availability), Claude and
-cross-Provider acceptance remain open. C14 is not closed.
+At that date, C14-CODEX-02 (post-exit SQLite availability), Claude and
+cross-Provider acceptance remained open. The current completed Provider matrix
+and the 2026-11-14 continuation above supersede that historical status.
+
+
+## Completed native continuation — 2026-11-14
+
+See [the native report](c14-cross-provider-2026-11-14.md) and its machine-readable
+evidence for the stale-daemon reproduction, RED/GREEN correction, both defaults,
+both switches, degraded recovery, same-ID resume and cleanup. Historical entries
+above describe their dates and do not override the completed Provider matrix.
+Calendar follow-up was separated after the owner questioned its inclusion in the
+Codex integration task; no calendar import or delivery result is inferred.

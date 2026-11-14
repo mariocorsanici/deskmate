@@ -422,7 +422,7 @@ class WorkSessionsTest(unittest.TestCase):
             self.assertEqual(result['session_id'], 'native-123')
             evidence = json.loads((self.home / 'fake-native.json').read_text())
             expected = ['--resume', 'native-123'] if provider == 'claude' else [
-                'resume', '--cd', str(self.project.resolve()), '--', 'native-123']
+                'resume', '--no-daemon', '--cd', str(self.project.resolve()), '--', 'native-123']
             self.assertEqual(evidence['argv'], expected)
             revision = result['card_revision']
 

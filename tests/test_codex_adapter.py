@@ -343,7 +343,7 @@ class CodexAdapterTest(unittest.TestCase):
         resumed = self.command("provider-launch", "--provider", "codex", "--folder", str(self.home),
                                "--session-id", SESSION_ID, "--dry-run")
         self.assertEqual(resumed["status"], "ok")
-        self.assertEqual(resumed["argv"], [executable, "resume", "--cd", str(self.home), "--", SESSION_ID])
+        self.assertEqual(resumed["argv"], [executable, "resume", "--no-daemon", "--cd", str(self.home), "--", SESSION_ID])
         unknown = self.failed_command("provider-launch", "--provider", "codex", "--folder", str(self.home),
                                       "--session-id", "unknown-session", "--dry-run")
         self.assertEqual(unknown["status"], "error")
@@ -365,13 +365,13 @@ class CodexAdapterTest(unittest.TestCase):
         self.assertEqual(new["status"], "ok")
         self.assertEqual(new["mode"], "new")
         self.assertIsNone(new["session_id"])
-        self.assertEqual(new["argv"], [executable, "--cd", str(folder), "--", prompt])
+        self.assertEqual(new["argv"], [executable, "--no-daemon", "--cd", str(folder), "--", prompt])
         self.write_rollout([self.metadata()])
         resumed = self.command("provider-launch", "--provider", "codex", "--folder", str(folder),
                                "--session-id", SESSION_ID, "--dry-run")
         self.assertEqual(resumed["mode"], "resume")
         self.assertEqual(resumed["session_id"], SESSION_ID)
-        self.assertEqual(resumed["argv"], [executable, "resume", "--cd", str(folder), "--", SESSION_ID])
+        self.assertEqual(resumed["argv"], [executable, "resume", "--no-daemon", "--cd", str(folder), "--", SESSION_ID])
 
     def test_iterm_launch_keeps_prompt_and_title_as_data(self):
         executable = self.fake_codex()
@@ -393,7 +393,7 @@ class CodexAdapterTest(unittest.TestCase):
         self.assertEqual(launched["status"], "launched")
         self.assertIsNone(launched["session_id"])
         self.assertEqual(json.loads((self.home / "launched-argv.json").read_text()),
-                         ["--cd", str(folder), "--", prompt])
+                         ["--no-daemon", "--cd", str(folder), "--", prompt])
         arguments, script = json.loads((self.home / "iterm-input.json").read_text())
         self.assertEqual(arguments[-1], title)
         self.assertNotIn(prompt, script)

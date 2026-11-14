@@ -365,7 +365,9 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
     if session_id and not resume_available(session_id):
         result.update(status="error", warnings=["Codex-owned Work session is unavailable; choose a new Work session explicitly."])
         return result
-    argv = [executable, *(["resume"] if session_id else []), "--cd", result["cwd"]]
+    # A shared app server retains its original environment, including another
+    # launch's correlation ID/data root. Hooks must run in this launch's process.
+    argv = [executable, *(["resume"] if session_id else []), "--no-daemon", "--cd", result["cwd"]]
     if session_id or prompt is not None:
         argv.append("--")
     if session_id:

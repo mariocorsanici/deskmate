@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** synthetic and native Codex/Claude groups recorded; C14-CLAUDE-01 repaired; selected launch environment repaired in 31f3cc6 with 277 full tests and 118 compatibility checks, then verified natively on Claude without a wrapper. Cross-Provider acceptance and remaining platform observations pending.
+**Implementation:** Provider acceptance completed on 2026-11-14: both native defaults, both real switch directions, source/history-unavailable recovery, correct native launch ownership and same-ID resume. C14-CODEX-03 repaired with dedicated Codex processes; 279/279 full tests and 70/70 compatibility checks. Calendar import/launchd remain separate platform follow-ups, not claimed as verified.
 **Owner:** `/root`, started 2026-11-10 from `b10d282`.
 
 - [x] Every skill, hook, reminder and documented command uses the provider-neutral interface.
@@ -15,7 +15,7 @@
 - [x] Documentation explains setup, native skill syntax, Default provider behavior, resume and Provider switch behavior.
 - [x] Automated tests cover the complete Daily loop with Claude only, Codex only and both Providers installed.
 - [x] A manual acceptance run uses dedicated non-sensitive Claude and Codex Work sessions.
-- [ ] Manual acceptance verifies skill discovery, hook logging, same-Provider resume and a real Provider switch in both directions.
+- [x] Manual acceptance verifies skill discovery, hook logging, same-Provider resume and a real Provider switch in both directions.
 - [x] Temporary tracker decisions are either promoted to durable documentation or identified for removal before merge.
 
 ## Comments
@@ -42,3 +42,6 @@ Authenticated native follow-up after repair: Deskmate submitted a real iTerm lau
 C14-ENV-01 automated verification: 277/277 preparation tests, 118/118 relevant system-Python tests, independent review approved and three actual AppleScript programs compiled outside the sandbox. Original-worktree full suite passed 277/277 in 124.183s before local repair commit. Native Claude proof without wrapper is recorded separately; cross-Provider requests remain held.
 
 C14-ENV-01 native acceptance completed: actual Deskmate/iTerm Claude resume used /usr/bin/osascript with no wrapper or in-tab exports. Process/native command confirmed selected HOME/PATH/ZDOTDIR/native roots and absent CLAUDE_CONFIG_DIR; Check exit 0 after the user approved the ordinary manual prompt. Start/end hooks and confirmed/ended journal match the original ID/cwd; owner/body preserved, revision 3->4 expected. CLI process exited; its numeric exit code was not observable. Temporary auth link removed, implementation hashes unchanged. Native evidence: `docs/testing/c14-launch-environment-native-2026-11-13.md`. Codex transport is automated coverage only in this repair; cross-Provider native requests remain held.
+
+
+2026-11-14: Owner requested autonomous C14 execution. Reused the isolated 0182bd8 fixture after checking all 53 implementation/test files against the feature worktree. Native Codex exposed C14-CODEX-03: a reused daemon retained an old DESKMATE_LAUNCH_ID and confirmed the wrong pending journal attempt. Two public regressions observed RED; new/resume now use --no-daemon, preserving ordinary trust/sandbox/storage. Both native defaults, healthy switches in both directions, zero-message unavailable-source recovery and exact-attempt same-ID Codex resume passed after repair. Normal native approvals were left to the owner. Full preparation suite 279/279, system-Python 70/70 and independent review passed; destination verification is recorded in the native report. C15/C16 were not implemented. Calendar was separated from the Codex acceptance scope after the owner's clarification; no import claimed. No push or merge. Retain this tracker until integration.

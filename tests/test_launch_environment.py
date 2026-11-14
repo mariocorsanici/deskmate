@@ -136,6 +136,27 @@ class LaunchEnvironmentTest(unittest.TestCase):
     def test_codex_resume_keeps_selected_native_storage(self):
         self.check_launch('codex', resume=True)
 
+    def check_codex_with_stale_daemon(self, resume=False):
+        """A shared server keeps its startup environment across CLI launches."""
+        executable = self.bin / 'codex'
+        source = executable.read_text()
+        stale_data = self.profile / 'stale-daemon-data'
+        stale = {'HOME': str(self.profile), 'DESKMATE_DATA_DIR': str(stale_data),
+                 'DESKMATE_LAUNCH_ID': 'd' * 32, 'CODEX_HOME': str(self.profile / '.codex')}
+        boundary = "payload={'hook_event_name':'SessionStart'"
+        self.assertIn(boundary, source)
+        source = source.replace(boundary,
+            "if '--no-daemon' not in sys.argv:\n    os.environ.update(" + repr(stale) + ")\n" + boundary)
+        executable.write_text(source)
+        self.check_launch('codex', resume=resume)
+        self.assertFalse(stale_data.exists(), 'Hooks wrote into the shared daemon data root')
+
+    def test_new_codex_keeps_its_own_environment_when_a_stale_daemon_exists(self):
+        self.check_codex_with_stale_daemon()
+
+    def test_codex_resume_keeps_its_own_environment_when_a_stale_daemon_exists(self):
+        self.check_codex_with_stale_daemon(resume=True)
+
     def test_default_storage_and_unset_claude_config_override_profile_values(self):
         self.env.pop('CODEX_HOME')
         self.check_launch('claude')
