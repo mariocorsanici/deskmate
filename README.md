@@ -2,6 +2,8 @@
 
 Claude Code skills to run your working day: open it in the morning, close it in the late afternoon, and every other day take stock of how you work. Claude acts as the colleague at the next desk who keeps track of where everything stands.
 
+The [development plan and tracker](docs/superpowers/plans/2026-11-09-development-tracker.md) records completed work, remaining tickets, priorities and the integration order for the Codex CLI, Daily loop and Agenda branches.
+
 ## A typical day
 
 | When | Skill | What it does |
