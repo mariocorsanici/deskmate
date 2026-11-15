@@ -208,6 +208,7 @@ def start_session(plan: dict, *, title: str | None = None, prompt: str | None = 
         save_journal(card, journal)
     native = implementation(plan['provider']).launch(plan['cwd'], session_id=plan['session_id'],
                                                      title=title, prompt=prompt, launch_id=launch_id)
+    result.update({key: native[key] for key in ('tty', 'pid', 'terminal_session_id') if key in native})
     with cards.locked(card):
         journal = read_journal(card)
         attempt = next(a for a in journal['attempts'] if a['launch_id'] == launch_id)
@@ -252,7 +253,8 @@ def render(result):
                 'Choose an explicit new Work session with --new --provider ' +
                 '|'.join(result.get('choices', [])) + '.\n')
     if result['status'] in ('error', 'invalid', 'conflict'):
-        return 'Work session error: ' + str(result.get('reason')) + '\n'
+        return ('Work session error: ' + str(result.get('reason')) + '\n' +
+                ''.join(f'warning: {warning}\n' for warning in result.get('warnings', [])))
     return (f"{result['mode']} Work session with {provider}: {result['cwd']} ({result['status']})\n" +
             ''.join(f'warning: {warning}\n' for warning in result.get('warnings', [])))
 

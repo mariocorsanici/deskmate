@@ -78,8 +78,13 @@ bin/deskmate work-session --folder /path/to/project --new --provider codex
 `--title` and `--prompt` supply optional terminal and initial-message text.
 This starts a new native Work session. To carry existing progress to another Provider, use the explicit switch preview below.
 
-Opening an iTerm tab submits a command; it does not prove that the native CLI
-started. A new session therefore remains `pending` until a matching native
+New and resumed terminal launches carry arguments, including long multiline
+prompts, in a private temporary payload (directory 0700, file 0600), removed
+before starting the native process. Deskmate waits up to about ten seconds for
+the selected Provider process on the returned iTerm tty. Failure reports the tty
+and tab identity and leaves an early failed start available for inspection.
+Process startup and native session ownership are separate: a new session
+remains `pending` until a matching native
 SessionStart or first UserPromptSubmit hook reports its actual ID. Review/trust
 Deskmate hooks normally, and rerun `integration --provider claude` or
 `integration --provider codex` when installing the lifecycle hooks. Personal
@@ -180,14 +185,16 @@ Missing/unreadable history returns exit 0 with `status: degraded` and partial or
 unavailable coverage so the Daily loop can continue. Invalid limits/configuration
 return exit 2. This command performs local extraction only; `switch` applies redaction, preview and consent before cross-Provider transfer.
 
-Some SQLite runtimes cannot read a closed Codex WAL database after its `-wal`
-and `-shm` files have disappeared. This can affect session metadata as well as
-paginated history. Deskmate reports unavailable coverage and continues from the
-Project card and Checks; it does not repair or rewrite native storage. Reopening
-the relevant Codex runtime normally may make the history readable again while
-its SQLite sidecars exist. A failed read does not establish that history was
-deleted. See the [cold-WAL investigation](docs/testing/c14-codex-sqlite-2026-11-13.md)
-for the verified runtime, recovery limits and evidence.
+Closed Codex SQLite metadata and history are read through a private disposable
+snapshot when native WAL/SHM/journal files are absent. This avoids SQLite runtime
+differences that can fail or initialize sidecars even with `mode=ro`. Snapshot
+creation and consumption require stable native file and directory metadata;
+racing writers cause explicit degradation. Live databases retain ordinary
+SQLite WAL coordination so committed messages remain visible. Only the private
+copy is opened immutable, and it is removed after reading. Unsupported schemas,
+corruption and unavailable or unstable storage still report partial/unavailable
+coverage so work can continue from the Project card and Checks. See the
+[cold-history verification](docs/testing/premerge-cold-history-2026-11-15.md).
 
 ## Experiments
 
@@ -303,7 +310,7 @@ non-interactive configuration requires an explicit choice, for example
 - `name`: how the skills address you. `language`: for replies, the handoff, the lessons and the reminders (reminder texts exist in `en` and `it`, other languages fall back to English).
 - `providers.installed`: compatible Providers found during configuration. `providers.default`: the Provider used when a Project card has no Work session to resume. Reminders show only the configured Providers: `/skill` for Claude Code, `$skill` for Codex CLI, with the Default provider first when both are installed. Desktop responses record that displayed Default provider without a native Work session identity.
 - `channels`:
-  - `mac`: an alert on the Mac that records your answer (used by `/how-did-it-go`). If the Mac is asleep at reminder time, the alert shows up on wake while it still makes sense (morning: up to 3 hours later; evening: from 1 hour before to 4 hours after); if the Mac is off, it is skipped.
+  - `mac`: an alert on the Mac that records your answer (used by `/how-did-it-go`). Morning runs at its scheduled time and when the LaunchAgent loads at login, including after power-off. It appears once per local working date, from 5 minutes before to 3 hours after the configured time, with concurrent attempts deduplicated while the alert is open. Evening retains its wake window from 1 hour before to 4 hours after its time; a missed evening while powered off is skipped.
   - `calendar` (not tested with a real calendar yet, see [ROADMAP.md](ROADMAP.md)): `install.sh` writes `data/deskmate-reminders.ics` with two recurring events and a notification. Open it once to import it into Apple Calendar, Google Calendar or Outlook; it reaches your phone and works with the Mac off, but records nothing. Import it again after changing times, days, language or Providers.
   - `slack`: planned, see [ROADMAP.md](ROADMAP.md).
 
@@ -330,6 +337,8 @@ bin/deskmate             stable command used by skills and automation
 tools/                   internal implementations behind bin/deskmate
   adapter_claude.py       Claude native storage, hooks and launch
   adapter_codex.py        Codex native storage, hooks and launch
+  terminal_launch.py     private arguments and verified iTerm process startup
+  codex_storage.py       read-only live WAL and stable private cold snapshots
   work_sessions.py       routing and confirmed native ownership
   project_cards.py       shared cards, revisions and migration
   session_delta.py       bounded reads with coverage and omission counts

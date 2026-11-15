@@ -1,6 +1,6 @@
 # Provider-neutral Deskmate for Claude Code and Codex CLI
 
-Durable contract promoted from the feature specification during C14. Implementation evidence and pending native acceptance live in [Daily-loop verification](testing/daily-loop.md).
+Durable contract promoted from the feature specification during C14. Implementation and native acceptance evidence live in [Daily-loop verification](testing/daily-loop.md).
 
 ## Problem Statement
 
@@ -105,6 +105,7 @@ Before a Session delta crosses the Provider boundary, Deskmate applies local sec
 - A project key combines a readable directory slug with a hash of the canonical project path.
 - Project cards remain Markdown with a restricted, validated metadata header containing schema version, revision and session ownership fields.
 - Native launches pin the selected executable and HOME/PATH/ZDOTDIR/config/data roots through an explicit iTerm command. zsh startup is retained under the selected shell configuration, then these selected values are reapplied. Optional Claude config absence is preserved; unrelated caller environment is not serialized. Native hooks still confirm process/session ownership; terminal submission alone is not startup proof.
+- New/resumed launches consume private temporary argv payloads before starting the native CLI and verify the selected Provider process on the returned tty within a bounded wait. Process liveness does not substitute for native hook ownership confirmation.
 - Claude session discovery and routing remain metadata-only. Native indexes are authoritative; indexless runtimes can use recorded native lifecycle identity plus a unique existing transcript. Conflicting canonical folders, missing identity evidence or ambiguous native files do not authorize resume. Unindexed activity uses hook times and native file modification time; file time is an approximate freshness signal, not transcript-derived activity.
 - Card writes use a lock and atomic replacement. Revision checks detect stale writers, which reread rather than silently overwrite.
 - Flexible shell Checks remain for this release under the current read-only convention, Provider sandbox and timeout. Structured check types and an allowlist are future hardening.
@@ -114,17 +115,18 @@ Before a Session delta crosses the Provider boundary, Deskmate applies local sec
 - The default Session delta limit is 12 messages and 6,000 characters. Limits are configurable and can be overridden for one command without mutating configuration.
 - A Session delta contains only messages after the latest Checkpoint, excludes metadata and raw tool outputs, retains useful early context plus the most recent context, and reports truncation, coverage and included or omitted counts.
 - Transcript extraction is best-effort. Failure produces a degraded switch from the Project card and Checks, and never blocks the rest of the Daily loop.
-- Native SQLite reads retain `mode=ro` and normal WAL coordination. On affected
-  runtimes, closed WAL databases without sidecars may be unavailable; expose
-  unavailable metadata/history rather than modifying native storage or using
-  `immutable=1`, which can miss committed live WAL records. Recovery is a
-  user-controlled normal native-runtime reopening, not a Deskmate database repair.
-  See [C14-CODEX-02 evidence](testing/c14-codex-sqlite-2026-11-13.md).
+- Existing native SQLite WAL+SHM pairs retain `mode=ro` and normal coordination.
+  Sidecar-free files use stable private snapshots, validated before and after
+  consumption; `immutable=1` is restricted to those private copies. Incomplete
+  sidecars, corruption, unknown schemas and writer races produce explicit
+  degradation. No native writable repair or persistent conversation cache is
+  used. See [cold-history verification](testing/premerge-cold-history-2026-11-15.md).
 - Retrospective analysis is progressive: inspect structured durable data first, list all candidate Work sessions, recommend at most five with reasons, let the user change the selection, then read bounded deltas and deepen one session at a time only when needed.
 - Logs gain a Provider column. Historical rows migrate as Claude, and Work session identity is the tuple of Provider plus native session ID.
 - Provider-specific raw analytics remain separate. Future normalized combined and comparative views may be added without rewriting raw history.
 - Hooks are merged into existing Provider configuration idempotently. Codex installation includes guidance for required approval or trust and an end-to-end logging check.
 - Reminders show every installed Provider's invocation syntax and list the Default provider first.
+- Morning reminders run at schedule and LaunchAgent load, once per local working date within the configured window. The claim is made at display attempt before waiting for an answer. Changed owned agents reload transactionally on setup; evening scheduling is preserved.
 - Configuration, Project cards and logs carry recognizable schema versions. Migrations create backups and replace files atomically. An unsupported future schema stops before any mutation.
 - Cross-provider transfer applies deterministic local redaction before the preview. The preview shows source and target Providers, Project card identity, size, coverage, omissions, and redaction categories and counts.
 - A possible secret that cannot be safely redacted blocks transfer for user review. No first-release non-interactive flag bypasses preview and consent.

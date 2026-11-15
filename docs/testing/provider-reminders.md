@@ -1,5 +1,10 @@
 # Provider-aware reminder verification
 
+Current follow-up: [C16 morning recovery](premerge-morning-2026-11-15.md) adds
+working-day RunAtLoad and once-per-date claiming and records actual native
+display, concurrent suppression and same-day LaunchAgent reload. The C12
+results below describe their original date.
+
 C12, verified 2026-11-09 on `feature/codex-cli-support`, starting from `8e34b5a`.
 
 ## Behavior

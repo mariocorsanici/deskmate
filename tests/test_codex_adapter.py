@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from tests.terminal_fixtures import ps_stub, TTY_REPLY
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -367,8 +368,11 @@ class CodexAdapterTest(unittest.TestCase):
         osascript.write_text("#!" + sys.executable + "\n"
             "import json,os,pathlib,subprocess,sys\n"
             "pathlib.Path(os.environ['HOME'],'iterm-input.json').write_text(json.dumps([sys.argv[1:],sys.stdin.read()]))\n"
-            "subprocess.run(['/bin/sh','-c',sys.argv[2]],check=True)\n")
+            "subprocess.run(['/bin/sh','-c',sys.argv[2]],check=True)\n" + TTY_REPLY)
         osascript.chmod(0o755)
+        processes = pathlib.Path(executable).with_name('ps')
+        processes.write_text('#!' + sys.executable + '\n' + ps_stub(processes.parent))
+        processes.chmod(0o755)
         folder = self.home / "project 'quoted'"
         folder.mkdir()
         prompt = "Do $checkpoint; $(touch unwanted)"

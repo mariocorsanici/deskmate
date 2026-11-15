@@ -17,6 +17,7 @@ import sqlite3
 import subprocess
 import tempfile
 import provider_environment
+import terminal_launch
 import codex_storage
 
 
@@ -374,41 +375,19 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
         argv.append(prompt)
     result["argv"] = argv
     try:
-        command = provider_environment.launch_command(argv, result['cwd'], ROOT, launch_id)
+        provider_environment.launch_command(argv, result['cwd'], ROOT, launch_id)
     except (OSError, ValueError) as error:
         result.update(status='error', warnings=[str(error)])
         return result
     if dry_run:
         return result
-    script = '''on run argv
-    set launchCommand to item 1 of argv
-    set tabTitle to item 2 of argv
-    tell application "iTerm"
-        if (count of windows) is 0 then
-            set w to (create window with default profile command launchCommand)
-            tell current session of w to set name to tabTitle
-        else
-        tell current window
-            create tab with default profile command launchCommand
-            tell current session
-                set name to tabTitle
-            end tell
-        end tell
-        end if
-        activate
-    end tell
-end run
-'''
     try:
-        completed = subprocess.run(["osascript", "-", command, title or pathlib.Path(result["cwd"]).name],
-                                   input=script, capture_output=True, text=True, timeout=10, check=False)
-        if completed.returncode:
-            result.update(status="error", submission_uncertain=True, warnings=["iTerm launch failed; check iTerm installation and terminal Automation permission."])
-        else:
-            result["status"] = "launched"
-    except (OSError, subprocess.TimeoutExpired) as error:
-        result.update(status="error", submission_uncertain=isinstance(error, subprocess.TimeoutExpired),
-                      warnings=["iTerm launch could not be verified; check the terminal before retrying."])
+        result.update(terminal_launch.start(argv, 'codex', result['cwd'], ROOT,
+                                            title or pathlib.Path(result['cwd']).name, launch_id))
+        result['status'] = 'launched'
+    except terminal_launch.LaunchError as error:
+        result.update(error.details)
+        result.update(status='error', submission_uncertain=error.uncertain, warnings=[str(error)])
     return result
 
 

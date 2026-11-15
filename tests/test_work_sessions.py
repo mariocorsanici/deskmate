@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from tests.terminal_fixtures import ps_stub, terminal_stub, TTY_REPLY
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -30,8 +31,8 @@ class WorkSessionsTest(unittest.TestCase):
         self.env.pop('DESKMATE_DRY_RUN', None)
         for provider in ('claude', 'codex'):
             self.executable(provider, "import sys\nprint('" + provider + " 1.0.0')\n")
-        self.executable('osascript', 'import sys\nsys.exit(0)\n')
-        self.executable('ps', 'import sys\nsys.exit(0)\n')
+        self.executable('osascript', terminal_stub())
+        self.executable('ps', ps_stub(self.binaries))
         self.configure()
 
     def executable(self, name, text):
@@ -136,7 +137,7 @@ class WorkSessionsTest(unittest.TestCase):
         self.executable('osascript',
                         "import subprocess,sys\n"
                         "result=subprocess.run(['/bin/zsh','-c',sys.argv[2]],capture_output=True,text=True)\n"
-                        "sys.stderr.write(result.stderr)\n"
+                        "sys.stderr.write(result.stderr)\n" + TTY_REPLY +
                         "sys.exit(" + ('7' if fail_after else 'result.returncode') + ")\n")
 
     def test_recorded_provider_overrides_default(self):

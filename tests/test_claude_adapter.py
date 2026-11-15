@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from tests.terminal_fixtures import ps_stub, TTY_REPLY
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -173,8 +174,11 @@ class ClaudeAdapterTest(unittest.TestCase):
         fake = binaries / 'osascript'
         fake.write_text(f'#!{sys.executable}\nimport json,pathlib,subprocess,sys\n'
                         f'pathlib.Path({str(output)!r}).write_text(json.dumps(sys.argv[1:]))\n'
-                        "sys.stdin.read()\nsubprocess.run(['/bin/sh','-c',sys.argv[2]],check=True)\n")
+                        "sys.stdin.read()\nsubprocess.run(['/bin/sh','-c',sys.argv[2]],check=True)\n" + TTY_REPLY)
         fake.chmod(0o755)
+        processes = binaries / 'ps'
+        processes.write_text('#!' + sys.executable + '\n' + ps_stub(binaries))
+        processes.chmod(0o755)
         self.env['PATH'] = str(binaries)
         prompt = 'a; touch CANARY $(touch CANARY)'
         plan = self.record('provider-launch', '--provider', 'claude', '--folder', str(self.home),

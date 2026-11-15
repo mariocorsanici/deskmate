@@ -1,5 +1,12 @@
 # Provider-neutral Daily-loop verification
 
+**All owner-required pre-merge reliability checks passed on 2026-11-15.**
+[Current reliability verification](premerge-reliability-2026-11-15.md) covers C15
+actual process startup, C16 real LaunchAgent load/deduplication, complete cold
+Codex conversation reads, and normal new/resume exits for both Providers with
+fresh SessionEnd and ended journals. The final combined suite passes 308/308;
+131/131 selected checks pass on system Python. Calendar remains separate.
+
 **C14 Provider integration acceptance passed on 2026-11-14.** The
 [cross-Provider native report](c14-cross-provider-2026-11-14.md) completes both
 Default provider variants, both real switch directions, source/history-unavailable
@@ -9,12 +16,13 @@ native confirmation. The final suite passes 279/279, with 70/70 system-Python
 compatibility checks and an independent review without findings.
 
 Earlier Codex timestamp and Claude indexless-resume/environment corrections
-remain documented below. Cold read-only SQLite access remains a
-[bounded runtime limitation](c14-codex-sqlite-2026-11-13.md), with explicit
-unavailable coverage and card-plus-Checks continuation verified natively.
-Native macOS reminder display/responses were exercised with a documented bounded
-alert timeout. Calendar application import and launchd scheduling are separate
-platform follow-ups; no calendar import is claimed. No push or merge was made.
+remain documented below. The earlier
+[cold SQLite limitation](c14-codex-sqlite-2026-11-13.md) is superseded by stable
+private snapshots and actual post-exit conversation verification. Native macOS
+reminder display/responses and RunAtLoad/deduplication were exercised with a
+bounded alert timeout. Reboot/fresh-login and future scheduled triggers were not
+performed. Calendar application import remains unverified and outside this task.
+No push or merge was made.
 
 ## Final entry points and migration
 
@@ -110,12 +118,13 @@ quota hold for these tests. Personal integration state was not reinstalled.
 | Codex → Claude | Same guarantees in reverse; no cross-Provider resume claim | Passed; post-Checkpoint marker recovered, live Check passed, new native identity confirmed |
 | Source/history unavailable | Continue from card and Checks with explicit missing-context disclosure | Passed natively: unavailable Claude runtime/history, zero-message transfer, explicit unavailable coverage and successful Codex Check |
 | Complete Daily loop | Actual morning → Checkpoint → selected retrospective → evening Handoff under each Provider | Both executed; original Claude run used a direct native-resume workaround |
-| macOS/calendar channels | Native notifications/responses and real calendar import behavior, recorded separately from model tests | Native reminder scripts/display/responses passed with bounded timeout. Calendar import and launchd remain separate unverified follow-ups |
+| macOS reminders | Native display/responses, load trigger and concurrent/same-day suppression | Passed: real RunAtLoad, bounded native alert, concurrent invocation and same-day reload; no reboot or future scheduled trigger performed |
+| Calendar application | Import and delivery, separately from model tests | Outside this task; remains unverified |
 
 Record date, native versions, Provider/session identities, actual commands,
 observed rows/card revisions and degraded outcomes without private conversation
 content. The fixture matrix does not substitute for native evidence. The calendar and
-launchd follow-ups are not represented as Provider acceptance results.
+future scheduling checks are not represented as Provider acceptance results.
 
 ## Temporary tracker disposition before merge
 
@@ -140,7 +149,8 @@ for removal, not an active post-merge documentation dependency.
 | C11 | `docs/testing/progressive-retrospective.md` |
 | C12 | `docs/testing/provider-reminders.md` |
 | C13 | `docs/testing/installation.md` |
-| C14 | This document, including native evidence still to be recorded |
+| C14 | This document and completed native Provider reports |
+| C15–C16 and pre-merge reliability | [Current reliability verification](premerge-reliability-2026-11-15.md), focused storage and morning reports |
 
 Ticket-level stop directives are historical execution boundaries, not changes to
 the final architecture. The C12 decision to attribute desktop responses to the
@@ -150,7 +160,7 @@ files until resolved; acceptance is governed by the current native matrix, rathe
 counts on earlier tickets.
 
 
-## Independent whole-feature review and fix pass
+## Independent whole-feature review and fix pass — historical
 
 One fresh-context reviewer inspected C14 against the whole Provider-neutral
 feature, including ownership/cancellation, bounded reading, consent/redaction,

@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-**Implementation:** Provider acceptance completed on 2026-11-14: both native defaults, both real switch directions, source/history-unavailable recovery, correct native launch ownership and same-ID resume. C14-CODEX-03 repaired with dedicated Codex processes; 279/279 full tests and 70/70 compatibility checks. Calendar import/launchd remain separate platform follow-ups, not claimed as verified.
+**Implementation:** Provider acceptance completed on 2026-11-14. Owner-required pre-merge follow-ups completed on 2026-11-15: C15 verified startup, C16 actual LaunchAgent load/deduplication, complete cold Codex history and normal new/resume exits for both Providers. Final candidate 308/308; system Python 131/131. See `docs/testing/premerge-reliability-2026-11-15.md`. Calendar remains separate and unverified; no reboot/future scheduled trigger is claimed.
 **Owner:** `/root`, started 2026-11-10 from `b10d282`.
 
 - [x] Every skill, hook, reminder and documented command uses the provider-neutral interface.
@@ -45,3 +45,13 @@ C14-ENV-01 native acceptance completed: actual Deskmate/iTerm Claude resume used
 
 
 2026-11-14: Owner requested autonomous C14 execution. Reused the isolated 0182bd8 fixture after checking all 53 implementation/test files against the feature worktree. Native Codex exposed C14-CODEX-03: a reused daemon retained an old DESKMATE_LAUNCH_ID and confirmed the wrong pending journal attempt. Two public regressions observed RED; new/resume now use --no-daemon, preserving ordinary trust/sandbox/storage. Both native defaults, healthy switches in both directions, zero-message unavailable-source recovery and exact-attempt same-ID Codex resume passed after repair. Normal native approvals were left to the owner. Full preparation suite 279/279, system-Python 70/70 and independent review passed; destination verification is recorded in the native report. C15/C16 were not implemented. Calendar was separated from the Codex acceptance scope after the owner's clarification; no import claimed. No push or merge. Retain this tracker until integration.
+
+2026-11-15: owner required the remaining reliability gaps resolved before merge.
+C15/C16 and the cold-history reader are implemented and reviewed. Actual new and
+resume sessions for both Providers exited normally with fresh native SessionEnd,
+ended journals and absent processes. Post-exit Codex history returned all expected
+messages/full coverage without native data or file-set changes. A real isolated
+RunAtLoad agent displayed once across concurrent calls and same-day reload, then
+was removed. Candidate full suite 308/308; selected system-Python suite 131/131.
+Current evidence: `docs/testing/premerge-reliability-2026-11-15.md`.
+No personal integration install, calendar work, push or merge.

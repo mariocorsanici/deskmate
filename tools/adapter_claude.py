@@ -14,6 +14,7 @@ import copy
 import csv
 import fcntl
 import provider_environment
+import terminal_launch
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -296,7 +297,7 @@ def launch(folder: str, session_id: str | None = None, prompt: str | None = None
             raise ValueError('Terminal title must not contain control characters.')
         if any('\0' in argument for argument in argv):
             raise ValueError('Launch arguments must not contain NUL.')
-        command = provider_environment.launch_command(
+        provider_environment.launch_command(
             argv, folder, ROOT, launch_id, {'CLAUDE_CODE_DISABLE_TERMINAL_TITLE': '1'})
         if dry_run or os.environ.get('DESKMATE_DRY_RUN'):
             return result
@@ -340,24 +341,15 @@ end run
                 result['warnings'].append('Existing Work session tab brought to front.')
                 return result
         terminal_submission = True
-        subprocess.run(['osascript', '-', command, title], input='''on run argv
-tell application "iTerm"
-activate
-if (count of windows) = 0 then
-set w to (create window with default profile command (item 1 of argv))
-tell current session of w to set name to (item 2 of argv)
-else
-tell current window
-set t to (create tab with default profile command (item 1 of argv))
-tell current session of t to set name to (item 2 of argv)
-end tell
-end if
-end tell
-end run
-''', capture_output=True, text=True, timeout=10, check=True)
+        result.update(terminal_launch.start(argv, 'claude', folder, ROOT, title, launch_id,
+                                            {'CLAUDE_CODE_DISABLE_TERMINAL_TITLE': '1'}))
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         result['status'] = 'error'
-        result['submission_uncertain'] = terminal_submission and isinstance(error, subprocess.SubprocessError)
+        if isinstance(error, terminal_launch.LaunchError):
+            result.update(error.details)
+            result['submission_uncertain'] = error.uncertain
+        else:
+            result['submission_uncertain'] = terminal_submission and isinstance(error, subprocess.SubprocessError)
         result['warnings'].append(f'Claude launch failed: {error}')
     return result
 

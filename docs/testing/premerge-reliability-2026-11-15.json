@@ -1,0 +1,437 @@
+{
+  "date": "2026-11-15",
+  "status": "passed",
+  "feature_branch": "feature/codex-cli-support",
+  "implementation_base": "8702d8c96b635ba562a646151d820827d365fc7b",
+  "destination_base": "d57e23d",
+  "versions": {
+    "claude": "2.1.325 (Claude Code)",
+    "codex": "codex-cli 0.168.0"
+  },
+  "automated": {
+    "candidate_python_314": {
+      "passed": 308,
+      "seconds": 194.908,
+      "log": "combined-final-proactive.log",
+      "resource_warnings": "errors",
+      "bytecode_writes": false
+    },
+    "selected_python_39": {
+      "passed": 131,
+      "seconds": 175.71,
+      "log": "system-final-proactive.log",
+      "resource_warnings": "errors",
+      "bytecode_writes": false
+    },
+    "destination_python_314": {
+      "passed": 308,
+      "seconds": 190.456,
+      "log": "destination-final.log",
+      "resource_warnings": "errors",
+      "bytecode_writes": false
+    },
+    "isolated_c16_checkpoint": {
+      "passed": 53,
+      "seconds": 30.346,
+      "log": "checkpoint-c16.log",
+      "resource_warnings": "errors",
+      "bytecode_writes": false
+    },
+    "isolated_cold_checkpoint": {
+      "passed": 35,
+      "seconds": 6.461,
+      "log": "checkpoint-cold.log",
+      "resource_warnings": "errors",
+      "bytecode_writes": false
+    }
+  },
+  "native_cases": {
+    "claude-new": {
+      "provider": "claude",
+      "mode": "new",
+      "native_id": "4a3e277a-5b13-42ce-ae39-49c39e22562f",
+      "marker": "PREMERGE-CLAUDE-be428e68c3",
+      "started_at": "2026-11-15T10:50:20.659983+00:00",
+      "ended_at": "2026-11-15T10:50:36.919328+00:00",
+      "answer": {
+        "role": "assistant",
+        "timestamp": "2026-11-15T10:50:31.487Z",
+        "text": "PREMERGE-CLAUDE-be428e68c3"
+      },
+      "passed": true,
+      "fresh_session_end": {
+        "date": "2026-11-15",
+        "time": "11:50",
+        "weekday": "sun",
+        "event": "session-end",
+        "detail": "",
+        "session": "4a3e277a-5b13-42ce-ae39-49c39e22562f",
+        "cwd": "/private/tmp/deskmate-c14-cross-20261113-em303n4n/project",
+        "turns": "",
+        "input_tokens": "",
+        "cache_tokens": "",
+        "output_tokens": "",
+        "schema_version": "1",
+        "provider": "claude"
+      },
+      "final_attempt": {
+        "created_at": "2026-11-15T10:50:20.765296+00:00",
+        "ended": true,
+        "expected_revision": 10,
+        "launch_id": "bac55637383e4b468170243a962e71df",
+        "mode": "new",
+        "native_session_id": "4a3e277a-5b13-42ce-ae39-49c39e22562f",
+        "provider": "claude",
+        "requested_session_id": null,
+        "state": "confirmed"
+      },
+      "process_absent": true,
+      "launch": {
+        "launch_id": "bac55637383e4b468170243a962e71df",
+        "tty": "/dev/ttys004",
+        "pid": 4540,
+        "terminal_session_id": "F517B1B6-B957-484A-86A0-7EAA10BE8300"
+      },
+      "normal_exit": "/exit"
+    },
+    "claude-resume": {
+      "provider": "claude",
+      "mode": "resume",
+      "native_id": "4a3e277a-5b13-42ce-ae39-49c39e22562f",
+      "marker": "PREMERGE-CLAUDE-be428e68c3",
+      "started_at": "2026-11-15T10:50:36.920041+00:00",
+      "ended_at": "2026-11-15T10:50:51.296122+00:00",
+      "answer": {
+        "role": "assistant",
+        "timestamp": "2026-11-15T10:50:46.587Z",
+        "text": "PREMERGE-CLAUDE-be428e68c3"
+      },
+      "passed": true,
+      "fresh_session_end": {
+        "date": "2026-11-15",
+        "time": "11:50",
+        "weekday": "sun",
+        "event": "session-end",
+        "detail": "",
+        "session": "4a3e277a-5b13-42ce-ae39-49c39e22562f",
+        "cwd": "/private/tmp/deskmate-c14-cross-20261113-em303n4n/project",
+        "turns": "",
+        "input_tokens": "",
+        "cache_tokens": "",
+        "output_tokens": "",
+        "schema_version": "1",
+        "provider": "claude"
+      },
+      "final_attempt": {
+        "created_at": "2026-11-15T10:50:37.018502+00:00",
+        "ended": true,
+        "expected_revision": 11,
+        "launch_id": "580ffde11d4645c5b29b00f3440aaa03",
+        "mode": "resume",
+        "native_session_id": "4a3e277a-5b13-42ce-ae39-49c39e22562f",
+        "provider": "claude",
+        "requested_session_id": "4a3e277a-5b13-42ce-ae39-49c39e22562f",
+        "state": "confirmed"
+      },
+      "process_absent": true,
+      "launch": {
+        "launch_id": "580ffde11d4645c5b29b00f3440aaa03",
+        "tty": "/dev/ttys005",
+        "pid": 4661,
+        "terminal_session_id": "C6BEE65A-2399-4928-A709-0F7093DA1AE6"
+      },
+      "normal_exit": "/exit"
+    },
+    "codex-new": {
+      "provider": "codex",
+      "mode": "new",
+      "native_id": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+      "marker": "PREMERGE-CODEX-16119615e9",
+      "started_at": "2026-11-15T10:50:51.296570+00:00",
+      "ended_at": "2026-11-15T16:40:18.735464+00:00",
+      "answer": {
+        "role": "assistant",
+        "timestamp": "2026-11-15T12:09:25.570000+00:00",
+        "text": "PREMERGE-CODEX-16119615e9"
+      },
+      "passed": true,
+      "fresh_session_end": {
+        "date": "2026-11-15",
+        "time": "17:34",
+        "weekday": "sun",
+        "event": "session-end",
+        "detail": "",
+        "session": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+        "cwd": "/private/tmp/deskmate-c14-cross-20261113-em303n4n/project",
+        "turns": "",
+        "input_tokens": "",
+        "cache_tokens": "",
+        "output_tokens": "",
+        "schema_version": "1",
+        "provider": "codex"
+      },
+      "final_attempt": {
+        "created_at": "2026-11-15T10:50:51.375117+00:00",
+        "ended": true,
+        "expected_revision": 12,
+        "launch_id": "50b324aed67e4d6fac98cda42c396fb8",
+        "mode": "new",
+        "native_session_id": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+        "provider": "codex",
+        "requested_session_id": null,
+        "state": "confirmed"
+      },
+      "process_absent": true,
+      "launch": {
+        "launch_id": "50b324aed67e4d6fac98cda42c396fb8",
+        "tty": "/dev/ttys004",
+        "pid": 4744,
+        "terminal_session_id": "EE3923F6-3C73-4461-9503-EDFDF696B808"
+      },
+      "normal_exit": "/quit"
+    },
+    "codex-resume": {
+      "provider": "codex",
+      "mode": "resume",
+      "native_id": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+      "marker": "PREMERGE-CODEX-16119615e9",
+      "started_at": "2026-11-15T16:49:26.012117+00:00",
+      "ended_at": "2026-11-15T16:49:39.908108+00:00",
+      "answer": {
+        "role": "assistant",
+        "timestamp": "2026-11-15T16:49:34.142000+00:00",
+        "text": "PREMERGE-CODEX-16119615e9"
+      },
+      "passed": true,
+      "fresh_session_end": {
+        "date": "2026-11-15",
+        "time": "17:49",
+        "weekday": "sun",
+        "event": "session-end",
+        "detail": "",
+        "session": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+        "cwd": "/private/tmp/deskmate-c14-cross-20261113-em303n4n/project",
+        "turns": "",
+        "input_tokens": "",
+        "cache_tokens": "",
+        "output_tokens": "",
+        "schema_version": "1",
+        "provider": "codex"
+      },
+      "final_attempt": {
+        "created_at": "2026-11-15T16:49:26.154023+00:00",
+        "ended": true,
+        "expected_revision": 13,
+        "launch_id": "a7f735a8b77b4d3e987febb17a766a24",
+        "mode": "resume",
+        "native_session_id": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+        "provider": "codex",
+        "requested_session_id": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+        "state": "confirmed"
+      },
+      "process_absent": true,
+      "launch": {
+        "launch_id": "a7f735a8b77b4d3e987febb17a766a24",
+        "tty": "/dev/ttys004",
+        "pid": 24669,
+        "terminal_session_id": "D73D833D-7025-4A11-A985-52292B02C6A9"
+      },
+      "normal_exit": "/quit"
+    }
+  },
+  "implementation_sha256": {
+    "tools/codex_storage.py": "5fe27a58f2fd0623542e67dc275cb32d7ef50df272fce9305c7b4dfeb1c2fb48",
+    "tools/terminal_launch.py": "b714f20c5743bbf0e1c5434e49d4acaf6755d474ba68a7e8907f1f95dfb1eadc",
+    "bin/deskmate": "b0019eb6391c868dfdf4f397535278acac35ccd2a4e368c46e67cdb8f9a72897",
+    "install.sh": "b0f1704d45dd2affc96d6bdf9212c6563ee18a56e67404714a21498d72b39a46",
+    "skills/call-it-a-day/SKILL.md": "b6524ae2c30ca308baf9ae8351cda2be31f8effdc273b42073442485b4fd052f",
+    "skills/call-it-a-day/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "skills/checkpoint/SKILL.md": "3af37ef3be7954f10c1b7bf4c422f8697b2d07a5bec029d512f7cfc05a46bed0",
+    "skills/checkpoint/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "skills/how-did-it-go/SKILL.md": "ad4075f05033fcc3c7726e298cab8117e8a5b2da03157b45afec2490de0d605b",
+    "skills/how-did-it-go/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "skills/setup/SKILL.md": "110bfe0b9712adfb18bfc8f8765d5a075d89d64d7842f84a35d03c1126fe5158",
+    "skills/setup/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "skills/study-later/SKILL.md": "81250644727d17edd9521aa2b0e56ee301d4fa09bebe87fe98ca19dcfc8a9d30",
+    "skills/study-later/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "skills/whats-on-today/SKILL.md": "1ff6de979dced69ff72bca524aa53561677ffc64c8b78600220b88342cb9b8b0",
+    "skills/whats-on-today/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "tools/activity_log.py": "1d5eccac3fe813023eb39a9e8e7d184b2ed6476d762a76a6503289692cbbe580",
+    "tools/adapter_claude.py": "08a609511bdeba63396fc5e95759714917dc92d78d5f5b5b981102a6d8adfbc6",
+    "tools/adapter_cli.py": "8d1bff72c72d6cbde96aa6a56d46469747fcc18c9bbfb9777cc9c4a35a9923c3",
+    "tools/adapter_codex.py": "e5dea434bdd0b496af4555267c7cc2c2a64867bf4c966879ed504b98d2b53740",
+    "tools/check.py": "364a32dad760e318245bf0525f1fbf38e6853af93eacea0c8dd0c76bd3d68fc9",
+    "tools/checkpoints.py": "ff17d282ea8fb74d1f2674a827b5cbbe58e953cc412c5281aab01930b1cc8734",
+    "tools/evening_reminder.sh": "ad2e1d4495c1e173c87e3e93b36d619504ee10b4817895d786d050c6765c3a17",
+    "tools/hook_event.py": "1170987d0a30bf069ecfd0a13f24a87cf68f96118422c4ce642930588fee91dc",
+    "tools/install_transaction.py": "914240b010b9cd6cc373339faa256ec731f6201818ccc5e6d068edad4abe8f37",
+    "tools/installation.py": "d31fef18fc659eaa76e8c29a7f70ba8cbbc5c701e33e1f44e952735b98bbed08",
+    "tools/metrics.py": "31d2d4b1cd2e1efb4f8362123e5c60126c0dfda33d2767ea761ce4ca5b666023",
+    "tools/morning_reminder.sh": "e37131e4e54c336f57f7ccb92040e63f07c8e38e9cb1b4c6b06dff7f9dabba79",
+    "tools/project_cards.py": "babb436daf3ff6d6af6cfec3c517b3485900ce40b81533678a556f5ed07f99d2",
+    "tools/provider_environment.py": "41bdd28e521d5124aa3acf1fbd1601f61f39c2521afe40fd4b3daa79e6a04ef5",
+    "tools/provider_switch.py": "b1757b6f2aa8d54b8b5f7a92f7aa1555a02422ec616e42998d4b389e1c5752a4",
+    "tools/providers.py": "4124f841b1b198ca6fb66458ab1e5cd109454ee302d28493e64978f4e67a9ea9",
+    "tools/reminders.py": "553baca640b05616db0c9b99ebffbfdcd11bb7441c0ee79a2dc327d1b98c2e44",
+    "tools/retrospective.py": "19b54ca7c5fb68957ff3db059e560cdb15e4af6787399605abf2010295811741",
+    "tools/session_delta.py": "1165c260f8da0fb03e4e2714b348e7d8cd419a9f59093f0fed4f67fa3dd4bc4d",
+    "tools/session_stats.py": "ee661d57b9303c6ea861254477bd697f12fe1ea0643e27cc52c346715de9afbe",
+    "tools/token_usage.py": "9a581874fa66618d727281729264cacc3015398773ddfeb5de1b8b4b9d022195",
+    "tools/transfers.py": "751ffaacc15b4a1201c0a53907e3d00ade6592de3fa7de57ac06a9fe1e6c03c0",
+    "tools/work_sessions.py": "15645ab0bca89dc2568f8b4937437c5cd49db5cf278efed047ecc22260f7f471"
+  },
+  "review": {
+    "initial_important_findings": 3,
+    "fixed_with_red_green": 3,
+    "cold_snapshot_followup": "independent review: no actionable findings"
+  },
+  "cleanup": {
+    "status": "passed",
+    "normal_exit_case_count": 4,
+    "native_test_pids_absent": true,
+    "fixture_process_arguments_absent": true,
+    "temporary_authentication_references_absent": true,
+    "removed_links": [
+      "codex-home/auth.json",
+      "home/Library/Keychains"
+    ],
+    "forced_process_termination_used": false
+  },
+  "push": false,
+  "merge": false,
+  "calendar_application_work": false,
+  "cold_history": {
+    "native_sha256": {
+      "state_5.sqlite": "eab242fb27aa2f53092764616fa13fe85aa0f2320295883b9490b1f1665ccead",
+      "thread_history_1.sqlite": "76d9093d073a532ea18d4858281dcc7a6df9dc0e6a32b502ac3aaafb7030d0cf",
+      "state_5.sqlite-wal": "022303cad488142ddaffc7d6f6951c9824a15d8a99b19f8d58278f37a1ed8e8f"
+    },
+    "native_data_bytes_and_file_set_unchanged": true,
+    "native_history_sidecars_absent": true,
+    "metadata_shm_read_marks_excluded_from_byte_comparison": true,
+    "native_id": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+    "timing": "After normal resume exit of the same native session created by codex-new",
+    "session_status": "ok",
+    "message_count": 4,
+    "delta": {
+      "schema_version": 1,
+      "provider": "codex",
+      "id": "01a1ded4-d8a3-7bd0-acd3-bcb8851fce6c",
+      "status": "ok",
+      "warnings": [],
+      "checkpoint": {
+        "timestamp": "2026-11-15T10:50:51.296570+00:00",
+        "source": "explicit",
+        "precision": "second"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "timestamp": "2026-11-15T12:09:21.491000+00:00",
+          "text": "Prova Deskmate pre-merge. Non eseguire comandi e non modificare file. Rispondi soltanto con questo marcatore: PREMERGE-CODEX-16119615e9"
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-11-15T12:09:25.570000+00:00",
+          "text": "PREMERGE-CODEX-16119615e9"
+        },
+        {
+          "role": "user",
+          "timestamp": "2026-11-15T16:49:32.170000+00:00",
+          "text": "Prova Deskmate pre-merge dopo resume. Restituisci soltanto il marcatore PREMERGE che ti ho chiesto nel messaggio precedente. Non eseguire comandi e non modificare file."
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-11-15T16:49:34.142000+00:00",
+          "text": "PREMERGE-CODEX-16119615e9"
+        }
+      ],
+      "limits": {
+        "max_messages": 12,
+        "max_characters": 6000
+      },
+      "included_messages": 4,
+      "omitted_messages": 0,
+      "characters": 353,
+      "omitted_characters": 0,
+      "truncated": false,
+      "coverage": {
+        "origin": "checkpoint",
+        "status": "full",
+        "counts": "readable conversation messages only; corrupt records are not counted"
+      }
+    },
+    "prior_failed_acceptance": [
+      "('No exact native ownership', {'created_at': '2026-11-15T10:50:51.375117+00:00', 'ended': False, 'expected_revision': 12, 'launch_id': '50b324aed67e4d6fac98cda42c396fb8', 'mode': 'new', 'native_session_id': None, 'provider': 'codex', 'requested_session_id': None, 'state': 'submitted'})",
+      "('Unexpected native exit composer', ['› Prova Deskmate pre-merge. Non eseguire comandi e non modificare file. Rispondi soltanto con questo marcatore: PREMERGE-CODEX-16119615e9', '› Ask Codex to do anything'])",
+      "['state_5.sqlite-wal', 'state_5.sqlite-shm']",
+      "Native SQLite data bytes/file set changed during cold read"
+    ]
+  },
+  "native_startup_calibration": {
+    "literal_prompt_characters": 2450,
+    "control_bytes_hex": "1504032f717569740d",
+    "shell_substitution_executed": false,
+    "failed_start_message": "No codex process appeared on /dev/ttys005 within 10 seconds. Inspect iTerm tab AB6FF7EA-2EFA-428A-9EC8-59B1A001C06F; do not retry until that tab is checked.",
+    "failed_start_metadata": {
+      "tty": "/dev/ttys005",
+      "terminal_session_id": "AB6FF7EA-2EFA-428A-9EC8-59B1A001C06F"
+    },
+    "failed_start_inspection_tab_retained": true
+  },
+  "morning": {
+    "status": "passed",
+    "label": "com.deskmate.premerge.nativec16wsnhg2zi.morning",
+    "started": "2026-11-15T17:50:14.265661+01:00",
+    "ended": "2026-11-15T17:50:20.859124+01:00",
+    "concurrent_elapsed_seconds": 0.19161770899999997,
+    "native_completion": "five_second_timeout",
+    "cleanup": {
+      "bootout_returncode": 0,
+      "service_absent": true
+    },
+    "source_unchanged": true,
+    "source_sha256_before": {
+      "tools/reminders.py": "553baca640b05616db0c9b99ebffbfdcd11bb7441c0ee79a2dc327d1b98c2e44",
+      "tools/morning_reminder.sh": "e37131e4e54c336f57f7ccb92040e63f07c8e38e9cb1b4c6b06dff7f9dabba79",
+      "bin/deskmate": "b0019eb6391c868dfdf4f397535278acac35ccd2a4e368c46e67cdb8f9a72897"
+    },
+    "source_sha256_after": {
+      "tools/reminders.py": "553baca640b05616db0c9b99ebffbfdcd11bb7441c0ee79a2dc327d1b98c2e44",
+      "tools/morning_reminder.sh": "e37131e4e54c336f57f7ccb92040e63f07c8e38e9cb1b4c6b06dff7f9dabba79",
+      "bin/deskmate": "b0019eb6391c868dfdf4f397535278acac35ccd2a4e368c46e67cdb8f9a72897"
+    },
+    "real_run_at_load": true,
+    "concurrent_returncodes": [
+      0,
+      0,
+      0
+    ],
+    "display_attempts": 1,
+    "same_day_reload_duplicate": false,
+    "activity_rows": [
+      {
+        "date": "2026-11-15",
+        "time": "17:50",
+        "weekday": "sun",
+        "event": "morning-reminder",
+        "detail": "ignored",
+        "session": "",
+        "cwd": "",
+        "turns": "",
+        "input_tokens": "",
+        "cache_tokens": "",
+        "output_tokens": "",
+        "schema_version": "1",
+        "provider": "codex"
+      }
+    ],
+    "limitations": [
+      "No reboot or fresh login",
+      "No future scheduled trigger",
+      "No personal agent installation",
+      "Fixture working day/time",
+      "Only alert title and five-second timeout adjusted"
+    ]
+  }
+}

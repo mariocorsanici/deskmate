@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from tests.terminal_fixtures import ps_stub, TTY_REPLY
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,7 +51,7 @@ class LaunchEnvironmentTest(unittest.TestCase):
             self.executable(self.bin / provider, body)
             self.executable(self.profile_bin / provider,
                             "from pathlib import Path\nPath(" + repr(str(self.profile / 'wrong-cli')) + ").touch()\n")
-        self.executable(self.bin / 'ps', 'import sys\nsys.exit(0)\n')
+        self.executable(self.bin / 'ps', ps_stub(self.bin))
         profile_env = {'HOME': str(self.profile), 'PATH': str(self.profile_bin),
                        'ZDOTDIR': str(self.profile),
                        'CODEX_HOME': str(self.profile / '.codex'),
@@ -63,7 +64,8 @@ class LaunchEnvironmentTest(unittest.TestCase):
                         "Path(" + repr(str(self.home / 'transport.json')) + ").write_text(json.dumps({'command':sys.argv[2],'script':script}))\n"
                         "env=dict(os.environ); env.update(" + repr(profile_env) + ")\n"
                         "r=subprocess.run(['/bin/sh','-c',sys.argv[2]],env=env,capture_output=True,text=True)\n"
-                        "sys.stderr.write(r.stderr); sys.exit(r.returncode)\n")
+                        "sys.stderr.write(r.stderr)\n" + TTY_REPLY +
+                        "sys.exit(r.returncode)\n")
 
     def executable(self, path, body):
         path.write_text('#!' + sys.executable + '\n' + body)
