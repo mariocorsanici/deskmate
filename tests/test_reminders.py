@@ -1,6 +1,5 @@
 """Reminder behavior through the CLI and scripts, with no native notifications."""
 import csv
-import datetime as dt
 import json
 import os
 from pathlib import Path
@@ -8,6 +7,7 @@ import plistlib
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +22,36 @@ class RemindersTest(unittest.TestCase):
         self.data.mkdir()
         self.executables = self.home / 'bin'
         self.executables.mkdir()
-        (self.executables / 'python3').symlink_to(sys.executable)
+        # Freeze only the clock in the reminder process. The public shell script
+        # and real reminder command run unchanged; no production test switch.
+        self.clock = self.home / 'clock'
+        self.clock.write_text('2026-11-16T09:10:00')  # Monday
+        python = self.executables / 'python3'
+        python.write_text('#!' + sys.executable + '\n' + f'''import csv, datetime as dt, os, pathlib, sys
+args = [arg for arg in sys.argv[1:] if arg not in ('-I', '-B')]
+if len(args) > 1 and args[1] == 'reminders':
+    frozen = dt.datetime.fromisoformat((pathlib.Path(os.environ['HOME']) / 'clock').read_text())
+    class Clock(dt.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return frozen if tz is None else frozen.astimezone(tz)
+    class Date(dt.date):
+        @classmethod
+        def today(cls):
+            return frozen.date()
+    dt.datetime, dt.date = Clock, Date
+    sys.path.insert(0, {str(ROOT / 'tools')!r})
+    import reminders
+    sys.argv = [str(pathlib.Path(args[0]).parent.parent / 'tools/reminders.py'), *args[2:]]
+    try:
+        reminders.main()
+    except (OSError, ValueError, csv.Error) as error:
+        print(error, file=sys.stderr)
+        sys.exit(2)
+else:
+    os.execv({sys.executable!r}, [{sys.executable!r}, *sys.argv[1:]])
+''')
+        python.chmod(0o755)
         # Always replace the desktop boundary, even in dry-run tests.
         self.executable('osascript', 'printf "%s" "$FAKE_ANSWER"')
         self.executable('sleep', 'exit 0')
@@ -40,8 +69,8 @@ class RemindersTest(unittest.TestCase):
     def configure(self, installed, default, language='en'):
         self.config = {'schema_version': 1, 'language': language,
                        'providers': {'installed': installed, 'default': default},
-                       'reminders': {'morning': dt.datetime.now().strftime('%H:%M'),
-                                     'evening': dt.datetime.now().strftime('%H:%M'),
+                       'reminders': {'morning': '09:00',
+                                     'evening': '09:00',
                                      'days': ['mon', 'fri'], 'channels': ['mac', 'calendar']}}
         self.save_config()
 
@@ -49,7 +78,8 @@ class RemindersTest(unittest.TestCase):
         (self.data / 'config.json').write_text(json.dumps(self.config))
 
     def cli(self, *args):
-        return subprocess.run([sys.executable, '-B', str(ROOT / 'bin/deskmate'),
+        python = str(self.executables / 'python3') if args[0] == 'window' else sys.executable
+        return subprocess.run([python, '-B', str(ROOT / 'bin/deskmate'),
                                'reminders', *args], env=self.env,
                               text=True, capture_output=True, timeout=10)
 
@@ -163,7 +193,8 @@ class RemindersTest(unittest.TestCase):
         self.assertFalse((self.data / 'log.csv').exists())
 
     def test_desktop_responses_use_configured_default_without_session_identity(self):
-        for provider in ('claude', 'codex'):
+        for provider, day in [('claude', '2026-11-16'), ('codex', '2026-11-20')]:
+            self.clock.write_text(day + 'T09:10:00')
             self.configure(['claude', 'codex'], provider)
             for kind in ('morning', 'evening'):
                 result = self.script(kind)
@@ -230,6 +261,72 @@ class RemindersTest(unittest.TestCase):
                          [{'Weekday': 1, 'Hour': hour, 'Minute': minute},
                           {'Weekday': 5, 'Hour': hour, 'Minute': minute}])
         self.assertEqual(plist['ProgramArguments'], [str(ROOT / 'tools/morning_reminder.sh')])
+
+    def test_login_trigger_is_morning_only(self):
+        morning = plistlib.loads(self.cli('plist', 'morning').stdout.encode())
+        evening = plistlib.loads(self.cli('plist', 'evening').stdout.encode())
+        self.assertIs(morning.get('RunAtLoad'), True)
+        self.assertNotIn('RunAtLoad', evening)
+
+    def test_morning_window_respects_working_days_and_inclusive_limits(self):
+        # Removing the working-day guard or shifting either boundary is a bug.
+        for now, wanted in [('2026-11-16T08:54:59', 1),
+                            ('2026-11-16T08:55:00', 0),
+                            ('2026-11-16T12:00:00', 0),
+                            ('2026-11-16T12:00:01', 1),
+                            ('2026-11-17T09:10:00', 1),
+                            ('2026-11-21T09:10:00', 1)]:
+            with self.subTest(now=now):
+                self.clock.write_text(now)
+                self.assertEqual(self.cli('window', 'morning').returncode, wanted)
+
+    def test_login_outside_window_does_not_consume_the_working_day(self):
+        self.executable('osascript', 'echo shown >> "$HOME/displays"; printf accepted')
+        for now in ['2026-11-16T08:54:59', '2026-11-16T12:00:01',
+                    '2026-11-17T09:10:00', '2026-11-21T09:10:00']:
+            self.clock.write_text(now)
+            self.assertEqual(self.script('morning').returncode, 0)
+        self.assertFalse((self.home / 'displays').exists())
+        self.clock.write_text('2026-11-16T09:31:00')
+        self.assertEqual(self.script('morning').returncode, 0)
+        self.assertEqual((self.home / 'displays').read_text().splitlines(), ['shown'])
+
+    def test_dry_run_does_not_claim_and_next_working_day_displays_again(self):
+        self.executable('osascript', 'echo shown >> "$HOME/displays"; printf accepted')
+        self.assertEqual(self.script('morning', DESKMATE_DRY_RUN='1').returncode, 0)
+        for now in ['2026-11-16T08:58:00', '2026-11-16T09:00:00',
+                    '2026-11-20T09:07:00', '2026-11-20T09:11:00']:
+            self.clock.write_text(now)
+            self.assertEqual(self.script('morning').returncode, 0)
+        self.assertEqual((self.home / 'displays').read_text().splitlines(), ['shown', 'shown'])
+
+    def test_concurrent_login_and_schedule_do_not_duplicate_an_unanswered_alert(self):
+        self.executable('osascript', 'echo shown >> "$HOME/displays"\n'
+                        'while [ ! -e "$HOME/answer" ]; do /bin/sleep 0.02; done\n'
+                        'printf accepted')
+        command = ['/bin/zsh', str(ROOT / 'tools/morning_reminder.sh')]
+        processes = [subprocess.Popen(command, env=self.env, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE, text=True) for _ in range(6)]
+        try:
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                if ((self.home / 'displays').exists()
+                        and sum(process.poll() is not None for process in processes) >= 5):
+                    break
+                time.sleep(0.02)
+            self.assertEqual(sum(process.poll() is not None for process in processes), 5,
+                             'duplicate callers must finish while the alert is unanswered')
+            self.assertEqual((self.home / 'displays').read_text().splitlines(), ['shown'])
+            self.assertFalse((self.data / 'log.csv').exists(), 'claim must precede response logging')
+            # A later scheduled trigger still cannot duplicate the open alert.
+            self.assertEqual(self.script('morning').returncode, 0)
+            self.assertEqual((self.home / 'displays').read_text().splitlines(), ['shown'])
+        finally:
+            (self.home / 'answer').touch()
+            for process in processes:
+                process.communicate(timeout=8)
+        self.assertEqual([process.returncode for process in processes], [0] * 6)
+        self.assertEqual([row['detail'] for row in self.rows()], ['accepted'])
 
 
 if __name__ == '__main__':

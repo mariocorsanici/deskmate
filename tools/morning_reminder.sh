@@ -1,13 +1,6 @@
 #!/bin/zsh
-# Morning reminder, started by the com.deskmate.morning LaunchAgent at the time set in data/config.json.
+# Morning reminder, started at login and at the time set in data/config.json.
 # DESKMATE_DRY_RUN=1 prints the text instead of showing the alert.
 
 root=${0:A:h:h}
-[[ -n $DESKMATE_DRY_RUN ]] || python3 -I "$root/bin/deskmate" reminders window morning || exit 0
-
-lines=("${(@f)$(python3 -I "$root/bin/deskmate" reminders text morning --with-provider)}") || exit $?
-title=$lines[1] message=$lines[2] button=$lines[3] provider=$lines[4]
-
-if [[ -n $DESKMATE_DRY_RUN ]]; then print -r -- "$title: $message"; exit 0; fi
-answer=$(osascript -e "button returned of (display alert \"$title\" message \"$message\" buttons {\"$button\"} default button 1 giving up after 3600)")
-python3 -I "$root/bin/deskmate" reminders respond morning "${answer:-ignored}" --provider "$provider" || exit $?
+exec python3 -I "$root/bin/deskmate" reminders display morning

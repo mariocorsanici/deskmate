@@ -5,16 +5,19 @@ Usage:
   reminders.py check                     validates the reminders section of config.json
   reminders.py text <morning|evening> [--with-provider]  title, message, buttons, optional Provider
   reminders.py window <morning|evening>  exit 0 if now is a good time to show the alert
+  reminders.py display morning           claim today's native alert before waiting for its response
   reminders.py plist <morning|evening>   LaunchAgent for the mac channel, on stdout
   reminders.py respond <morning|evening> <answer> --provider claude|codex  records the desktop response
   reminders.py ics                       writes data/deskmate-reminders.ics, prints "changed" or "unchanged"
 """
 import csv
 import datetime as dt
+import fcntl
 import os
 import pathlib
 import plistlib
 import re
+import subprocess
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -149,6 +152,54 @@ def check(r):
     return errors
 
 
+def within_window(kind, r, now):
+    if kind == "morning" and DAYS[now.weekday()] not in r["days"]:
+        return False
+    h, m = hour_minute(r[kind])
+    start = now.replace(hour=h, minute=m, second=0, microsecond=0)
+    before, after = (dt.timedelta(minutes=5), dt.timedelta(hours=3)) if kind == "morning" \
+        else (dt.timedelta(hours=1), dt.timedelta(hours=4))
+    return start - before <= now <= start + after
+
+
+def display_morning(c, r, t):
+    title, message = t["morning_title"], numbered(lines("morning", t), "\\n")
+    if os.environ.get("DESKMATE_DRY_RUN"):
+        print(f"{title}: {message}")
+        return
+    if not within_window("morning", r, dt.datetime.now()):
+        return
+    directory = DATA / ".reminders"
+    directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+    with (directory / "morning.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        # Recheck after serialization, including a possible local date change.
+        now = dt.datetime.now()
+        if not within_window("morning", r, now):
+            return
+        marker = directory / f"morning-{now.date().isoformat()}.shown"
+        if marker.exists():
+            return
+        script = (f'button returned of (display alert "{title}" message "{message}" '
+                  f'buttons {{"{t["morning_button"]}"}} default button 1 giving up after 3600)')
+        # Reserve only at the native display boundary. Keep this claim if the
+        # alert is dismissed or the parent dies while waiting for an answer.
+        fd = os.open(marker, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        os.close(fd)
+        try:
+            process = subprocess.Popen(["osascript", "-e", script],
+                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        except OSError:
+            marker.unlink()
+            raise
+    # Other login/scheduled invocations must finish even with this alert open.
+    answer, error = process.communicate()
+    if process.returncode:
+        raise ValueError(error.strip() or "Could not display the morning reminder")
+    activity_log.append_event("morning-reminder", answer.strip() or "ignored",
+                              provider=provider_order(c)[0])
+
+
 def main():
     cmd, kind = sys.argv[1], (sys.argv[2] if len(sys.argv) > 2 else None)
     c, r = config()
@@ -181,12 +232,12 @@ def main():
 
     elif cmd == "window":
         # if the Mac was asleep at reminder time, launchd fires on wake: show it only while it still makes sense
-        h, m = hour_minute(r[kind])
-        now = dt.datetime.now()
-        start = now.replace(hour=h, minute=m, second=0, microsecond=0)
-        before, after = (dt.timedelta(minutes=5), dt.timedelta(hours=3)) if kind == "morning" \
-            else (dt.timedelta(hours=1), dt.timedelta(hours=4))
-        sys.exit(0 if start - before <= now <= start + after else 1)
+        sys.exit(0 if within_window(kind, r, dt.datetime.now()) else 1)
+
+    elif cmd == "display":
+        if kind != "morning":
+            raise ValueError("Usage: deskmate reminders display morning")
+        display_morning(c, r, t)
 
     elif cmd == "plist":
         h, m = hour_minute(r[kind])
@@ -195,6 +246,7 @@ def main():
             "Label": f"com.deskmate.{kind}",
             "ProgramArguments": [str(ROOT / "tools" / f"{kind}_reminder.sh")],
             "StartCalendarInterval": [{"Weekday": d % 7, "Hour": h, "Minute": m} for d in weekdays],
+            **({"RunAtLoad": True} if kind == "morning" else {}),
         }).decode())
 
     elif cmd == "ics":

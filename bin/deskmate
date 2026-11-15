@@ -77,7 +77,7 @@ USAGE = {
     "check": "deskmate check [--all] [card ...]",
     "sessions": "deskmate sessions [--provider claude|codex|all] [--since DATE] [--messages N] [--cut N] [--format text|json]",
     "session-stats": "deskmate session-stats [--since DATE]",
-    "reminders": "deskmate reminders <check|text|window|plist|ics|respond> [kind] [answer] [--provider claude|codex] [--with-provider]",
+    "reminders": "deskmate reminders <check|text|window|display|plist|ics|respond> [kind] [answer] [--provider claude|codex] [--with-provider]",
     "log-event": "deskmate log-event <event> [detail] [session] [cwd] [--provider claude|codex]",
     "metrics": "deskmate metrics [--provider claude|codex|all] [--since DATE]",
     "hook-event": "deskmate hook-event --provider claude|codex < native-hook.json",

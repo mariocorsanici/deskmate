@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import pty
+import plistlib
 import re
 import select
 import shutil
@@ -557,6 +558,66 @@ p.write_text(json.dumps(active))
                         + (f'echo ready > "{self.home}/launch-ready"; /bin/sleep 20; exit 17'
                            if pause else 'echo denied >&2; exit 17' if failing else 'exit 0')
                         + ';; *) exit 91;; esac')
+
+    def existing_morning_service(self):
+        self.providers('claude')
+        self.config.write_text(json.dumps({'reminders': {'channels': ['mac']}}))
+        executable = self.executable('launchctl', '')
+        executable.write_text('#!' + sys.executable + '\n' + '''import json, os, pathlib, plistlib, sys
+h = pathlib.Path(os.environ['HOME'])
+state = h / 'loaded-agents.json'
+active = json.loads(state.read_text()) if state.exists() else {}
+verb = sys.argv[1]
+label = sys.argv[-1].rsplit('/', 1)[-1].replace('.plist', '')
+if verb == 'print':
+    sys.exit(0 if label in active else 1)
+calls = h / 'launch-calls.jsonl'
+with calls.open('a') as stream:
+    stream.write(json.dumps([verb, label]) + '\\n')
+if verb == 'bootout':
+    active.pop(label, None)
+elif verb == 'bootstrap':
+    value = plistlib.loads(pathlib.Path(sys.argv[-1]).read_bytes())
+    if value.get('RunAtLoad') and (h / 'fail-upgrade').exists():
+        sys.exit(17)
+    active[label] = value
+else:
+    sys.exit(91)
+state.write_text(json.dumps(active))
+''')
+        self.succeeds(self.setup())
+        agent = self.home / 'Library/LaunchAgents/com.deskmate.morning.plist'
+        old = plistlib.loads(agent.read_bytes())
+        old.pop('RunAtLoad', None)
+        original = plistlib.dumps(old)
+        agent.write_bytes(original)
+        state = self.home / 'loaded-agents.json'
+        active = json.loads(state.read_text())
+        active['com.deskmate.morning'] = old
+        state.write_text(json.dumps(active))
+        (self.home / 'launch-calls.jsonl').write_text('')
+        return agent, original, active
+
+    def test_upgrade_reloads_an_active_morning_service_for_login(self):
+        agent, _, _ = self.existing_morning_service()
+        self.succeeds(self.setup())
+        loaded = json.loads((self.home / 'loaded-agents.json').read_text())
+        self.assertIs(loaded['com.deskmate.morning'].get('RunAtLoad'), True)
+        self.assertEqual(loaded['com.deskmate.morning'], plistlib.loads(agent.read_bytes()))
+        calls = [json.loads(line) for line in (self.home / 'launch-calls.jsonl').read_text().splitlines()]
+        self.assertEqual(calls, [['bootout', 'com.deskmate.morning'],
+                                 ['bootstrap', 'com.deskmate.morning']])
+
+    def test_failed_morning_upgrade_restores_the_old_active_service_and_bytes(self):
+        agent, original, active = self.existing_morning_service()
+        (self.home / 'fail-upgrade').touch()
+        result = self.setup()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('launchctl', result.stderr)
+        self.assertEqual(agent.read_bytes(), original)
+        self.assertEqual(json.loads((self.home / 'loaded-agents.json').read_text()), active)
+        journals = list((self.home / 'data/backups/install').glob('*/transaction.json'))
+        self.assertIn('rolled-back', [json.loads(path.read_text())['status'] for path in journals])
 
     def test_reminders_include_selected_data_root_and_removal_preserves_foreign_agent(self):
         self.providers('codex')
