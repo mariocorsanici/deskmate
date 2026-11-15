@@ -5,7 +5,7 @@
 #   ("let's close the day /call-it-a-day"). A command merely mentioned in a sentence is not logged.
 
 root=${0:A:h:h}
-skills='^(whats-on-today|how-did-it-go|call-it-a-day|study-later|checkpoint)$'
+skills='^(whats-on-today|how-did-it-go|call-it-a-day|study-later|checkpoint|agenda)$'
 input=$(cat)
 if [[ $(jq -r '.hook_event_name // ""' <<< "$input") == PreToolUse ]]; then
   name=$(jq -r '.tool_input.skill // ""' <<< "$input")

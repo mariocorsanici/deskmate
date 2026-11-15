@@ -95,6 +95,9 @@ fi
 jq '.reminders = ({morning: "09:00", evening: "17:00", days: ["mon","tue","wed","thu","fri"], channels: ["mac"]} + (.reminders // {}))' \
   $config > $config.tmp && mv $config.tmp $config
 problems=$(python3 -I $root/tools/reminders.py check) || { print "  ✗ data/config.json:\n$problems" | sed '2,$s/^/      /'; exit 1 }
+if [[ ! -e $root/data/agenda.md ]]; then
+  python3 -I "$root/tools/agenda.py" list >/dev/null
+fi
 ok "data/ ready, name: $(jq -r .name $config), language: $(jq -r .language $config)"
 
 print "Skills"
