@@ -133,8 +133,8 @@ class CodexAdapterTest(unittest.TestCase):
         self.assertEqual(result["messages"], [])
         self.assertTrue(result["warnings"])
 
-    def test_cold_wal_unavailability_is_explicit_and_native_files_are_preserved(self):
-        # Catch an unsafe read-write/immutable fallback or fabricated full coverage.
+    def test_cold_wal_recovers_complete_history_and_preserves_native_files(self):
+        # Require post-exit recovery without a native read-write/immutable fallback.
         for database in ("state_5.sqlite", "thread_history_1.sqlite"):
             with self.subTest(database=database):
                 case = CodexAdapterTest()
@@ -153,32 +153,17 @@ class CodexAdapterTest(unittest.TestCase):
                     self.assertFalse(path.with_name(database + "-shm").exists())
                     before = {p.name: p.read_bytes() for p in case.codex_home.iterdir()}
 
-                    # Probe an independent copy: do not warm the source fixture.
-                    # Some SQLite builds support cold WAL, so characterize that
-                    # capability independently rather than require their failure.
-                    probe = case.home / "cold-probe.sqlite"
-                    probe.write_bytes(path.read_bytes())
                     table = "threads" if database == "state_5.sqlite" else "thread_items"
-                    try:
-                        with closing(sqlite3.connect(probe.as_uri() + "?mode=ro", uri=True)) as reader:
-                            reader.execute("SELECT count(*) FROM " + table).fetchone()
-                        cold_supported = True
-                    except sqlite3.OperationalError as error:
-                        self.assertIn("unable to open database file", str(error))
-                        cold_supported = False
-
                     delta = case.command("session-delta", "--provider", "codex", "--session-id", SESSION_ID)
-                    if cold_supported:
-                        self.assertEqual(delta["status"], "ok")
-                        self.assertEqual([m["text"] for m in delta["messages"]], ["persisted native progress"])
-                    else:
-                        self.assertEqual(delta["status"], "degraded")
-                        self.assertEqual(delta["coverage"]["status"], "unavailable")
-                        self.assertEqual(delta["messages"], [])
-                        self.assertEqual(delta["included_messages"], 0)
-                        self.assertTrue(any("Project card and Checks" in warning for warning in delta["warnings"]))
-                        self.assertEqual({p.name: p.read_bytes() for p in case.codex_home.iterdir()}, before)
-                    self.assertEqual(path.read_bytes(), before[database])
+                    self.assertEqual(delta["status"], "ok")
+                    self.assertEqual(delta["warnings"], [])
+                    self.assertEqual(delta["coverage"]["status"], "full")
+                    self.assertEqual([m["text"] for m in delta["messages"]], ["persisted native progress"])
+                    self.assertEqual({p.name: p.read_bytes() for p in case.codex_home.iterdir()}, before)
+                    session = case.command("session", "--provider", "codex", "--session-id", SESSION_ID)
+                    self.assertEqual(session["usage"], {"tokens_used": 450})
+                    self.assertEqual(session["cwd"], str(project))
+                    self.assertEqual({p.name: p.read_bytes() for p in case.codex_home.iterdir()}, before)
 
                     # Model native-runtime reopening, not a Deskmate rw fallback.
                     with closing(sqlite3.connect(path)) as native_runtime:

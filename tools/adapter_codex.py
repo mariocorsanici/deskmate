@@ -7,7 +7,6 @@ unavailable or malformed sessions degrade without stopping the Daily loop.
 from __future__ import annotations
 
 import datetime as dt
-from contextlib import closing
 import json
 import os
 import pathlib
@@ -18,6 +17,7 @@ import sqlite3
 import subprocess
 import tempfile
 import provider_environment
+import codex_storage
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -68,9 +68,7 @@ def metadata_rows(session_id=None):
     if not paths:
         return []
     path = paths[0]
-    # mode=ro prevents creating a missing database or changing its contents.
-    # Do not use immutable=1 here: it would ignore live WAL records.
-    with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True, timeout=1)) as db:
+    with codex_storage.read_only(path) as db:
         db.row_factory = sqlite3.Row
         columns = {row[1] for row in db.execute("PRAGMA table_info(threads)")}
         required = {"id", "cwd", "created_at", "updated_at", "rollout_path", "tokens_used"}
@@ -276,7 +274,7 @@ def read_paginated(session, *, on_message=None):
     if not paths:
         return degraded(session, "Codex paginated history is unavailable; continue from the Project card and Checks.")
     try:
-        with closing(sqlite3.connect(paths[0].resolve().as_uri() + "?mode=ro", uri=True, timeout=1)) as db:
+        with codex_storage.read_only(paths[0]) as db:
             # Filter before reading item_json, so tool output and reasoning never
             # enter the Session delta reader.
             query = ("SELECT created_at_ms,item_json FROM thread_items WHERE thread_id = ? "
