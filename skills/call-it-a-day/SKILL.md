@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # Call it a day
 
+Before working, read `~/Dev/mc_dev/deskmate/docs/agents/skill-metrics.md` and capture this invocation’s native session/start identity for the completion step.
+
 Leave tomorrow's user a **handoff**: for every open piece of work, where it stands, what is left to do and how to resume it. Data files live in `~/Dev/mc_dev/deskmate/data/`. First read `~/Dev/mc_dev/deskmate/data/config.json`: address the user by `name`, and write every reply and the handoff in `language`. Short sentences, plain words, jargon explained.
 
 ## Steps
@@ -26,6 +28,7 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 
    ```markdown
    # Handoff for <weekday> <date>
+   Generated: <current ISO-8601 creation timestamp with timezone offset>
 
    ## In short
    - one line per open session: name, what unblocks it
@@ -43,9 +46,22 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
    In stand-by: <short names of the standby projects>
    ```
 
+   Keep the machine-readable `Generated:` label in English even when the headings are translated. Its value is the actual creation time, not the day named in the title.
+
 5. **Study later.** Suggest up to 5 topics met today that are worth studying calmly: concepts explained in a hurry, solutions adopted without fully understanding them, new tools. The user picks; add the chosen ones to `~/Dev/mc_dev/deskmate/data/study-later.md` in the `/study-later` format.
 
 6. **Sign off.** Short message in chat:
    - how many sessions are still open and the first thing to do tomorrow;
    - the sessions read from the transcript because they had no fresh checkpoint, if any;
    - **After closing:** 2 or 3 open items from `study-later.md` that fit the time left, plus any admin tasks that came up today.
+
+
+## Complete the measurement
+
+After completing the steps above, log this skill's end using the identity captured at its start:
+
+```bash
+~/Dev/mc_dev/deskmate/tools/log_event.sh call-it-a-day-end "" "<session-id>" "<starting-folder>"
+```
+
+Follow the completion/unfinished-run rules in `docs/agents/skill-metrics.md`; send the prepared final reply after this last tool action.

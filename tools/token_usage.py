@@ -1,103 +1,155 @@
 #!/usr/bin/env python3
-"""Fills in data/log.csv the tokens used by each run of the deskmate skills.
+"""Fill skill usage until its precise end marker or the legacy command boundary.
 
-A run lasts from its command (/call-it-a-day, ...) to the next command of the
-same session (any /command) or to the end of the session, so it includes the
-user's replies inside the skill. Tokens come from the usage field of Claude's
-messages in the transcript.
-
-Usage:
-  token_usage.py                  # every session in the log
-  token_usage.py --session <id>   # just one (used by the Stop hook)
+An end-marked window excludes unrelated work after completion. Historical runs
+without a valid marker keep the next-command/session-end window, labeled
+legacy-window. Neither scope claims to include a final reply after the marker.
 """
 import argparse
 import csv
-import fcntl
+import datetime as dt
 import json
 import pathlib
 import re
+import sys
 
-DATA = pathlib.Path(__file__).resolve().parent.parent / "data"
-LOG = DATA / "log.csv"
-PROJECTS = pathlib.Path.home() / ".claude" / "projects"
-COLUMNS = ["date", "time", "weekday", "event", "detail", "session", "cwd",
-           "turns", "input_tokens", "cache_tokens", "output_tokens"]
-# the transcript stores a typed command as "<command-message>…</command-message>\n<command-name>/name</command-name>"
-COMMAND = re.compile(r"^\s*(?:<command-message>[^<]*</command-message>\s*)?<command-name>/?([^<]+)</command-name>")
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from usage_log import COLUMNS, SKILLS, atomic_write, data_root, locked, read_log
+
+DATA = data_root()
+LOG = DATA / 'log.csv'
+PROJECTS = pathlib.Path.home() / '.claude' / 'projects'
+COMMAND = re.compile(r'^\s*(?:<command-message>[^<]*</command-message>\s*)?<command-name>/?([^<]+)</command-name>')
+
+
+def timestamp(value):
+    try:
+        parsed = dt.datetime.fromisoformat(value.replace('Z', '+00:00'))
+        return parsed.timestamp() if parsed.tzinfo is not None else None
+    except (ValueError, TypeError, AttributeError, OverflowError):
+        return None
 
 
 def read_transcript(path):
-    """Returns the commands run [(ts, name)] and the usage [(ts, input, cache, output)]."""
+    """Return normalized command boundaries and deduplicated native usage."""
     commands, usage, seen = [], [], set()
-    for line in path.open(encoding="utf-8", errors="replace"):
-        try:
-            r = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        ts = r.get("timestamp")
-        msg = r.get("message") or {}
-        if r.get("type") == "user" and not r.get("isMeta") and isinstance(msg.get("content"), str):
-            m = COMMAND.match(msg["content"])
-            if m:
-                commands.append((ts, m.group(1).strip()))
-        if r.get("type") == "assistant" and isinstance(msg.get("content"), list):
-            # a skill started by Claude through the Skill tool, e.g. a command inside a sentence
-            commands += [(ts, b["input"]["skill"]) for b in msg["content"]
-                         if b.get("type") == "tool_use" and b.get("name") == "Skill" and b.get("input", {}).get("skill")]
-        if r.get("type") == "assistant" and msg.get("usage") and msg.get("id") not in seen:
-            seen.add(msg.get("id"))
-            u = msg["usage"]
-            usage.append((ts, u.get("input_tokens", 0) + u.get("cache_creation_input_tokens", 0),
-                          u.get("cache_read_input_tokens", 0), u.get("output_tokens", 0)))
+    with path.open(encoding='utf-8', errors='replace') as stream:
+        for line in stream:
+            try:
+                record = json.loads(line)
+            except ValueError:
+                continue
+            if not isinstance(record, dict) or record.get('isSidechain') or record.get('isMeta'):
+                continue
+            stamp, message = timestamp(record.get('timestamp')), record.get('message')
+            if stamp is None or not isinstance(message, dict):
+                continue
+            content = message.get('content')
+            if record.get('type') == 'user' and isinstance(content, str):
+                match = COMMAND.match(content)
+                if match:
+                    commands.append((stamp, match.group(1).strip()))
+            if record.get('type') != 'assistant':
+                continue
+            if isinstance(content, list):
+                for block in content:
+                    if not isinstance(block, dict) or block.get('type') != 'tool_use' or block.get('name') != 'Skill':
+                        continue
+                    arguments = block.get('input')
+                    if isinstance(arguments, dict) and isinstance(arguments.get('skill'), str):
+                        commands.append((stamp, arguments['skill']))
+            counters, identity = message.get('usage'), message.get('id')
+            if not isinstance(counters, dict):
+                continue
+            if isinstance(identity, str):
+                if identity in seen:
+                    continue
+                seen.add(identity)
+            def count(key):
+                value = counters.get(key, 0)
+                return value if type(value) is int and value >= 0 else 0
+            usage.append((stamp, count('input_tokens') + count('cache_creation_input_tokens'),
+                          count('cache_read_input_tokens'), count('output_tokens')))
     return commands, usage
 
 
+def marker_after(rows, row_index, session, start, end):
+    current = rows[row_index]
+    for candidate in rows[row_index + 1:]:
+        if candidate.get('session') != session:
+            continue
+        if candidate.get('event') in SKILLS:
+            break  # another invocation owns any later completion marker
+        if (candidate.get('event') != current['event'] + '-end'
+                or candidate.get('cwd') != current.get('cwd')):
+            continue
+        stamp = timestamp(candidate.get('detail'))
+        if stamp is not None and start <= stamp < end:
+            return stamp
+    return None
+
+
 def compute(session, rows):
-    found = list(PROJECTS.glob(f"*/{session}.jsonl"))
-    if not found:
+    own = [row for row in rows if row.get('session') == session and row.get('event') in SKILLS]
+    for row in own:
+        row.setdefault('usage_scope', 'legacy-window')
+        if not row['usage_scope']:
+            row['usage_scope'] = 'legacy-window'
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', session):
         return
-    commands, usage = read_transcript(found[0])
-    used = set()
-    for row in rows:
-        # the k-th run of a skill in the log matches the k-th one in the transcript
-        index = next((i for i, (_, name) in enumerate(commands)
-                      if name == row["event"] and i not in used), None)
+    paths = list(PROJECTS.glob(f'*/{session}.jsonl'))
+    if len(paths) != 1:
+        return
+    try:
+        commands, usage = read_transcript(paths[0])
+    except OSError:
+        return
+    consumed = -1
+    for row_index, row in enumerate(rows):
+        if row.get('session') != session or row.get('event') not in SKILLS:
+            continue
+        index = next((i for i in range(consumed + 1, len(commands))
+                      if commands[i][1] == row['event']), None)
         if index is None:
             continue
-        used.add(index)
+        consumed = index
         start = commands[index][0]
-        end = commands[index + 1][0] if index + 1 < len(commands) else "9999"
-        part = [u for u in usage if start <= u[0] < end]
-        row["turns"] = str(len(part))
-        for name, pos in (("input_tokens", 1), ("cache_tokens", 2), ("output_tokens", 3)):
-            row[name] = str(sum(u[pos] for u in part))
+        end = commands[index + 1][0] if index + 1 < len(commands) else float('inf')
+        marked = marker_after(rows, row_index, session, start, end)
+        row['usage_scope'] = 'end-marked' if marked is not None else 'legacy-window'
+        if marked is not None:
+            end = marked
+        part = [entry for entry in usage if start <= entry[0] < end]
+        row['turns'] = str(len(part))
+        for name, pos in (('input_tokens', 1), ('cache_tokens', 2), ('output_tokens', 3)):
+            row[name] = str(sum(entry[pos] for entry in part))
 
 
 def main():
     global PROJECTS
-    p = argparse.ArgumentParser()
-    p.add_argument("--session")
-    p.add_argument("--projects", type=pathlib.Path, help="transcripts folder (for tests)")
-    a = p.parse_args()
-    PROJECTS = a.projects or PROJECTS
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--session')
+    parser.add_argument('--projects', type=pathlib.Path, help='transcripts folder (for tests)')
+    args = parser.parse_args()
+    PROJECTS = args.projects or PROJECTS
     if not LOG.exists():
-        return
-    with (DATA / ".log.lock").open("w") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        with LOG.open(newline="") as f:
-            rows = list(csv.DictReader(f))
-        by_session = {}
-        for r in rows:
-            if r.get("session") and not r["event"].endswith("-reminder"):
-                by_session.setdefault(r["session"], []).append(r)
-        for session, group in by_session.items():
-            if a.session in (None, session):
-                compute(session, group)
-        with LOG.open("w", newline="") as f:
-            w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="ignore")
-            w.writeheader()
-            w.writerows({k: (r.get(k) or "") for k in COLUMNS} for r in rows)
+        return 0
+    try:
+        with locked(DATA) as path:
+            fields, rows = read_log(path)
+            by_session = {}
+            for row in rows:
+                if row.get('session'):
+                    by_session.setdefault(row['session'], []).append(row)
+            for session, group in by_session.items():
+                if args.session in (None, session):
+                    compute(session, group)
+            atomic_write(path, fields, rows)
+        return 0
+    except (OSError, ValueError, csv.Error) as error:
+        print(f'token usage: {error}', file=sys.stderr)
+        return 2
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    raise SystemExit(main())
