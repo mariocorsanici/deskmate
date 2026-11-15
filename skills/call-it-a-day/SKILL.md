@@ -12,7 +12,7 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 
 ## Steps
 
-1. **Retrospective.** If today is Monday, Wednesday or Friday and `~/Dev/mc_dev/deskmate/data/lessons.md` has no entry for today yet, ask whether to run `/how-did-it-go` first. If yes, stop here: the user will run this skill again afterwards.
+1. **Retrospective.** Not proposed here: `/whats-on-today` proposes `/how-did-it-go` as the first step of the day, every two development days. If the user asks for it now, stop here: they will run this skill again afterwards.
 
 2. **Collect.** The state of each project comes from its **project card**, written by `/checkpoint` in the project's own session: `~/.claude/projects/*/memory/project-card.md`, section `## Status`. Then run `python3 -I ~/Dev/mc_dev/deskmate/tools/sessions.py` (today's sessions) to see which sessions were active, and reread `~/Dev/mc_dev/deskmate/data/handoff.md`.
    - **Card with a checkpoint later than the session's last activity:** use the card as it is, without reading the transcript.
@@ -27,11 +27,15 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
    **Agenda before the handoff.** Ask once, in one line: "Qualcosa di non sviluppo da segnare o chiudere?" (English: "Anything non-development to record or close?"). Read `~/Dev/mc_dev/deskmate/docs/agenda.md` for interpretation and exit codes. An empty/negative answer adds nothing. Resolve dates and write the requested tasks, days or completions only through `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py`; confirm the exact written lines. On ambiguity or multiple matches, ask which date/entry before writing; exit 1 leaves the requested change unapplied. Agenda tasks remain in the agenda independently of the session handoff.
    After processing the answer, run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py archive --today <today>` to archive past day entries while keeping completed tasks for the retrospective. Read tomorrow's commitments with `list --today <tomorrow>` and `is-dev-day <tomorrow>`. If the latter returns 3, put one line in the handoff naming the commitment and saying there are no sessions tomorrow (e.g. "Domani trasferta Monfalcone: niente sessioni"); make the sign-off consistent with that plan. For a half day, name the occupied half so tomorrow's work fits the other half. Report all notices and invalid lines, including when exit 3 takes precedence over 2; exit 2 means the operation already succeeded and is not a reason to repeat it. Resolve command failures before claiming an agenda write/archive succeeded.
 
+   **Goal of the day.** Read today's latest `goal` row in `~/Dev/mc_dev/deskmate/data/log.csv`. If there is one, judge it against the cards, checks and sessions: **reached**, **partly reached** or **dropped**, with one line why (the evidence, or what got in the way). If no goal was logged today, say so in one line and skip it.
+
 4. **Write.** Move the old `handoff.md` to `archive/YYYY-MM-DD.md` (the date in its title), then write the new one in this shape, with the headings translated into `language`:
 
    ```markdown
    # Handoff for <weekday> <date>
    Generated: <current ISO-8601 creation timestamp with timezone offset>
+
+   Goal of the day: <goal> → reached / partly reached / dropped: <why>  (only if a goal was logged today)
 
    ## In short
    - one line per open session: name, what unblocks it
@@ -54,6 +58,7 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 5. **Study later.** Suggest up to 5 topics met today that are worth studying calmly: concepts explained in a hurry, solutions adopted without fully understanding them, new tools. The user picks; add the chosen ones to `~/Dev/mc_dev/deskmate/data/study-later.md` in the `/study-later` format.
 
 6. **Sign off.** Short message in chat:
+   - the goal of the day and its outcome, in one line, if one was logged;
    - how many sessions are still open and the first thing to do tomorrow;
    - the sessions read from the transcript because they had no fresh checkpoint, if any;
    - **After closing:** 2 or 3 open items from `study-later.md` that fit the time left, plus any admin tasks that came up today.

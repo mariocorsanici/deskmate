@@ -10,7 +10,7 @@ import tempfile
 from contextlib import contextmanager
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILLS = {'checkpoint', 'whats-on-today', 'call-it-a-day', 'how-did-it-go', 'study-later'}
+SKILLS = {'checkpoint', 'whats-on-today', 'call-it-a-day', 'how-did-it-go', 'study-later', 'agenda'}
 LEGACY_COLUMNS = ['date', 'time', 'weekday', 'event', 'detail', 'session', 'cwd',
                   'turns', 'input_tokens', 'cache_tokens', 'output_tokens']
 COLUMNS = [*LEGACY_COLUMNS, 'usage_scope']

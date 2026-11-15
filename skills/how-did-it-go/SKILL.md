@@ -8,11 +8,11 @@ disable-model-invocation: true
 
 Before working, read `~/Dev/mc_dev/deskmate/docs/agents/skill-metrics.md` and capture this invocation’s native session/start identity for the completion step.
 
-A **retrospective** on *how* the work went over the last few days, not on its technical content: organisation, method, use of Claude. It runs on Monday, Wednesday and Friday, before `/call-it-a-day`. Data files live in `~/Dev/mc_dev/deskmate/data/`. First read `~/Dev/mc_dev/deskmate/data/config.json`: address the user by `name`, and write every reply and the `lessons.md` entry in `language`.
+A **retrospective** on *how* the work went over the last few days, not on its technical content: organisation, method, use of Claude. It runs every two development days, proposed by `/whats-on-today` as the first step of the day (about 10 minutes). Data files live in `~/Dev/mc_dev/deskmate/data/`. First read `~/Dev/mc_dev/deskmate/data/config.json`: address the user by `name`, and write every reply and the `lessons.md` entry in `language`.
 
 ## Steps
 
-1. **Period.** From the day after the latest entry in `~/Dev/mc_dev/deskmate/data/lessons.md` until today; if `lessons.md` has no entries yet, the last 3 days.
+1. **Period.** From the date of the latest entry in `~/Dev/mc_dev/deskmate/data/lessons.md` (retrospectives run in the morning, so that day's work has not been reviewed yet; for an older entry written in the evening, from the day after) until yesterday; if `lessons.md` has no entries yet, the last 3 days.
 
 2. **Collect.** Run `python3 -I ~/Dev/mc_dev/deskmate/tools/sessions.py --since <start> --messages 60 --cut 400` and read the handoffs of the period in `~/Dev/mc_dev/deskmate/data/archive/` and `handoff.md`: they are the plan, the transcripts are what happened. `~/Dev/mc_dev/deskmate/data/log.csv` tells when the skills ran, how the user answered the reminders and how many tokens each run used. For claims about the **cost of the skills themselves**, use only start rows whose `usage_scope` is `end-marked`, excluding `*-end` rows. Separate them from `legacy-window` or unlabeled historical rows; report the sample size and marker boundary. If no end-marked sample exists, say that bounded skill-cost evidence is unavailable instead of comparing the old windows. Session-wide experiment metrics remain session metrics, not skill costs.
    Also read `~/Dev/mc_dev/deskmate/docs/agenda.md` and run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py list --today <today> --closed-since <start>`. Keep its `closed` entries as evidence for this retrospective, including today's completions. Report all initialization/repair and invalid-line diagnostics; exit 2 still returns usable data. Resolve exit 1 before treating the agenda as empty. Collect before archiving; step 6 does the cleanup after the report is preserved.
@@ -22,7 +22,8 @@ A **retrospective** on *how* the work went over the last few days, not on its te
    - **Plan and reality:** what was in the handoff and got done, postponed, forgotten.
    - **Rework:** false starts, retracted answers, stale notes taken at face value, work done twice.
    - **Waiting and blockers:** time stuck waiting for people, permissions, access.
-   - **Context switches:** parallel sessions, interruptions, work resumed several times.
+   - **Context switches:** parallel sessions, interruptions, work resumed several times. Read the `switch` rows of the period in `log.csv` ("<from> → <to>: <reason>"): for each, say whether it was a **real block** (waiting on someone, a run, an access; check it against the handoff's "Waiting on" and the transcripts) or **scattering** (no block, a pull towards something else). Give the count of each.
+   - **Goals:** the `goal` rows of the period against the handoffs' "Goal of the day" outcomes: how many reached, partly, dropped, and what the dropped ones have in common.
    - **Use of Claude:** vague requests that needed clarification, things Claude could have done alone or that were better done by hand.
    - **What worked:** to repeat.
    - **Data experiment:** if `config.json` has `experiments.fresh_sessions`, run `python3 -I ~/Dev/mc_dev/deskmate/tools/session_stats.py` and report the "per mode" lines. When both modes have at least `target_days` session-days, compare them (context at start, tokens per answer, compactions, rating, corrections like "that's old" in the transcripts) and propose a decision: then the experiment ends, and you remove `experiments.fresh_sessions` from `config.json` once the user agrees.
@@ -30,7 +31,7 @@ A **retrospective** on *how* the work went over the last few days, not on its te
 
 4. **Previous experiments.** For each experiment in the latest entry: did it happen? Did it help? Decide whether to keep, change or drop it. Compare with older entries too: a problem seen two or more times is **recurring**.
 
-5. **Talk it through.** Present the 3–5 strongest observations, recurring ones first, and ask for the user's reading: it is a conversation, and their view counts more than the transcripts. Agree on 1–3 experiments for the next days, concrete and checkable ("one session per project", not "be tidier").
+5. **Talk it through.** Present at most three observations, the strongest, recurring ones first, and ask for the user's reading: it is a conversation, and their view counts more than the transcripts. Agree on 1–3 experiments for the next days, concrete and checkable ("one session per project", not "be tidier").
 
 6. **Record.** Append to `lessons.md`, with the labels translated into `language`:
 
@@ -43,9 +44,11 @@ A **retrospective** on *how* the work went over the last few days, not on its te
    - …
    ```
 
+   At most three points per section: keep the strongest, drop the rest.
+
    Report the collected agenda completions in one line in `language` (e.g. "Non sviluppo completato: report trasferta; nota spese"); if there are none, say so briefly. Then run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py archive --today <today> --closed-before <today>`. This archives past days and tasks completed before today, preserving today's completions. Report notices and every invalid-line diagnostic; exit 2 means cleanup already happened on valid lines, so do not repeat it. Resolve failures before claiming cleanup succeeded.
 
-   Then remind the user that `/call-it-a-day` is the next step.
+   Then go back to the day: if `/whats-on-today` already proposed it, point to its plan; otherwise suggest running `/whats-on-today` now.
 
 
 ## Complete the measurement

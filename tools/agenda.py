@@ -312,8 +312,8 @@ def operate(args, doc, words):
             archive = Document(archive_path, words, repair=False)
             extra.append(archive)
             entries = entries + archive.entries
-        whole_day = any(e.kind == 'days' and e.date == args.date and e.part == 'day' for e in entries)
-        return output, notices, extra, whole_day
+        whole = [e for e in entries if e.kind == 'days' and e.date == args.date and e.part == 'day']
+        return [e.raw for e in whole], notices, extra, bool(whole)
     return output, notices, extra, False
 
 

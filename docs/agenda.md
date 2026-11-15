@@ -49,7 +49,7 @@ The third/fifth following weekday is the inclusive end date; weekend dates
 inside the interval remain visible. A task may appear in both `due` and
 `deadline`: show it once with its deadline highlighted.
 
-Mutating commands print the affected entry lines. Initialization, repaired
+Mutating commands print the affected entry lines. `is-dev-day` prints the whole-day entry lines when it returns 3, so callers can name the commitment. Initialization, repaired
 sections, replacements, date warnings and invalid-line diagnostics are stderr.
 Report those diagnostics even when stdout contains valid results.
 

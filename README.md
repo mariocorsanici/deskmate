@@ -12,7 +12,7 @@ The [development plan and tracker](docs/superpowers/plans/2026-11-09-development
 | during the day | `/study-later <topic>` | notes a topic to study later |
 | anytime | `/agenda <what>` | records non-development days and tasks, closes completed tasks; without arguments, shows the agenda |
 | end of each work session | `/checkpoint` | writes where the project stands in its project card |
-| Mon, Wed, Fri before closing | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md` |
+| every two development days, first thing in the morning | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md`; `/whats-on-today` proposes it when due (`tools/retro_due.py`) |
 | evening (reminder) | `/call-it-a-day` | collects the project cards, checks the live state and writes `data/handoff.md` for tomorrow |
 
 After closing: study the topics you set aside, or admin work.
@@ -30,6 +30,7 @@ Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md
 
 - `## Status`: state (`active`, `paused`, `standby`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
 - `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `tools/check.py` runs them for `/whats-on-today` and `/call-it-a-day`.
+- `## Logins` (optional): the logins the work needs (`ssh-key <path>`, `gcloud`, `gcloud-adc`, `1password`). `/whats-on-today` checks them with `tools/logins.py` and lists the `! <command>` lines to run before starting, all at once.
 
 `paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `check.py` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
 
@@ -104,6 +105,8 @@ skills/                  the skills of the day
 tools/
   sessions.py            summary of the Claude Code sessions in a period
   agenda.py              locked reads, writes and archiving of non-development days and tasks
+  retro_due.py           is a retrospective due: development days since the last one
+  logins.py              read-only check of the logins listed in the project cards
   log_event.sh           appends a row to the log
   token_usage.py         computes bounded or legacy-window skill usage from transcripts
   usage_log.py           shared locked, atomic activity CSV storage
@@ -128,4 +131,4 @@ data/                    personal files, not in git
 - `study-later.md`: topics to study.
 - `agenda.md`: non-development days and tasks, managed through `tools/agenda.py`; the installer creates it only if absent.
 - `archive/agenda-YYYY-MM.md`: past non-development days and completed agenda tasks.
-- `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens, usage_scope`. Each completed skill writes a `<skill>-end` metadata row; its detail is a precise UTC end timestamp. Usage stops at the earliest valid matching marker, next command or session end. `usage_scope=end-marked` identifies marker-bounded measurements; `legacy-window` preserves the old next-command/session-end behavior for history and incomplete runs. Retrospectives use only end-marked runs for skill-cost comparisons. The final model reply after a marker is outside that measurement. End-event rows have no usage totals. Both writers preserve extension columns and serialize atomic updates through `.log.lock`. `DESKMATE_DATA_DIR` overrides the activity-log root for isolated checks.
+- `log.csv`: one skill run or reminder per row, plus `goal` (the confirmed goal of the day) and `switch` ("<from> → <to>: <reason>") rows. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens, usage_scope`. Each completed skill writes a `<skill>-end` metadata row; its detail is a precise UTC end timestamp. Usage stops at the earliest valid matching marker, next command or session end. `usage_scope=end-marked` identifies marker-bounded measurements; `legacy-window` preserves the old next-command/session-end behavior for history and incomplete runs. Retrospectives use only end-marked runs for skill-cost comparisons. The final model reply after a marker is outside that measurement. End-event rows have no usage totals. Both writers preserve extension columns and serialize atomic updates through `.log.lock`. `DESKMATE_DATA_DIR` overrides the activity-log root for isolated checks.

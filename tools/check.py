@@ -93,27 +93,36 @@ def repositories(command):
     return folders
 
 
+def select(args):
+    """The cards named by args (paths or project names), or every card when args is empty.
+
+    A name with several matches or none prints the candidates and exits 1, before anything runs.
+    """
+    all_paths = sorted(PROJECTS.glob("*/memory/project-card.md"))
+    if not args:
+        return all_paths
+    known = []
+    for p in all_paths:
+        text = p.read_text(encoding="utf-8")
+        known.append((p, title(text, p), state_of(text)))
+    cards, problems = [], []
+    for a in args:
+        found = resolve(a, known)
+        if len(found) == 1:
+            cards.append(found[0])
+        else:
+            listed = [(t, p) for p, t, _ in known if p in found] if found else [(t, p) for p, t, _ in known]
+            head = f"'{a}' matches {len(found)} cards:" if found else f"'{a}' matches no card. Cards:"
+            problems.append("\n".join([head] + [f"  {t}  {p}" for t, p in listed]))
+    if problems:
+        print("\n".join(problems), file=sys.stderr)
+        sys.exit(1)
+    return cards
+
+
 def main():
     args = [a for a in sys.argv[1:] if a != "--all"]
-    all_paths = sorted(PROJECTS.glob("*/memory/project-card.md"))
-    cards = all_paths
-    if args:
-        known = []
-        for p in all_paths:
-            text = p.read_text(encoding="utf-8")
-            known.append((p, title(text, p), state_of(text)))
-        cards, problems = [], []
-        for a in args:
-            found = resolve(a, known)
-            if len(found) == 1:
-                cards.append(found[0])
-            else:
-                listed = [(t, p) for p, t, _ in known if p in found] if found else [(t, p) for p, t, _ in known]
-                head = f"'{a}' matches {len(found)} cards:" if found else f"'{a}' matches no card. Cards:"
-                problems.append("\n".join([head] + [f"  {t}  {p}" for t, p in listed]))
-        if problems:
-            print("\n".join(problems), file=sys.stderr)
-            sys.exit(1)
+    cards = select(args)
     skip = not args and "--all" not in sys.argv
     standby = []
     fetched = set()
