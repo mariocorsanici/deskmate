@@ -1,5 +1,9 @@
 # Provider-neutral Daily-loop verification
 
+For the current branch state, publication status, remaining integration steps
+and calibration-cleanup correction, see
+[Codex integration status](../codex-integration-status.md).
+
 **All owner-required pre-merge reliability checks passed on 2026-11-15.**
 [Current reliability verification](premerge-reliability-2026-11-15.md) covers C15
 actual process startup, C16 real LaunchAgent load/deduplication, complete cold

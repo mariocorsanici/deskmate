@@ -4,6 +4,8 @@ Shared skills for Claude Code and Codex CLI to run your working day: open it in 
 
 Use `/skill` in Claude Code and `$skill` in Codex CLI. Setup links the same sources into both. The table uses Claude syntax; substitute `$` in Codex.
 
+[Codex integration status and remaining integration steps](docs/codex-integration-status.md).
+
 ## A typical day
 
 | When | Skill | What it does |
