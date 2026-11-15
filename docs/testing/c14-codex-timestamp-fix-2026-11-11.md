@@ -51,3 +51,12 @@ probe as proof that cold read-only access is reliable.
 
 C14 remains incomplete: Claude and cross-Provider native groups are still on
 hold, and C14-CODEX-02 needs triage. No push or merge was performed.
+
+## Follow-up — 2026-11-13
+
+C14-CODEX-02 is now triaged as a documented bounded runtime limitation; see the
+[cold-WAL investigation](c14-codex-sqlite-2026-11-13.md) for reproductions inside
+and outside the sandbox, public-command contracts and recovery limits. The
+strict read-only production reader is unchanged. Claude-only native acceptance
+was separately authorized and launched on 2026-11-13; results are pending and
+the cross-Provider group remains held. C14 remains open.

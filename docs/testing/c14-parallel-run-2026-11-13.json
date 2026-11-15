@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-13",
+  "source_commit": "8ab2f78a817a9919428d75d56496f31adaf90fa4",
+  "claude_run_dir": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0",
+  "claude_evidence_dir": "/private/tmp/deskmate-c14-claude-20261113-dvho_hu0/source/docs/testing",
+  "authorization": "User requested parallel C14-CODEX-02 diagnosis and Claude native acceptance in horizontal terminal split. Claude-only authorized; cross-provider held.",
+  "status": "launch-environment-fixed-and-native-verified-without-wrapper",
+  "iterm_session_id": "063AB4A9-B197-4FF1-88D6-220B055ABB0F",
+  "sqlite_disposition": "documented bounded runtime limitation; no production reader change",
+  "sqlite_preparation_full_suite": {
+    "passed": 255,
+    "total": 255
+  },
+  "sqlite_system_python_suites": {
+    "passed": 51,
+    "total": 51
+  },
+  "sqlite_evidence": "docs/testing/c14-codex-sqlite-2026-11-13.md",
+  "destination_verification": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest discover -s tests -q",
+    "passed": 255,
+    "total": 255,
+    "seconds": 104.086,
+    "exit_code": 0
+  },
+  "claude_native_acceptance": "Original group executed; indexless resume repaired and verified; selected launch environment fix committed and native no-wrapper follow-up finalizing.",
+  "cross_provider": "Authorized explicitly by owner; native execution in progress on 0182bd8.",
+  "claude_evidence": "docs/testing/c14-claude-native-2026-11-13.md",
+  "claude_test_iterm_session_id": "EBA67971-5B76-4E50-B8E6-5989F3984FBD",
+  "checked_at": "2026-11-13T14:46:04.271353+00:00",
+  "claude_native_session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+  "claude_finding": {
+    "id": "C14-CLAUDE-01",
+    "status": "fixed and native Deskmate resume verified",
+    "original_resume_dry_run_exit_code": 4,
+    "repaired_resume_dry_run_exit_code": 0
+  },
+  "claude_evidence_log_matches_actual": true,
+  "temporary_claude_auth_symlink_removed": true,
+  "c14_complete": false,
+  "sqlite_commit": "3fe01e79f4b0e2e2e672ae208905f998e7b19069",
+  "claude_repair_preparation_tests": {
+    "full": 263,
+    "system_python": 76,
+    "independent_review": "approved without findings"
+  },
+  "claude_resume_evidence": "docs/testing/c14-claude-resume-fix-2026-11-13.md",
+  "claude_repair_commit": "ecf9109",
+  "claude_native_resume_evidence_commit": "f22022e",
+  "claude_native_resume": {
+    "passed": true,
+    "session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "launch_id": "7a0b081e2e6946ca8a9c6708edbdfa7f",
+    "exit_code": 0,
+    "journal": "confirmed and ended",
+    "manual_permission_prompt_observed": true,
+    "transport_limit": "Test-only wrapper passed isolated HOME/PATH; custom HOME propagation was not added to production.",
+    "evidence": "docs/testing/c14-claude-native-resume-2026-11-13.md"
+  },
+  "claude_repair_destination_tests": {
+    "passed": 263,
+    "seconds": 109.403,
+    "exit_code": 0
+  },
+  "current_feature_commit": "0182bd8",
+  "launch_environment": {
+    "implementation_commit": "31f3cc6",
+    "native_evidence_commit": "0182bd8",
+    "full_tests": 277,
+    "compatibility_checks": 118,
+    "review": "approved without findings",
+    "applescript_programs_compiled": 3,
+    "native_without_wrapper": "passed Claude-only",
+    "native_session_id": "85b0fc6e-17b9-4d11-a788-c47ee19232eb",
+    "launch_id": "64e50406658d4854b3a9e2ee38a67f62",
+    "selected_environment_matches": true,
+    "check_exit_code": 0,
+    "native_numeric_exit_code": "not observed; process absent, hook ended, tab closed",
+    "temporary_auth_link_removed": true,
+    "codex_native_requests": 0
+  },
+  "cross_provider_run_manifest": "docs/testing/c14-cross-provider-run-2026-11-13.json"
+}

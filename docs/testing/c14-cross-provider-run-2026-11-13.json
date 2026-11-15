@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-13",
+  "authorized_at": "2026-11-13T15:55:55.737652+00:00",
+  "authorization": "User explicitly requested esegui i test cross-provider; previous native-request quota hold lifted for this group.",
+  "source_commit": "0182bd801b0e30989ad70913064346d6e0977a0f",
+  "run_dir": "/private/tmp/deskmate-c14-cross-20261113-em303n4n",
+  "source": "/private/tmp/deskmate-c14-cross-20261113-em303n4n/source",
+  "status": "awaiting-user-onboarding-confirmation",
+  "cross_provider_hold": false,
+  "c14_complete": false,
+  "preflight": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -Werror::ResourceWarning -m unittest tests.test_provider_switch tests.test_transfers -q",
+    "passed": 27,
+    "seconds": 21.447,
+    "exit_code": 0
+  },
+  "checked_at": "2026-11-13T16:10:56.050683+00:00",
+  "setup_snapshots_independently_verified": true,
+  "awaiting": {
+    "tab": "project",
+    "iterm_session": "8F246AEE-E5D6-4911-9D55-8E64183D78AE",
+    "action": "User completes Security notes and trust for isolated cross project until Claude prompt.",
+    "why": "Claude automatic permission classifier rejected scripted Enter as Undermining Oversight; not retried."
+  }
+}

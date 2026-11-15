@@ -235,5 +235,11 @@
   "remaining": [
     "Claude native group",
     "Cross-Provider native group"
-  ]
+  ],
+  "implementation_commit": "8ab2f78a817a9919428d75d56496f31adaf90fa4",
+  "follow_up": {
+    "id": "C14-CODEX-02",
+    "status": "needs-triage",
+    "summary": "Closed native history read-only access may require existing SQLite WAL/SHM sidecars."
+  }
 }
