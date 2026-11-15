@@ -65,8 +65,8 @@ class RetroDue(unittest.TestCase):
                  ('2026-11-10', 'study-later'))
         self.assertEqual(self.due('2026-11-11')['development_days'], [])
 
-    def test_the_retrospective_day_and_today_do_not_count(self):
-        self.log(('2026-11-09', 'checkpoint'), ('2026-11-09', 'how-did-it-go'),
+    def test_days_before_the_retrospective_and_today_do_not_count(self):
+        self.log(('2026-11-06', 'checkpoint'), ('2026-11-09', 'how-did-it-go'),
                  ('2026-11-10', 'checkpoint'), ('2026-11-11', 'checkpoint'))
         self.assertEqual(self.due('2026-11-11')['development_days'], ['2026-11-10'])
 
@@ -85,6 +85,39 @@ class RetroDue(unittest.TestCase):
         (self.root / 'data' / 'log.csv').write_text('nonsense,header\n1,2\n')
         result = self.due('2026-11-04', rc=1)
         self.assertIn('log.csv', result.stderr)
+
+    def test_the_retrospective_day_counts_when_it_ran_in_the_morning(self):
+        self.log(('2026-11-11', 'how-did-it-go'), ('2026-11-11', 'how-did-it-go-end'),
+                 ('2026-11-11', 'checkpoint'), ('2026-11-12', 'checkpoint'))
+        out = self.due('2026-11-13')
+        self.assertEqual(out['development_days'], ['2026-11-11', '2026-11-12'])
+        self.assertTrue(out['due'])
+
+    def test_an_abandoned_retrospective_does_not_reset_the_count(self):
+        self.log(('2026-11-06', 'how-did-it-go'), ('2026-11-06', 'how-did-it-go-end'),
+                 ('2026-11-09', 'checkpoint'), ('2026-11-10', 'how-did-it-go'), ('2026-11-10', 'checkpoint'))
+        out = self.due('2026-11-11')
+        self.assertEqual(out['last_retrospective'], '2026-11-06')
+        self.assertTrue(out['due'])
+
+    def test_rows_with_a_bad_date_are_skipped_and_counted(self):
+        self.log(('2026-11-06', 'how-did-it-go'), ('', 'checkpoint'), ('11/09/2026', 'checkpoint'),
+                 ('2026-11-09', 'checkpoint'), ('2026-11-10', 'checkpoint'))
+        out = self.due('2026-11-11')
+        self.assertEqual(out['skipped_rows'], 2)
+        self.assertTrue(out['due'])
+
+    def test_data_dir_override_applies_to_the_agenda_too(self):
+        other = self.root / 'elsewhere'
+        other.mkdir()
+        (other / 'config.json').write_text('{"language": "en"}')
+        self.log(('2026-11-06', 'how-did-it-go'), ('2026-11-09', 'checkpoint'), ('2026-11-10', 'checkpoint'))
+        (self.root / 'data' / 'log.csv').rename(other / 'log.csv')
+        (other / 'agenda.md').write_text('# Agenda\n\n## Days\n- 2026-11-10 · day · Trip\n\n## Tasks\n', encoding='utf-8')
+        env = {**os.environ, 'DESKMATE_DATA_DIR': str(other)}
+        result = subprocess.run([sys.executable, '-I', '-B', str(self.root / 'tools' / 'retro_due.py'),
+                                 '--today', '2026-11-11'], capture_output=True, text=True, env=env, timeout=15)
+        self.assertEqual(json.loads(result.stdout)['development_days'], ['2026-11-09'])
 
     # A06
 

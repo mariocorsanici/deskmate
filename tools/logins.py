@@ -17,11 +17,13 @@ Usage:
   logins.py <card> ...     these cards: a path or a project name, as for check.py
 
 Prints one JSON object: {"logins": [{login, projects, status, detail, fix}], "all_ok": bool}
-status: ok | missing | warning | unavailable (CLI or key file not found) | unknown (login type).
+status: ok | missing | warning | unavailable (CLI, key file or SSH agent not found, or a timeout:
+the state is unknown, so no fix is proposed) | unknown (login type).
 Logins are deduplicated across cards, in order of first appearance.
 """
 import json
 import os
+import shlex
 import pathlib
 import shutil
 import signal
@@ -32,6 +34,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import check  # noqa: E402
 
 TIMEOUT = 5
+SLOW = {'gcloud': 15, 'gcloud-adc': 15}  # a cold gcloud start plus a token refresh over VPN
 FIX = {
     'gcloud': 'gcloud auth login',
     'gcloud-adc': 'gcloud auth application-default login',
@@ -44,7 +47,7 @@ PROBE = {
 }
 
 
-def run(argv, keep_output=False):
+def run(argv, keep_output=False, timeout=TIMEOUT):
     """(exit code or 'timeout', stdout if kept). Never prompts: no stdin, own process group."""
     try:
         proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
@@ -53,10 +56,13 @@ def run(argv, keep_output=False):
     except OSError:
         return 'unavailable', ''
     try:
-        out, _ = proc.communicate(timeout=TIMEOUT)
+        out, _ = proc.communicate(timeout=timeout)
         return proc.returncode, out or ''
     except subprocess.TimeoutExpired:
-        os.killpg(proc.pid, signal.SIGKILL)
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
         proc.communicate()
         return 'timeout', ''
 
@@ -77,19 +83,23 @@ def probe(kind, target):
         code, loaded = run(['ssh-add', '-l'], keep_output=True)
         if code == 0 and parts[1] in loaded.split():
             return 'ok', '', ''
-        detail = 'timeout' if code == 'timeout' else 'not loaded in the SSH agent'
-        return 'missing', detail, f'ssh-add {key}'
+        if code == 'timeout':
+            return 'unavailable', 'timeout: state unknown', ''
+        if code == 2:
+            return 'unavailable', 'no SSH agent running', ''
+        return 'missing', 'not loaded in the SSH agent', f'ssh-add {shlex.quote(str(key))}'
     if kind not in PROBE:
         return 'unknown', f'unknown login type: {kind}', ''
     if not shutil.which(PROBE[kind][0]):
         return 'unavailable', f'{PROBE[kind][0]} not found', ''
-    code, _ = run(PROBE[kind])
+    code, _ = run(PROBE[kind], timeout=SLOW.get(kind, TIMEOUT))
     if code == 0:
         return 'ok', '', ''
-    detail = 'timeout' if code == 'timeout' else f'exit {code}'
+    if code == 'timeout':
+        return 'unavailable', 'timeout: state unknown, rerun or check by hand', ''
     if kind == '1password':
-        return 'warning', detail + ': Touch ID will show up at the first secret read', FIX[kind]
-    return 'missing', detail, FIX[kind]
+        return 'warning', f'exit {code}: Touch ID shows up at the first secret read in each terminal', FIX[kind]
+    return 'missing', f'exit {code}', FIX[kind]
 
 
 def main():

@@ -145,11 +145,26 @@ class Logins(unittest.TestCase):
         self.assertEqual(out['logins'][0]['status'], 'unknown')
         self.assertFalse(out['all_ok'])
 
-    def test_slow_check_times_out(self):
+    def test_slow_check_is_unavailable_without_a_fix(self):
         self.add('-Users-me-Dev-fleet', 'Fleet', ['gcloud'])
         out = self.run_logins('fleet', gcloud='slow')
-        self.assertEqual(out['logins'][0]['status'], 'missing')
-        self.assertIn('timeout', out['logins'][0]['detail'])
+        login = out['logins'][0]
+        self.assertEqual((login['status'], login['fix']), ('unavailable', ''))
+        self.assertIn('timeout', login['detail'])
+
+    def test_no_ssh_agent_is_unavailable_without_a_fix(self):
+        self.add('-Users-me-Dev-fleet', 'Fleet', ['ssh-key ~/.ssh/work_key'])
+        (self.bin / 'ssh-add').write_text('#!/bin/sh\necho "ssh-add $*" >> "$CALLS"\nexit 2\n')
+        login = self.run_logins('fleet')['logins'][0]
+        self.assertEqual((login['status'], login['fix']), ('unavailable', ''))
+        self.assertIn('no SSH agent', login['detail'])
+
+    def test_key_path_with_spaces_is_quoted_in_the_fix(self):
+        (self.home / 'my keys').mkdir()
+        (self.home / 'my keys' / 'k.pub').write_text('ssh-ed25519 AAAA me@mac\n')
+        self.add('-Users-me-Dev-fleet', 'Fleet', ['ssh-key ~/my keys/k'])
+        login = self.run_logins('fleet', ssh_add='fail')['logins'][0]
+        self.assertEqual(login['fix'], f"ssh-add '{self.home}/my keys/k'")
 
     def test_unknown_project_name_fails_without_traceback(self):
         self.add('-Users-me-Dev-fleet', 'Fleet', ['gcloud'])

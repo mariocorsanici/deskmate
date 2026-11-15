@@ -12,7 +12,7 @@ A **retrospective** on *how* the work went over the last few days, not on its te
 
 ## Steps
 
-1. **Period.** From the day after the latest entry in `~/Dev/mc_dev/deskmate/data/lessons.md` until today; if `lessons.md` has no entries yet, the last 3 days.
+1. **Period.** From the date of the latest entry in `~/Dev/mc_dev/deskmate/data/lessons.md` (retrospectives run in the morning, so that day's work has not been reviewed yet; for an older entry written in the evening, from the day after) until yesterday; if `lessons.md` has no entries yet, the last 3 days.
 
 2. **Collect.** Run `python3 -I ~/Dev/mc_dev/deskmate/tools/sessions.py --since <start> --messages 60 --cut 400` and read the handoffs of the period in `~/Dev/mc_dev/deskmate/data/archive/` and `handoff.md`: they are the plan, the transcripts are what happened. `~/Dev/mc_dev/deskmate/data/log.csv` tells when the skills ran, how the user answered the reminders and how many tokens each run used. For claims about the **cost of the skills themselves**, use only start rows whose `usage_scope` is `end-marked`, excluding `*-end` rows. Separate them from `legacy-window` or unlabeled historical rows; report the sample size and marker boundary. If no end-marked sample exists, say that bounded skill-cost evidence is unavailable instead of comparing the old windows. Session-wide experiment metrics remain session metrics, not skill costs.
    Also read `~/Dev/mc_dev/deskmate/docs/agenda.md` and run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py list --today <today> --closed-since <start>`. Keep its `closed` entries as evidence for this retrospective, including today's completions. Report all initialization/repair and invalid-line diagnostics; exit 2 still returns usable data. Resolve exit 1 before treating the agenda as empty. Collect before archiving; step 6 does the cleanup after the report is preserved.
@@ -48,7 +48,7 @@ A **retrospective** on *how* the work went over the last few days, not on its te
 
    Report the collected agenda completions in one line in `language` (e.g. "Non sviluppo completato: report trasferta; nota spese"); if there are none, say so briefly. Then run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py archive --today <today> --closed-before <today>`. This archives past days and tasks completed before today, preserving today's completions. Report notices and every invalid-line diagnostic; exit 2 means cleanup already happened on valid lines, so do not repeat it. Resolve failures before claiming cleanup succeeded.
 
-   Then remind the user that `/call-it-a-day` is the next step.
+   Then go back to the day: if `/whats-on-today` already proposed it, point to its plan; otherwise suggest running `/whats-on-today` now.
 
 
 ## Complete the measurement
