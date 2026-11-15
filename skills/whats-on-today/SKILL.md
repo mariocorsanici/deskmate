@@ -18,7 +18,7 @@ Get the user back on track in a few minutes, starting from the handoff written b
 
 4. **Propose the day.** In chat, short:
    - **Before you start:** the preparation steps from the handoff.
-   - **In stand-by:** the projects in state `standby`, in one line. Do not propose them and do not open sessions for them unless the user asks; if they do, run their checks with `check.py <card>`.
+   - **In stand-by:** the projects in state `standby`, in one line. Do not propose them and do not open sessions for them unless the user asks; if they do, run their checks with `check.py <card>` (a project name or the card's path).
    - **Suggested order:** first what unblocks others (messages to send, replies to give), then the long work.
    - **Method:** the running experiments from `lessons.md`, one line each, to keep them in mind.
    - The number of open items in `study-later.md`, without listing them: they are for after closing time.
