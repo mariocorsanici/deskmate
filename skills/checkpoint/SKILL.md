@@ -52,7 +52,7 @@ Run inside a project's work session, when you stop working on it (at the end of 
 
 6. **Resume rating.** If `config.json` has `experiments.fresh_sessions` and this is the first checkpoint of the day for this session, ask one question: "How did the restart go this morning? **1** picked up straight away · **2** I had to explain something again · **3** it worked on stale or wrong context". Record the answer with `~/Dev/mc_dev/deskmate/tools/log_event.sh resume-rating <1|2|3> <session-id> <folder>`. Skip it if the user does not want to answer.
 
-7. **Reply.** In chat, the status as written (translated into `language`) and one line: "Saved in the project card, `/call-it-a-day` will use it."
+7. **Reply.** In chat, the status as written (translated into `language`) and one line: "Saved in the project card, `/call-it-a-day` will use it." If the user says they are leaving this project for another one outside today's high/low pair (or swapping high and low), log it with its reason: `~/Dev/mc_dev/deskmate/tools/log_event.sh switch "<from> → <to>: <reason>" "<session-id>" "<starting-folder>"`.
 
 
 ## Complete the measurement

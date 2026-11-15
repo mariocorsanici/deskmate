@@ -22,7 +22,8 @@ A **retrospective** on *how* the work went over the last few days, not on its te
    - **Plan and reality:** what was in the handoff and got done, postponed, forgotten.
    - **Rework:** false starts, retracted answers, stale notes taken at face value, work done twice.
    - **Waiting and blockers:** time stuck waiting for people, permissions, access.
-   - **Context switches:** parallel sessions, interruptions, work resumed several times.
+   - **Context switches:** parallel sessions, interruptions, work resumed several times. Read the `switch` rows of the period in `log.csv` ("<from> → <to>: <reason>"): for each, say whether it was a **real block** (waiting on someone, a run, an access; check it against the handoff's "Waiting on" and the transcripts) or **scattering** (no block, a pull towards something else). Give the count of each.
+   - **Goals:** the `goal` rows of the period against the handoffs' "Goal of the day" outcomes: how many reached, partly, dropped, and what the dropped ones have in common.
    - **Use of Claude:** vague requests that needed clarification, things Claude could have done alone or that were better done by hand.
    - **What worked:** to repeat.
    - **Data experiment:** if `config.json` has `experiments.fresh_sessions`, run `python3 -I ~/Dev/mc_dev/deskmate/tools/session_stats.py` and report the "per mode" lines. When both modes have at least `target_days` session-days, compare them (context at start, tokens per answer, compactions, rating, corrections like "that's old" in the transcripts) and propose a decision: then the experiment ends, and you remove `experiments.fresh_sessions` from `config.json` once the user agrees.
