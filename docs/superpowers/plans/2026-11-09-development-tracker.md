@@ -41,7 +41,7 @@ part of C14. C15/C16 (launch start check, morning reminder after power-off,
 specified in `67cc376`) are outside the 29-ticket count and not implemented;
 the owner decides whether they precede Codex integration.
 
-**Implementation count: 24 of 29.** Remaining: L05–L08 and A06. L09 landed as a hotfix on `develop` (`51ba159`, merged in `dfd7636`).
+**Implementation count: 29 of 29 (2026-11-15).** L09 landed as a hotfix (`51ba159`); Daily loop and Agenda core merged into `develop` (`b34f38c`, `1420b75`); L05–L08 and A06 merged from `feature/daily-loop-followups` (`8b1eb4b`). Still open: the `## Logins` sections of the real cards (L08, needs the owner's list) and real-day use of the new skill instructions. Next: step 4 below, the Codex reconciliation, which now also has to carry `retro_due.py`, `logins.py`, `check.select()`, the `agenda` entries in `usage_log.SKILLS` and the reminder texts.
 
 **New integration order, decided by the owner on 2026-11-15:**
 
@@ -577,17 +577,17 @@ implementation, while milestone checkboxes record integration and acceptance.
 | [x] | L02 | Morning remote-change report |
 | [x] | L03 | Stale-Handoff disclosure |
 | [x] | L04 | Explicit skill completion and bounded token metrics |
-| [ ] | L05 | Retrospective every two development days |
-| [ ] | L06 | Goal of the day |
-| [ ] | L07 | High/low priorities and project-switch log |
-| [ ] | L08 | Morning login checks |
+| [x] | L05 | Retrospective every two development days |
+| [x] | L06 | Goal of the day |
+| [x] | L07 | High/low priorities and project-switch log |
+| [x] | L08 | Morning login checks |
 | [x] | L09 | Check a Project card by project name or existing path (hotfix on `develop`, `51ba159`) |
 | [x] | A01 | Agenda CLI and contract tests |
 | [x] | A02 | Agenda skill, logging and initial installation |
 | [x] | A03 | Morning Agenda integration |
 | [x] | A04 | Evening Agenda integration |
 | [x] | A05 | Closed Agenda tasks in the retrospective |
-| [ ] | A06 | Non-development days in cadence and stale-Handoff rules |
+| [x] | A06 | Non-development days in cadence and stale-Handoff rules |
 
 ## Verification and ownership rules
 
@@ -669,6 +669,8 @@ checks as pending/blocked rather than passed.
 | 2026-11-15 | Owner changed the integration order: L09 hotfix on `develop`, then Daily loop, then Agenda, then `develop` merged into Codex and reconciled there, then Codex into `develop`. See the 2026-11-15 status section. C14 evidence formerly untracked in the `develop` checkout committed on the Codex branch as `d57e23d`. Card versioning needs a design session first. | 23/29 | L09 hotfix on `develop` |
 
 | 2026-11-15 | L09 implemented as `hotfix/check-by-project-name` (`51ba159`), merged into `develop` (`dfd7636`). Path or name; name matches folder key or title case-insensitively; closed cards count only when no open card matches; several/no matches list candidates and exit 1 before running checks. 8/8 tests on Python 3.14.6 and system 3.9. Expected conflicts in `tools/check.py` and `skills/checkpoint/SKILL.md` with Daily loop and Codex; Codex reconciliation moves the lookup onto the shared card helper. | 24/29 | Merge `feature/daily-loop-tuning` into `develop` |
+
+| 2026-11-15 | Daily loop (L01–L04) and Agenda core (A01–A05) merged into `develop` (`b34f38c`, `1420b75`); the agenda hook test now copies `usage_log.py`. `feature/daily-loop-followups`: /agenda measured (`7a99df1`), L05+A06 `retro_due.py` and `is-dev-day` printing the entry (`c9bd69f`), L08 `logins.py` (`308bb23`), L06+L07 goal, priorities and switch log (`ea584d8`), independent review fixes (`84bbabc`): evening reminder without fixed-day retro, retro day counted, timeouts unavailable not missing. Merged as `8b1eb4b`; 103/103 tests on Python 3.14.6 and system 3.9. Skill instructions not yet exercised in a real day. | 29/29 | Real-day use; owner confirms Logins; Codex reconciliation |
 
 When starting a ticket, append the date, ticket ID and responsible session/owner.
 At completion, add commit, test evidence and remaining blockers. When a merge
