@@ -433,5 +433,33 @@
       "Fixture working day/time",
       "Only alert title and five-second timeout adjusted"
     ]
+  },
+  "calibration_cleanup_followup": {
+    "trigger": "Owner reported visible DESKMATE_FAKE_INPUT_READY tabs",
+    "initial_native_cleanup_missed_calibration_programs": true,
+    "programs_found_still_waiting": 2,
+    "normal_input_exit_and_tab_cleanup": [
+      {
+        "terminal_session_id": "463303E0-CD98-4426-AE4F-237B06DCF0AD",
+        "tty": "/dev/ttys002",
+        "native_test_program": false,
+        "calibration_process_absent": true,
+        "runner_absent": true,
+        "tab": "already closed",
+        "termination_signal_used": false
+      },
+      {
+        "terminal_session_id": "317AF860-3D13-42E3-A8C5-313D0AB87366",
+        "tty": "/dev/ttys003",
+        "native_test_program": false,
+        "calibration_process_absent": true,
+        "runner_absent": true,
+        "tab": "already closed",
+        "termination_signal_used": false
+      }
+    ],
+    "remaining_calibration_programs_or_runners_on_marker_tabs": 0,
+    "other_work_terminals_preserved": true,
+    "production_and_native_acceptance_bytes_unchanged": true
   }
 }

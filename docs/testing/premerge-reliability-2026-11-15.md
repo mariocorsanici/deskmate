@@ -113,3 +113,21 @@ screen/launchd state remain in
 non-sensitive test content, selected native facts, hashes and cleanup results.
 Historical C14 reports describe their own dates; this report supersedes their
 cold-history and launchd limitations for the implemented mechanisms above.
+
+## Correction: calibration tab cleanup
+
+After the owner reported visible `DESKMATE_FAKE_INPUT_READY` terminals, a
+targeted audit found two earlier input-calibration programs still waiting for
+input, each with its terminal runner. The original cleanup checked the real
+Provider PIDs and fixture-specific arguments; it missed these separate programs
+under the pre-merge diagnostics directory. The claim that all test processes
+were gone was therefore too broad.
+
+Both identified fake programs received their normal terminating input, followed
+by acknowledgement of the runner's inspection prompt where needed. Both child
+processes and runners exited, and their two tabs closed. No termination signal
+was used. A follow-up audit found no calibration program or runner on tabs with
+that marker; the real Codex work terminal was preserved. The original successful
+literal-input proof was backed up before this cleanup could overwrite its raw
+diagnostic capture. Native Provider acceptance results and production code are
+unchanged. The accompanying JSON records this late cleanup explicitly.
