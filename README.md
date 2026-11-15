@@ -12,7 +12,7 @@ The [development plan and tracker](docs/superpowers/plans/2026-11-09-development
 | during the day | `/study-later <topic>` | notes a topic to study later |
 | anytime | `/agenda <what>` | records non-development days and tasks, closes completed tasks; without arguments, shows the agenda |
 | end of each work session | `/checkpoint` | writes where the project stands in its project card |
-| Mon, Wed, Fri before closing | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md` |
+| every two development days, first thing in the morning | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md`; `/whats-on-today` proposes it when due (`tools/retro_due.py`) |
 | evening (reminder) | `/call-it-a-day` | collects the project cards, checks the live state and writes `data/handoff.md` for tomorrow |
 
 After closing: study the topics you set aside, or admin work.
@@ -104,6 +104,7 @@ skills/                  the skills of the day
 tools/
   sessions.py            summary of the Claude Code sessions in a period
   agenda.py              locked reads, writes and archiving of non-development days and tasks
+  retro_due.py           is a retrospective due: development days since the last one
   log_event.sh           appends a row to the log
   token_usage.py         computes bounded or legacy-window skill usage from transcripts
   usage_log.py           shared locked, atomic activity CSV storage

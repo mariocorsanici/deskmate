@@ -33,6 +33,6 @@ Prepares the Mac for the deskmate skills, or runs a health check if it is alread
    - with `calendar`: if the install says the events changed, run `open data/deskmate-reminders.ics` and ask the user to confirm the import in their calendar app; when replacing older events, tell them to delete the previous deskmate events if the app duplicated them.
    Done when every item has an observed result.
 
-5. **Summary.** In chat, one line per piece with ✓ or the remaining problem. Remind the user that Claude sessions already open see the hooks only after a restart, and that the typical day is: `/whats-on-today` in the morning, `/study-later` during the day, `/how-did-it-go` (Mon, Wed, Fri) and `/call-it-a-day` at the evening reminder.
+5. **Summary.** In chat, one line per piece with ✓ or the remaining problem. Remind the user that Claude sessions already open see the hooks only after a restart, and that the typical day is: `/whats-on-today` in the morning, `/study-later` during the day, `/how-did-it-go` when `/whats-on-today` proposes it (every two development days) and `/call-it-a-day` at the evening reminder.
 
 To remove everything: `./install.sh --remove` (data stays).

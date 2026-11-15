@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Before working, read `~/Dev/mc_dev/deskmate/docs/agents/skill-metrics.md` and capture this invocation’s native session/start identity for the completion step.
 
-A **retrospective** on *how* the work went over the last few days, not on its technical content: organisation, method, use of Claude. It runs on Monday, Wednesday and Friday, before `/call-it-a-day`. Data files live in `~/Dev/mc_dev/deskmate/data/`. First read `~/Dev/mc_dev/deskmate/data/config.json`: address the user by `name`, and write every reply and the `lessons.md` entry in `language`.
+A **retrospective** on *how* the work went over the last few days, not on its technical content: organisation, method, use of Claude. It runs every two development days, proposed by `/whats-on-today` as the first step of the day (about 10 minutes). Data files live in `~/Dev/mc_dev/deskmate/data/`. First read `~/Dev/mc_dev/deskmate/data/config.json`: address the user by `name`, and write every reply and the `lessons.md` entry in `language`.
 
 ## Steps
 
@@ -30,7 +30,7 @@ A **retrospective** on *how* the work went over the last few days, not on its te
 
 4. **Previous experiments.** For each experiment in the latest entry: did it happen? Did it help? Decide whether to keep, change or drop it. Compare with older entries too: a problem seen two or more times is **recurring**.
 
-5. **Talk it through.** Present the 3–5 strongest observations, recurring ones first, and ask for the user's reading: it is a conversation, and their view counts more than the transcripts. Agree on 1–3 experiments for the next days, concrete and checkable ("one session per project", not "be tidier").
+5. **Talk it through.** Present at most three observations, the strongest, recurring ones first, and ask for the user's reading: it is a conversation, and their view counts more than the transcripts. Agree on 1–3 experiments for the next days, concrete and checkable ("one session per project", not "be tidier").
 
 6. **Record.** Append to `lessons.md`, with the labels translated into `language`:
 
@@ -42,6 +42,8 @@ A **retrospective** on *how* the work went over the last few days, not on its te
    **Running experiments:**
    - …
    ```
+
+   At most three points per section: keep the strongest, drop the rest.
 
    Report the collected agenda completions in one line in `language` (e.g. "Non sviluppo completato: report trasferta; nota spese"); if there are none, say so briefly. Then run `python3 -I ~/Dev/mc_dev/deskmate/tools/agenda.py archive --today <today> --closed-before <today>`. This archives past days and tasks completed before today, preserving today's completions. Report notices and every invalid-line diagnostic; exit 2 means cleanup already happened on valid lines, so do not repeat it. Resolve failures before claiming cleanup succeeded.
 

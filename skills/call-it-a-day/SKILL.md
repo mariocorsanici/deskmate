@@ -12,7 +12,7 @@ Leave tomorrow's user a **handoff**: for every open piece of work, where it stan
 
 ## Steps
 
-1. **Retrospective.** If today is Monday, Wednesday or Friday and `~/Dev/mc_dev/deskmate/data/lessons.md` has no entry for today yet, ask whether to run `/how-did-it-go` first. If yes, stop here: the user will run this skill again afterwards.
+1. **Retrospective.** Not proposed here: `/whats-on-today` proposes `/how-did-it-go` as the first step of the day, every two development days. If the user asks for it now, stop here: they will run this skill again afterwards.
 
 2. **Collect.** The state of each project comes from its **project card**, written by `/checkpoint` in the project's own session: `~/.claude/projects/*/memory/project-card.md`, section `## Status`. Then run `python3 -I ~/Dev/mc_dev/deskmate/tools/sessions.py` (today's sessions) to see which sessions were active, and reread `~/Dev/mc_dev/deskmate/data/handoff.md`.
    - **Card with a checkpoint later than the session's last activity:** use the card as it is, without reading the transcript.

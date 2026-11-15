@@ -274,6 +274,16 @@ class AgendaCLI(unittest.TestCase):
         self.assertIn('invalid: BROKEN', result.stderr)
         self.run_cli('is-dev-day', '2026-11-09', rc=2)
 
+    def test_is_dev_day_prints_the_whole_day_entry(self):
+        self.run_cli('day', '2026-10-30', 'day', 'Trip Monfalcone')
+        self.run_cli('day', '2026-11-06', 'morning', 'Office')
+        result = self.run_cli('is-dev-day', '2026-10-30', rc=3)
+        self.assertEqual(result.stdout, '- 2026-10-30 · day · Trip Monfalcone\n')
+        self.assertEqual(self.run_cli('is-dev-day', '2026-11-06').stdout, '')
+        self.run_cli('archive', '--today', '2026-11-06')
+        result = self.run_cli('is-dev-day', '2026-10-30', rc=3)
+        self.assertEqual(result.stdout, '- 2026-10-30 · day · Trip Monfalcone\n')
+
     def test_half_days_and_unlisted_weekends_are_development_days(self):
         self.run_cli('day', '2026-11-06', 'morning', 'Office')
         self.run_cli('day', '2026-11-06', 'afternoon', 'Travel')
