@@ -48,6 +48,8 @@ Run inside a project's work session, when you stop working on it (at the end of 
 
    Only commands that change nothing: no fetch with side effects beyond refs, no writes, no Slack. Run `python3 -I ~/Dev/mc_dev/deskmate/tools/check.py <card>` (a project name or the card's path) to confirm they work, and fix the ones that fail for the wrong reason.
 
+   **Logins** (optional section, after `## Checks`): the logins this project's work needs, one per line, from `ssh-key <path to the private key>`, `gcloud`, `gcloud-adc`, `1password`. Add one when this session hit an expired or missing login, after asking the user; never write a secret, only the type and the key path. `/whats-on-today` checks them every morning with `tools/logins.py`.
+
 6. **Resume rating.** If `config.json` has `experiments.fresh_sessions` and this is the first checkpoint of the day for this session, ask one question: "How did the restart go this morning? **1** picked up straight away · **2** I had to explain something again · **3** it worked on stale or wrong context". Record the answer with `~/Dev/mc_dev/deskmate/tools/log_event.sh resume-rating <1|2|3> <session-id> <folder>`. Skip it if the user does not want to answer.
 
 7. **Reply.** In chat, the status as written (translated into `language`) and one line: "Saved in the project card, `/call-it-a-day` will use it."

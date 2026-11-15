@@ -30,6 +30,7 @@ Each project has a card, `~/.claude/projects/<folder-key>/memory/project-card.md
 
 - `## Status`: state (`active`, `paused`, `standby`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
 - `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `tools/check.py` runs them for `/whats-on-today` and `/call-it-a-day`.
+- `## Logins` (optional): the logins the work needs (`ssh-key <path>`, `gcloud`, `gcloud-adc`, `1password`). `/whats-on-today` checks them with `tools/logins.py` and lists the `! <command>` lines to run before starting, all at once.
 
 `paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `check.py` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
 
@@ -105,6 +106,7 @@ tools/
   sessions.py            summary of the Claude Code sessions in a period
   agenda.py              locked reads, writes and archiving of non-development days and tasks
   retro_due.py           is a retrospective due: development days since the last one
+  logins.py              read-only check of the logins listed in the project cards
   log_event.sh           appends a row to the log
   token_usage.py         computes bounded or legacy-window skill usage from transcripts
   usage_log.py           shared locked, atomic activity CSV storage
