@@ -41,7 +41,7 @@ part of C14. C15/C16 (launch start check, morning reminder after power-off,
 specified in `67cc376`) are outside the 29-ticket count and not implemented;
 the owner decides whether they precede Codex integration.
 
-**Implementation count: 23 of 29.** Remaining: L05–L09 and A06.
+**Implementation count: 24 of 29.** Remaining: L05–L08 and A06. L09 landed as a hotfix on `develop` (`51ba159`, merged in `dfd7636`).
 
 **New integration order, decided by the owner on 2026-11-15:**
 
@@ -581,7 +581,7 @@ implementation, while milestone checkboxes record integration and acceptance.
 | [ ] | L06 | Goal of the day |
 | [ ] | L07 | High/low priorities and project-switch log |
 | [ ] | L08 | Morning login checks |
-| [ ] | L09 | Check a Project card by project name or existing path |
+| [x] | L09 | Check a Project card by project name or existing path (hotfix on `develop`, `51ba159`) |
 | [x] | A01 | Agenda CLI and contract tests |
 | [x] | A02 | Agenda skill, logging and initial installation |
 | [x] | A03 | Morning Agenda integration |
@@ -667,6 +667,8 @@ checks as pending/blocked rather than passed.
 | 2026-11-14 | Cross-Provider native acceptance passed on the Codex branch, commit `8702d8c`: both defaults, both switch directions, unavailable-source recovery, same-ID resume. C14-CODEX-03 (stale Codex daemon environment) repaired with `--no-daemon`; 279/279 full tests, 70/70 system-Python checks, independent review without findings. Calendar import and launchd remain platform follow-ups. No push or merge. | 23/29 | Integration |
 
 | 2026-11-15 | Owner changed the integration order: L09 hotfix on `develop`, then Daily loop, then Agenda, then `develop` merged into Codex and reconciled there, then Codex into `develop`. See the 2026-11-15 status section. C14 evidence formerly untracked in the `develop` checkout committed on the Codex branch as `d57e23d`. Card versioning needs a design session first. | 23/29 | L09 hotfix on `develop` |
+
+| 2026-11-15 | L09 implemented as `hotfix/check-by-project-name` (`51ba159`), merged into `develop` (`dfd7636`). Path or name; name matches folder key or title case-insensitively; closed cards count only when no open card matches; several/no matches list candidates and exit 1 before running checks. 8/8 tests on Python 3.14.6 and system 3.9. Expected conflicts in `tools/check.py` and `skills/checkpoint/SKILL.md` with Daily loop and Codex; Codex reconciliation moves the lookup onto the shared card helper. | 24/29 | Merge `feature/daily-loop-tuning` into `develop` |
 
 When starting a ticket, append the date, ticket ID and responsible session/owner.
 At completion, add commit, test evidence and remaining blockers. When a merge
