@@ -130,15 +130,17 @@ observed rows/card revisions and degraded outcomes without private conversation
 content. The fixture matrix does not substitute for native evidence. The calendar and
 future scheduling checks are not represented as Provider acceptance results.
 
-## Temporary tracker disposition before merge
+## Temporary tracker disposition
 
 The durable contract is [Provider-neutral CLI](../provider-neutral-cli.md);
 [ADR 0001](../adr/0001-provider-neutral-core.md) and
 [development workflow](../agents/development-workflow.md) remain authoritative.
-Retain `.scratch/provider-neutral-cli/` until the integration change.
-Delete that entire temporary directory in the eventual integration change after
-preserving the native results and checking the evidence below. It is identified
-for removal, not an active post-merge documentation dependency.
+The temporary `.scratch/provider-neutral-cli/` tracker was removed on 2026-11-16,
+in the change that integrated `develop`, after checking the evidence mapping
+below. Its C04 note on native Claude Code 2.1.317 skill discovery and hook
+delivery is superseded by the authenticated C14 Claude acceptance on 2.1.323.
+Historical plans under `docs/superpowers/` still cite tracker paths; read them
+through git history (`git show 2d2713d:.scratch/provider-neutral-cli/...`).
 
 | Temporary material | Durable destination before removal |
 | --- | --- |

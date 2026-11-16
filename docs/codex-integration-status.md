@@ -1,17 +1,18 @@
 # Codex integration status
 
-Updated 2026-11-15 for `feature/codex-cli-support`.
+Updated 2026-11-16 for `feature/codex-cli-support`.
 
 ## Current state
 
 C01–C16 are implemented. The agreed Provider integration and pre-merge
 reliability cases have passed. No unresolved functional blocker is known within
-that acceptance scope. Integration into the current `develop` and publication
-of the local commits remain to be performed.
+that acceptance scope. Integration with the current `develop` is complete
+locally; publication and the merge into `develop` remain.
 
-The latest production change is `1a83dfa`; `0de0aa7` records the subsequent
-correction to calibration cleanup. This status refresh changes documentation
-only. The implementation bytes still match the actual native acceptance copy.
+The native acceptance covered the implementation up to `1a83dfa`; `0de0aa7`
+records the subsequent correction to calibration cleanup. The `develop`
+integration in `40c8a8e` changed shared logging, token usage, `check.py` and the
+skills afterwards; see [Local and remote state](#local-and-remote-state).
 
 ## Completed and verified
 
@@ -68,17 +69,26 @@ valid. The detailed report and JSON explicitly retain this correction.
 
 ## Local and remote state
 
-The remote branch was checked with `git ls-remote` during this refresh:
-`origin/feature/codex-cli-support` points to
-`c23d6938b9006e1bd58fbb5cb3cc8368a83647aa`. The completed work and this status
-update are local commits; this task has performed no push or merge.
+Updated 2026-11-16. The status refresh `2d2713d` was pushed:
+`origin/feature/codex-cli-support` pointed to it before this integration.
 
-Before merging:
+Integration steps completed locally:
 
-1. Remove `.scratch/provider-neutral-cli/` in the integration change, after
-   checking the durable evidence mapping in
-   [Daily-loop verification](testing/daily-loop.md#temporary-tracker-disposition-before-merge).
-2. Reconcile the feature with the current `develop`; both contain independent
-   commits. Resolve any conflicts and run the suite on the integrated result.
-3. Publish the reviewed feature commits and perform integration according to
-   the [development workflow](agents/development-workflow.md).
+1. `develop` (up to `74f713c`) was merged into the feature in `40c8a8e`. The
+   Daily-loop follow-ups and the Agenda were ported to the Provider-neutral
+   design rather than restoring the Claude-only shell hooks: `activity_log.py`
+   now holds `usage_scope` and the precise `<skill>-end` markers, skills log
+   through `deskmate log-event ... --provider`, and `deskmate agenda`,
+   `deskmate logins` and `deskmate retro-due` replace direct tool paths.
+   Per-skill token windows remain Claude-only; Codex usage stays session-wide.
+2. `.scratch/provider-neutral-cli/` was removed after checking the
+   [evidence mapping](testing/daily-loop.md#temporary-tracker-disposition).
+3. The integrated result passed the full suite: 413/413 on Python 3.14.6 and
+   413/413 on macOS Python 3.9.6, ResourceWarnings as errors, no bytecode writes.
+
+The native acceptance above predates the integration. The integrated skills
+(Agenda, goal, switches, logins, end markers) have automated coverage only;
+they have not been exercised in a native Claude or Codex session.
+
+Remaining: publish the feature commits and merge into `develop` according to
+the [development workflow](agents/development-workflow.md).
