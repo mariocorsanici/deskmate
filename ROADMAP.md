@@ -14,9 +14,6 @@ A third reminder channel, `slack`: a plain message to a channel or to yourself t
 - Creating the Slack app may need a workspace admin's approval.
 - Plain messages carry no buttons, so unlike the `mac` channel they don't record the answer in `data/log.csv`.
 
-## License
-Pick one after a first period of real use.
-
 ## Command names
 `/call-it-a-day` is the current name for the evening skill. Alternatives considered: `/wrap-up`, `/punch-out`, `/end-of-shift`, `/sign-off`, `/lights-out`, `/pack-up`, `/log-off`.
 
