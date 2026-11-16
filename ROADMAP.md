@@ -53,3 +53,10 @@ Pick one after a first period of real use.
 
 ## Command names
 `/call-it-a-day` is the current name for the evening skill. Alternatives considered: `/wrap-up`, `/punch-out`, `/end-of-shift`, `/sign-off`, `/lights-out`, `/pack-up`, `/log-off`.
+
+## Version the project cards
+Project cards live in `~/.claude/projects/<folder-key>/memory/`, outside any git repo, so an edit overwrites the old card with no way back (2026-11-12: closing the vlm-demo-builder card and moving its items to apps-monorepo needed hand-made `.bak` copies; Time Machine was not mounting).
+- A local git repo in `~/.claude/projects` that tracks only `*/memory/*.md` (everything else ignored: transcripts are large and may hold secrets). Never pushed.
+- `/checkpoint` and `/call-it-a-day` commit after writing a card, one commit per run, with the card's title in the message.
+- Bonus: `git log -p` of a card shows how a project moved, which `/how-did-it-go` could use.
+- Open: `feature/codex-cli-support` moves cards to `<DESKMATE_DATA_DIR>/projects/<key>/project-card.md`, with a revision number and one `card write` command for every write (the Claude path becomes a symlink). The approach above predates that; design it again before implementing.

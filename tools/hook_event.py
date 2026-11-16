@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import activity_log
 
-SKILLS = {'whats-on-today', 'how-did-it-go', 'call-it-a-day', 'study-later', 'checkpoint'}
+SKILLS = activity_log.SKILLS
 
 
 def handle(provider, payload):

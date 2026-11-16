@@ -17,8 +17,15 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY_COLUMNS = ['date', 'time', 'weekday', 'event', 'detail', 'session', 'cwd',
                   'turns', 'input_tokens', 'cache_tokens', 'output_tokens']
-COLUMNS = [*LEGACY_COLUMNS, 'schema_version', 'provider']
+COLUMNS = [*LEGACY_COLUMNS, 'schema_version', 'provider', 'usage_scope']
 PROVIDERS = ('claude', 'codex')
+SKILLS = {'whats-on-today', 'how-did-it-go', 'call-it-a-day', 'study-later', 'checkpoint', 'agenda'}
+END_EVENTS = {skill + '-end' for skill in SKILLS}
+
+
+def default_scope(row):
+    """Claude per-skill token windows are labeled; other rows claim no window."""
+    return 'legacy-window' if row['provider'] == 'claude' and row['event'] in SKILLS else ''
 
 
 def data_root():
@@ -49,6 +56,7 @@ def read_log(path):
     if not legacy and not {'schema_version', 'provider'}.issubset(fields):
         raise ValueError('unrecognized log schema: provider and schema_version are required together')
     rows = list(reader)
+    scoped = 'usage_scope' in fields
     for row in rows:
         if None in row or any(value is None for value in row.values()):
             raise ValueError('invalid log CSV row: column count does not match header')
@@ -58,7 +66,11 @@ def read_log(path):
             raise ValueError(f"unsupported log schema {row['schema_version']}")
         if row['provider'] not in PROVIDERS:
             raise ValueError(f"unknown log provider {row['provider']}")
-    return [*fields, *(['schema_version', 'provider'] if legacy else [])], rows, legacy
+        # usage_scope is an optional extension column, added on the next write.
+        if not row.setdefault('usage_scope', ''):
+            row['usage_scope'] = default_scope(row)
+    added = [*(['schema_version', 'provider'] if legacy else []), *([] if scoped else ['usage_scope'])]
+    return [*fields, *added], rows, legacy
 
 
 def atomic_write(path, fields, rows):
@@ -107,14 +119,18 @@ def migrate_locked(path):
 def append_event(event, detail='', session='', cwd='', provider='claude'):
     if provider not in PROVIDERS:
         raise ValueError(f'unknown log provider {provider}')
+    now = dt.datetime.now().astimezone()
+    if event in END_EVENTS and not detail:
+        # A precise completion marker bounds the skill's token window.
+        detail = now.astimezone(dt.timezone.utc).isoformat(timespec='microseconds')
     with locked() as path:
         fields, rows, _ = migrate_locked(path)
-        now = dt.datetime.now()
         row = dict.fromkeys(fields, '')
         row.update(date=now.strftime('%Y-%m-%d'), time=now.strftime('%H:%M'),
                    weekday='mon tue wed thu fri sat sun'.split()[now.weekday()],
                    event=event, detail=detail, session=session, cwd=cwd,
                    schema_version='1', provider=provider)
+        row['usage_scope'] = default_scope(row)
         rows.append(row)
         atomic_write(path, fields, rows)
 

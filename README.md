@@ -6,17 +6,27 @@ Use `/skill` in Claude Code and `$skill` in Codex CLI. Setup links the same sour
 
 [Codex integration status and remaining integration steps](docs/codex-integration-status.md).
 
+The [development plan and tracker](docs/superpowers/plans/2026-11-09-development-tracker.md) records completed work, remaining tickets, priorities and the integration order for the Codex CLI, Daily loop and Agenda branches.
+
 ## A typical day
 
 | When | Skill | What it does |
 |---|---|---|
 | morning (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day, lists the commands you can use and opens the sessions in titled iTerm tabs |
 | during the day | `/study-later <topic>` | notes a topic to study later |
+| anytime | `/agenda <what>` | records non-development days and tasks, closes completed tasks; without arguments, shows the agenda |
 | end of each work session | `/checkpoint` | writes where the project stands in its project card |
-| Mon, Wed, Fri before closing | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md` |
+| every two development days, first thing in the morning | `/how-did-it-go` | retrospective on organisation and method, updates `data/lessons.md`; `/whats-on-today` proposes it when due (`deskmate retro-due`) |
 | evening (reminder) | `/call-it-a-day` | collects the project cards, checks the live state and writes `data/handoff.md` for tomorrow |
 
 After closing: study the topics you set aside, or admin work.
+
+`/agenda` keeps travel, office days and non-code tasks in `data/agenda.md`.
+Dates are optional references, and tasks stay open until explicitly closed.
+For example, `/agenda giovedì trasferta Monfalcone` reserves next Thursday;
+`/agenda nota spese novembre` saves an undated task; `/agenda fatto nota spese`
+closes it. Replies follow the configured language. See the [agenda reference](docs/agenda.md)
+for the command output, date interpretation and archive rules.
 
 ## Project cards
 
@@ -24,6 +34,7 @@ Each project has one shared Markdown card at `data/projects/<slug>-<path-hash>/p
 
 - `## Status`: state (`active`, `paused`, `standby`, `closed`), where you are, what to do, what you are waiting on, how to resume (session ID and folder);
 - `## Checks`: read-only commands, one per line as ``- <label>: `<command>` ``, that tell in a few seconds whether the status is still true. `deskmate check` runs them for `/whats-on-today` and `/call-it-a-day`.
+- `## Logins` (optional): the logins the work needs (`ssh-key <path>`, `gcloud`, `gcloud-adc`, `1password`). `/whats-on-today` checks them with `deskmate logins` and lists the `! <command>` lines to run before starting, all at once.
 
 `paused` work waits for a decision about priorities and is still proposed every morning. `standby` work is left alone until you ask for it: `deskmate check` skips its checks (unless you pass `--all` or name the card), and the handoff and the morning brief name it in one line. Less noise in the handoff, no slow checks (an SSH timing out on a machine that is off), and a few thousand tokens less per project each day.
 
@@ -198,6 +209,20 @@ corruption and unavailable or unstable storage still report partial/unavailable
 coverage so work can continue from the Project card and Checks. See the
 [cold-history verification](docs/testing/premerge-cold-history-2026-11-15.md).
 
+## Morning freshness
+
+`/checkpoint` labels remote-state checks separately from local-state checks. Shared
+ticket files are read with `git show <remote>/<branch>:<path>` after the central
+fetch; local edits/branches are read from the working tree. Fetch failures make
+remote freshness unknown even when a cached ref can still be read.
+
+`/whats-on-today` reports remote commits and, when available, merged PRs since the
+Handoff was generated, marking other authors and reconciling completed work before
+planning. Handoffs carry a timezone-aware `Generated:` timestamp, separate from
+their target day. Intervening calendar dates without work events trigger a stale
+Handoff notice; current state then comes from live Checks and remote changes.
+Older files use mtime with an explicit estimate, and missing evidence stays unknown.
+
 ## Experiments
 
 `experiments.fresh_sessions` in `config.json` can select new-session weekdays
@@ -352,6 +377,10 @@ tools/                   internal implementations behind bin/deskmate
   reminders.py           configured Provider syntax, LaunchAgents and calendar
   morning_reminder.sh    desktop wrapper through the stable command
   evening_reminder.sh    desktop wrapper through the stable command
+  agenda.py              locked reads, writes and archiving of non-development days and tasks
+  retro_due.py           is a retrospective due: development days since the last one
+  logins.py              read-only check of the logins listed in the project cards
+  token_usage.py         computes bounded or legacy-window Claude skill usage from transcripts
 install.sh               install, update, remove
 data/                    personal files, not in git
 ```
@@ -363,7 +392,9 @@ data/                    personal files, not in git
 - `handoff.md`: state of the sessions and things to do, rewritten every evening; the previous version goes to `archive/`.
 - `lessons.md`: log of the retrospectives, with the running method experiments.
 - `study-later.md`: topics to study.
-- `log.csv`: one skill run or reminder per row. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens, schema_version, provider`. Historical rows migrate as Claude; Provider plus native ID identifies a Work session. Raw Codex counters live separately under `usage/`. A run lasts from its command to the next `/command` of the same session, or to the end of the session: for clean numbers, run the skills in a dedicated session or finish with `/clear`.
+- `agenda.md`: non-development days and tasks, managed through `deskmate agenda`; setup creates it only if absent.
+- `archive/agenda-YYYY-MM.md`: past non-development days and completed agenda tasks.
+- `log.csv`: one skill run or reminder per row, plus `goal` (the confirmed goal of the day) and `switch` ("<from> → <to>: <reason>") rows. Columns: `date, time, weekday, event, detail, session, cwd, turns, input_tokens, cache_tokens, output_tokens, schema_version, provider, usage_scope`. Historical rows migrate as Claude; Provider plus native ID identifies a Work session. Raw Codex counters live separately under `usage/`. Each completed skill writes a `<skill>-end` metadata row through `deskmate log-event`; its detail is a precise UTC end timestamp. For Claude, usage stops at the earliest valid matching marker, next command or session end. `usage_scope=end-marked` identifies marker-bounded measurements; `legacy-window` preserves the old next-command/session-end behavior for history and incomplete runs. Codex skill rows keep an empty `usage_scope`: Codex usage is session-wide. Retrospectives use only end-marked runs for skill-cost comparisons. The final model reply after a marker is outside that measurement. End-event rows have no usage totals. Writers preserve extension columns and serialize atomic updates through `.log.lock`. `DESKMATE_DATA_DIR` overrides the data root for isolated checks.
 
 
 The [Provider-neutral contract](docs/provider-neutral-cli.md) records durable

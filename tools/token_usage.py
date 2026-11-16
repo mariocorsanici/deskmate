@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Fills in data/log.csv the tokens used by each run of the deskmate skills.
+"""Fills in data/log.csv the tokens used by each Claude run of the deskmate skills.
 
-A run lasts from its command (/call-it-a-day, ...) to the next command of the
-same session (any /command) or to the end of the session, so it includes the
-user's replies inside the skill. Tokens come from the usage field of Claude's
-messages in the transcript.
+A run starts at its command (/call-it-a-day, ...). It ends at the skill's precise
+`<skill>-end` marker when one was logged (usage_scope end-marked), which excludes
+unrelated work after completion. Historical runs without a valid marker keep the
+next-command/session-end window (usage_scope legacy-window), which includes the
+user's replies inside the skill. Neither scope claims a final reply after the
+marker. Tokens come from the usage field of Claude's messages in the transcript.
 
 Usage:
   token_usage.py                  # every session in the log
@@ -12,6 +14,7 @@ Usage:
 """
 import argparse
 import csv
+import datetime as dt
 import fcntl
 import json
 import os
@@ -28,8 +31,6 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data"))
 LOG = DATA / "log.csv"
 PROJECTS = claude_home() / "projects"
-COLUMNS = ["date", "time", "weekday", "event", "detail", "session", "cwd",
-           "turns", "input_tokens", "cache_tokens", "output_tokens"]
 # the transcript stores a typed command as "<command-message>…</command-message>\n<command-name>/name</command-name>"
 COMMAND = re.compile(r"^\s*(?:<command-message>[^<]*</command-message>\s*)?<command-name>/?([^<]+)</command-name>")
 
@@ -50,6 +51,8 @@ def read_transcript(path):
                 continue
             if row.get("type") not in ("user", "assistant"):
                 continue
+            if row.get("isSidechain"):
+                continue  # subagent traffic is not a run of the parent skill
             msg = row.get("message")
             ts = timestamp(row.get("timestamp"))
             if not isinstance(msg, dict) or ts is None:
@@ -103,25 +106,59 @@ def read_transcript(path):
     return commands, usage
 
 
+def marker_timestamp(value):
+    """A marker counts only with an explicit offset, as append_event writes it."""
+    try:
+        parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return parsed.timestamp() if parsed.tzinfo is not None else None
+    except (AttributeError, TypeError, ValueError, OverflowError):
+        return None
+
+
+def marker_after(rows, row_index, session, start, end):
+    """The timestamp of this run's own end marker inside [start, end), or None."""
+    current = rows[row_index]
+    for candidate in rows[row_index + 1:]:
+        if candidate.get("session") != session:
+            continue
+        if candidate.get("event") in activity_log.SKILLS:
+            break  # another invocation owns any later completion marker
+        if (candidate.get("event") != current["event"] + "-end"
+                or candidate.get("cwd") != current.get("cwd")):
+            continue
+        stamp = marker_timestamp(candidate.get("detail"))
+        if stamp is not None and start <= stamp < end:
+            return stamp
+    return None
+
+
 def compute(session, rows):
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", session):
+        return
     found = list(PROJECTS.glob(f"*/{session}.jsonl"))
-    if not found:
+    if len(found) != 1:
         return
     try:
         commands, usage = read_transcript(found[0])
     except (OSError, UnicodeError):
         print('token usage: warning: transcript unavailable; per-skill attribution skipped.', file=sys.stderr)
         return
-    used = set()
-    for row in rows:
-        # the k-th run of a skill in the log matches the k-th one in the transcript
-        index = next((i for i, (_, name) in enumerate(commands)
-                      if name == row["event"] and i not in used), None)
+    consumed = -1
+    for row_index, row in enumerate(rows):
+        if row["event"] not in activity_log.SKILLS:
+            continue
+        # runs match in order: the next transcript command of the same skill
+        index = next((i for i in range(consumed + 1, len(commands))
+                      if commands[i][1] == row["event"]), None)
         if index is None:
             continue
-        used.add(index)
+        consumed = index
         start = commands[index][0]
         end = commands[index + 1][0] if index + 1 < len(commands) else float("inf")
+        marked = marker_after(rows, row_index, session, start, end)
+        row["usage_scope"] = "end-marked" if marked is not None else "legacy-window"
+        if marked is not None:
+            end = marked
         part = [u for u in usage if start <= u[0] < end]
         row["turns"] = str(len(part))
         for name, pos in (("input_tokens", 1), ("cache_tokens", 2), ("output_tokens", 3)):

@@ -28,7 +28,6 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = pathlib.Path(os.environ.get("DESKMATE_DATA_DIR", ROOT / "data")).expanduser().resolve()
 ICS = DATA / "deskmate-reminders.ics"
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
-RETRO_DAYS = {"mon", "wed", "fri"}
 CHANNELS = {"mac", "calendar", "slack"}
 DEFAULTS = {"morning": "09:00", "evening": "17:00",
             "days": ["mon", "tue", "wed", "thu", "fri"], "channels": ["mac"]}
@@ -37,12 +36,10 @@ TEXTS = {
     "en": {
         "morning_title": "Good morning, let's go",
         "morning": ["/whats-on-today: rereads yesterday's handoff, checks what changed, suggests the order of the day and opens the sessions.",
-                    "Do the «Before you start» steps it lists.",
+                    "Do the «Before you start» steps it lists; if it proposes /how-did-it-go (every two development days), do that first.",
                     "During the day: /study-later <topic> for anything you want to study later."],
         "evening_title": "Time to call it a day",
         "checkpoint": "/checkpoint in each work session: saves where the project stands in its project card.",
-        "retro": "/how-did-it-go: retrospective on how the last few days went, updates the lessons.",
-        "retro_days": "(Mon, Wed, Fri) ",
         "close": "/call-it-a-day: snapshots the open sessions, writes tomorrow's handoff and suggests topics to study.",
         "after": "After closing: study ({n} topics to study) or admin work.",
         "after_static": "After closing: study the topics you set aside, or admin work.",
@@ -51,12 +48,10 @@ TEXTS = {
     "it": {
         "morning_title": "Buongiorno, si riparte",
         "morning": ["/whats-on-today: rilegge le consegne di ieri, controlla cosa è cambiato, propone l'ordine della giornata e apre le sessioni.",
-                    "Fai i passi «Prima di iniziare» che ti indica.",
+                    "Fai i passi «Prima di iniziare» che ti indica; se propone /how-did-it-go (ogni due giorni di sviluppo), parti da quella.",
                     "Durante il giorno: /study-later <argomento> per ciò che vuoi studiare dopo."],
         "evening_title": "È ora di chiudere",
         "checkpoint": "/checkpoint in ogni sessione di lavoro: salva lo stato del progetto nella sua scheda.",
-        "retro": "/how-did-it-go: retrospettiva sul metodo degli ultimi giorni, aggiorna le lezioni.",
-        "retro_days": "(lun, mer, ven) ",
         "close": "/call-it-a-day: fotografa le sessioni aperte, scrive le consegne per domani e propone argomenti da approfondire.",
         "after": "Dopo la chiusura: studio ({n} argomenti da approfondire) o amministrazione.",
         "after_static": "Dopo la chiusura: studio degli argomenti messi da parte, o amministrazione.",
@@ -117,10 +112,7 @@ def lines(kind, t, static=False):
     except FileNotFoundError:
         pass
     after = t["after_static"] if static else t["after"].format(n=open_topics)
-    if static:
-        return [t["checkpoint"], t["retro_days"] + t["retro"], t["close"], after]
-    today = DAYS[dt.date.today().weekday()]
-    return [t["checkpoint"]] + ([t["retro"]] if today in RETRO_DAYS else []) + [t["close"], after]
+    return [t["checkpoint"], t["close"], after]
 
 
 def numbered(items, sep):

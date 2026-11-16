@@ -175,6 +175,9 @@ class DeskmateCliTest(unittest.TestCase):
             "work-session",
             "log-event",
             "token-usage",
+            "agenda",
+            "logins",
+            "retro-due",
         }
         with tempfile.TemporaryDirectory() as directory:
             result = self.run_deskmate("--help", home=pathlib.Path(directory))
@@ -220,6 +223,9 @@ class DeskmateCliTest(unittest.TestCase):
             "work-session",
             "log-event",
             "token-usage",
+            "agenda",
+            "logins",
+            "retro-due",
         )
         with tempfile.TemporaryDirectory() as directory:
             home = pathlib.Path(directory)

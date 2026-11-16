@@ -20,6 +20,7 @@ import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import activity_log
 import adapter_codex
+import agenda
 import project_cards as cards
 import providers
 from provider_environment import claude_home
@@ -405,8 +406,10 @@ def setup(args):
         for legacy, shared, text in migrations:
             transaction.add(shared, file_state(text))
             transaction.add(legacy, {'kind': 'link', 'target': str(shared)})
+        words = agenda.WORDS.get(config.get('language'), agenda.WORDS['en'])
         for name, content in [('lessons.md', '# Lessons\n\nRetrospectives, latest at the bottom.\n'),
-                              ('study-later.md', '# Study later\n\nTopics to study after closing time.\n')]:
+                              ('study-later.md', '# Study later\n\nTopics to study after closing time.\n'),
+                              ('agenda.md', f'# Agenda\n\n{words["intro"]}\n\n## {words["days"]}\n\n## {words["tasks"]}\n')]:
             if not (data / name).exists():
                 transaction.add(data / name, file_state(content.encode()))
         with tempfile.TemporaryDirectory(prefix='deskmate-setup-stage-') as directory:
