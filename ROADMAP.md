@@ -26,3 +26,9 @@ Project cards live in `~/.claude/projects/<folder-key>/memory/`, outside any git
 - `/checkpoint` and `/call-it-a-day` commit after writing a card, one commit per run, with the card's title in the message.
 - Bonus: `git log -p` of a card shows how a project moved, which `/how-did-it-go` could use.
 - Open: `feature/codex-cli-support` moves cards to `<DESKMATE_DATA_DIR>/projects/<key>/project-card.md`, with a revision number and one `card write` command for every write (the Claude path becomes a symlink). The approach above predates that; design it again before implementing.
+
+## Install separately from the development checkout
+Today the installed copy is the repository in `~/Dev/mc_dev/deskmate`, with personal data inside it (`docs/agents/release.md`). After `v0.3.0`, install from a clone pinned to a release tag, with the data in its own folder, so deploy and rollback become "move to tag, run `deskmate setup`".
+- Setup must pass `DESKMATE_DATA_DIR` to the Claude and Codex hooks too; today only the reminders receive it, and hooks fall back to `<repo>/data`.
+- Moving existing data is a setup migration with a backup, like the card and log migrations.
+- Distribution as a Claude Code plugin was considered: it gives pinned, versioned copies for Claude, but Codex would still need its own install path. `deskmate setup` stays the single install point for both providers.
