@@ -1,6 +1,6 @@
 # 01: tools/agenda.py and its tests
 
-**Status:** implemented
+**Status:** done (merged into develop as `1420b75`, 2026-11-15)
 
 Implement `tools/agenda.py` as in the spec ("File format", "Deterministic handling", "commands"), Python standard library only, run with `python3 -I`.
 

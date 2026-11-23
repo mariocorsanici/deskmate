@@ -1,6 +1,6 @@
 # 03: /whats-on-today reads the agenda
 
-**Status:** implemented
+**Status:** done (merged into develop as `1420b75`, 2026-11-15)
 **Blocked by:** 01
 
 - [x] Whole non-development day: said first, only the agenda block, no project checks or sessions unless asked.

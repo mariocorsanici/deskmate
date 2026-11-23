@@ -1,6 +1,6 @@
 # 02: The /agenda skill
 
-**Status:** implemented
+**Status:** done (merged into develop as `1420b75`, 2026-11-15)
 **Blocked by:** 01
 
 - [x] `skills/agenda/SKILL.md` as in the spec ("The `/agenda` skill"), modelled on `study-later`.

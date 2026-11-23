@@ -1,6 +1,6 @@
 # 05: /how-did-it-go reports closed agenda tasks
 
-**Status:** implemented
+**Status:** done (merged into develop as `1420b75`, 2026-11-15)
 **Blocked by:** 01
 
 - [x] One line with the tasks closed since the last retrospective (`list --closed-since`).

@@ -1,6 +1,6 @@
 # Daily loop tuning: live state, honest metrics, retrospective cadence
 
-Status: ready-for-agent
+Status: done (tickets 01–07 and 09 merged into develop by 2026-11-15; 08 awaits the Logins of the real cards)
 
 ## Problem Statement
 

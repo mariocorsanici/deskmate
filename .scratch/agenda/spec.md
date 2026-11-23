@@ -1,6 +1,6 @@
 # Agenda: non-development days and tasks
 
-Status: implemented tickets 01–05; integration follow-up 06 blocked by daily-loop-tuning
+Status: done (tickets 01–05 merged as `1420b75`, 06 as `8b1eb4b`, 2026-11-15)
 
 ## Problem Statement
 

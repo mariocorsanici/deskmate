@@ -1,6 +1,6 @@
 # 01: Card checks read the remote state, not the working tree
 
-**Status:** ready-for-agent
+**Status:** done (merged into develop as `b34f38c`, 2026-11-15)
 
 **Implementation:** complete (automated/local verification; native acceptance not claimed).
 

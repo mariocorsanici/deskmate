@@ -1,6 +1,6 @@
 # 04: /call-it-a-day writes and tidies the agenda
 
-**Status:** implemented
+**Status:** done (merged into develop as `1420b75`, 2026-11-15)
 **Blocked by:** 01
 
 - [x] One-line question for non-development items to add or close; answers written through `tools/agenda.py`.

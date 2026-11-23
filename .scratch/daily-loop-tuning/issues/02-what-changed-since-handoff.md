@@ -1,6 +1,6 @@
 # 02: /whats-on-today lists what changed on the remote since the handoff
 
-**Status:** ready-for-agent
+**Status:** done (merged into develop as `b34f38c`, 2026-11-15)
 
 **Implementation:** complete (automated/local verification; native acceptance not claimed).
 
