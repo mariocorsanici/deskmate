@@ -46,7 +46,7 @@ The installed copy follows the line under trial (today `develop`).
 |---|---|---|
 | `v0.1.0` (2026-11-16) | Claude-only Daily loop, standby, check fetch, L09 hotfix | in place, symlinks to the installed copy |
 | `v0.2.0` (2026-11-23) | Agenda, Daily-loop tuning and follow-ups, after one week of use | unchanged: fast-forward `main`, no upgrade step |
-| `v0.3.0` (not tagged yet) | Calendar and Slack reminder channels removed; CI | unchanged, but `data/config.json` may only list the `mac` channel: `./install.sh` refuses any other |
+| next, not assigned | Whatever brings a user-facing change; it also carries the removal of the unused calendar and Slack reminder channels and the CI | `data/config.json` may only list the `mac` channel: `./install.sh` refuses any other |
 
 One risky change per release: a release that changes the installation (such
 as ROADMAP item 3) carries nothing else, so if it misbehaves the cause is the
