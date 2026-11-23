@@ -2,7 +2,8 @@
 
 How the installed Deskmate is kept separate from development work, and how a
 release reaches it. Branch roles (`main`, `develop`, `feature/*`) are in
-`development-workflow.md`, which arrives on `develop` with the Codex branch.
+`development-workflow.md`, which arrives on `develop` with the Codex branch
+(postponed).
 
 ## Rules
 
@@ -37,13 +38,13 @@ The installed copy follows the line under trial (today `develop`).
 | Version | Content | Installation |
 |---|---|---|
 | `v0.1.0` (2026-11-16) | Claude-only Daily loop, standby, check fetch, L09 hotfix | in place, symlinks to the installed copy |
-| `v0.2.0` | Agenda, Daily-loop tuning and follow-ups, after one week of use | unchanged: fast-forward `main`, no upgrade step |
-| `v0.3.0` | Codex CLI support (`feature/codex-cli-support`) | **changes**: requires `deskmate setup` (upgrade checklist below) |
+| `v0.2.0` (2026-11-23) | Agenda, Daily-loop tuning and follow-ups, after one week of use | unchanged: fast-forward `main`, no upgrade step |
+| not assigned | Codex CLI support (`feature/codex-cli-support`), postponed | **changes**: requires `deskmate setup` (upgrade checklist below) |
 
-One risky change per release: if `v0.3.0` misbehaves, the cause is the
-migration or Codex, not the Agenda.
+One risky change per release: the release that brings Codex support carries
+nothing else, so if it misbehaves the cause is the migration or Codex.
 
-## v0.3.0 upgrade checklist
+## Codex upgrade checklist
 
 Run once, at the end of a working day, after `/call-it-a-day`.
 
@@ -69,7 +70,7 @@ Run once, at the end of a working day, after `/call-it-a-day`.
    (`launchctl print gui/$(id -u)/com.deskmate.morning`).
 6. **Rollback, if needed:** `deskmate remove` (keeps data), restore the step 2
    copies (replacing the card symlinks with the saved files),
-   `git switch --detach v0.2.0`, `./install.sh`. Cards written after the
+   `git switch --detach <previous tag>`, `./install.sh`. Cards written after the
    upgrade exist only in `data/projects/`: copy their current text over the
    saved ones first.
 7. Promote to `main` with the tag after a stable period.

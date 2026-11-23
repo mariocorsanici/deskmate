@@ -2,13 +2,13 @@
 
 Claude Code skills to run your working day: open it in the morning, close it in the late afternoon, and every other day take stock of how you work. Claude acts as the colleague at the next desk who keeps track of where everything stands.
 
-The [development plan and tracker](docs/superpowers/plans/2026-11-09-development-tracker.md) records completed work, remaining tickets, priorities and the integration order for the Codex CLI, Daily loop and Agenda branches.
+The [development plan and tracker](docs/superpowers/plans/2026-11-09-development-tracker.md) records completed work, remaining tickets, priorities and the integration order for the Codex CLI, Daily loop and Agenda branches. Released versions and their notes are tags (`git tag -n20`); Codex CLI support is postponed.
 
 ## A typical day
 
 | When | Skill | What it does |
 |---|---|---|
-| morning (reminder) | `/whats-on-today` | rereads the handoff, checks what changed, flags skipped steps, suggests the order of the day, lists the commands you can use and opens the sessions in titled iTerm tabs |
+| morning (reminder) | `/whats-on-today` | rereads the handoff, checks what changed (remote commits and merged PRs too) and the logins the work needs, flags skipped steps, proposes a goal of the day with high/low priorities, suggests the order of the day, lists the commands you can use and opens the sessions in titled iTerm tabs |
 | during the day | `/study-later <topic>` | notes a topic to study later |
 | anytime | `/agenda <what>` | records non-development days and tasks, closes completed tasks; without arguments, shows the agenda |
 | end of each work session | `/checkpoint` | writes where the project stands in its project card |
@@ -52,7 +52,7 @@ Older files use mtime with an explicit estimate, and missing evidence stays unkn
 
 ## Experiments
 
-`data/config.json` can hold a running experiment on the way of working, which the skills remind you of every morning. Today there is one, `experiments.fresh_sessions`: is it better to resume yesterday's session (`claude --resume`) or to start a new one that picks up from the project card? On the weekdays in `new_days`, `/whats-on-today` opens a new session (`open_tab.sh --new`), on the others it resumes; `/checkpoint` asks how the restart went (1–3); `tools/session_stats.py` measures each session-day from the transcripts (context at the first answer, tokens, compactions) and `/how-did-it-go` proposes a decision once both modes have `target_days` days.
+`data/config.json` can hold a running experiment on the way of working, which the skills remind you of every morning. The one built in is `experiments.fresh_sessions`: is it better to resume yesterday's session (`claude --resume`) or to start a new one that picks up from the project card? On the weekdays in `new_days`, `/whats-on-today` opens a new session (`open_tab.sh --new`), on the others it resumes; `/checkpoint` asks how the restart went (1–3); `tools/session_stats.py` measures each session-day from the transcripts (context at the first answer, tokens, compactions) and `/how-did-it-go` proposes a decision once both modes have `target_days` days.
 
 ## Installation
 

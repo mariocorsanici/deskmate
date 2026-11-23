@@ -5,44 +5,40 @@ Next steps in priority order. Release rules and checklists are in
 
 ## Next
 
-### 1. v0.2.0: Agenda and Daily-loop tuning
-On `develop`, in daily use for one trial week from 2026-11-16. Fixes go through
-`fix/…` branches (`hotfix/…` only for urgent fixes to the installed copy) and
-are listed for porting to the Codex branch. After the week, promote `develop`
-to `main` and tag `v0.2.0`. No upgrade step.
-
-### 2. v0.3.0: Codex CLI support
-`feature/codex-cli-support`: Claude Code and Codex CLI as equivalent
-Providers through one `deskmate` command. Follow the upgrade checklist in
-`docs/agents/release.md`: bring in `develop` again, port the week's fixes,
-rehearse upgrade and rollback in an isolated `HOME`, then `deskmate setup`.
-Before tagging, run the integrated skills natively in both Providers (Agenda,
-goal of the day, switches, logins, end markers in Codex): today they have
-automated coverage only.
-
-### 3. Run the tests in CI
+### 1. Run the tests in CI
 Run the complete suite on pushes and pull requests (GitHub Actions, macOS
 runner, Python 3.14 and the system Python), with ResourceWarnings as errors.
 Branch protection and mandatory pull requests are not planned: for a single
 maintainer they add friction without adding checks.
 
-### 4. Install separately from the development checkout
+### 2. Install separately from the development checkout
 Today the installed copy is the repository in `~/Dev/mc_dev/deskmate`, with
-personal data inside it. After `v0.3.0`, install from a clone pinned to a
-release tag, with the data in its own folder, so deploy and rollback become
-"move to tag, run `deskmate setup`".
-- Setup must pass `DESKMATE_DATA_DIR` to the Claude and Codex hooks too; today
-  only the reminders receive it, and hooks fall back to `<repo>/data`.
+personal data inside it. Install from a clone pinned to a release tag, with
+the data in its own folder, so deploy and rollback become "move to tag, rerun
+the installer" (`./install.sh` today, `deskmate setup` once Codex support
+ships).
+- The hooks must receive `DESKMATE_DATA_DIR` too; today only the reminders
+  receive it, and hooks fall back to `<repo>/data`.
 - Moving existing data is a setup migration with a backup, like the card and
   log migrations.
 - Distribution as a Claude Code plugin was considered: it gives pinned,
   versioned copies for Claude, but Codex would still need its own install
-  path. `deskmate setup` stays the single install point for both Providers.
+  path. One installer stays the single install point for every Provider.
 
 ## Later
 
+### Codex CLI support (postponed, no version assigned)
+`feature/codex-cli-support`: Claude Code and Codex CLI as equivalent
+Providers through one `deskmate` command. Parked on 2026-11-23 at `dada99a`
+(suite green, contains `develop` up to `74f713c`); no date to resume. Fixes on
+`develop` are no longer listed for porting: on resuming, merge the `develop`
+of that time and port what changed. Follow the Codex upgrade checklist in
+`docs/agents/release.md` and run the integrated skills natively in both
+Providers before tagging.
+
 ### Cross-provider analytics
-After at least a month of use with both Providers. Store Claude Code and Codex
+Only after Codex support ships, and at least a month of use with both
+Providers. Store Claude Code and Codex
 CLI measurements with their Provider identity and analyse them separately
 first. Then define normalized metrics that support combined views and explicit
 comparisons without mixing incompatible raw token, context or compaction values.
@@ -115,8 +111,8 @@ plain words) and count the notes before building anything.
 - **Slack reminders:** the `mac` alert covers the need and records the answer;
   a webhook message cannot, and the Slack app may need admin approval.
 - **Renaming commands** (`/call-it-a-day`): the names are habits now, and
-  renaming after `v0.3.0` would touch both Providers.
+  renaming after Codex support would touch both Providers.
 - **Branch protection and mandatory pull requests:** only CI is kept (step 3).
-- **Versioning the project cards with a local git repo:** `v0.3.0` adds card
+- **Versioning the project cards with a local git repo:** Codex support adds card
   revisions and a backup on every overwrite. If card history is still missing
   after that, design it again on the shared cards.
