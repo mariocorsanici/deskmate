@@ -68,6 +68,46 @@ on the `mac` channel. To verify it: import into Google and Apple Calendar,
 check that event notifications survive the import, and document what a second
 import does after times or days change.
 
+## Ideas to explore (drafts)
+
+### Daily journal (draft, 2026-11-23)
+Not designed yet: an idea from the first trial week, to explore before any
+implementation. Evidence from that week: the morning session was reused all
+day (2026-11-16), switches were never logged (the `switch` one-liner felt
+unnatural), the goal of the day was often missing because assigned work ran
+out, and two of five evening closes did not finish.
+
+Idea: one file per lived day, `data/journal/YYYY-MM-DD.md`, holding the whole
+day and replacing `handoff.md` and its archive:
+
+- `## Plan`: written by `/whats-on-today` (goal, high/low priorities, order,
+  waiting items). The morning session then runs `/clear` and becomes the
+  journal, so notes do not carry the morning context.
+- `## Journal`: timestamped notes in plain words (blocks, switches with their
+  reason, decisions, news, "out of assigned work"), from the journal session
+  or a `/note <text>` skill usable in any session.
+- `## Close`: written by `/call-it-a-day` (goal outcome and why, what closed,
+  what deviated from the plan).
+- `## Tomorrow`: the handoff (per project: where you are, to do, waiting on,
+  before you start; proposed goal). The morning reads the latest journal that
+  has this section, so weekends and travel days need no special case.
+
+Open questions:
+- Which events are worth a note; whether energy or mood belongs there.
+- Whether the journal tab stays open in practice, or `/note` is enough.
+- A close done the next morning must write into the day it closes; a repeated
+  close replaces `## Close` and `## Tomorrow` and keeps a backup.
+- A tool, not the model, should create the file, replace sections and find the
+  latest `## Tomorrow`, so the morning reads only that section.
+- Migration: keep the handoff archive as history; keep `handoff.md` as a copy of
+  `## Tomorrow` during the transition.
+- How it relates to the goal-of-the-day and switch changes from the trial week
+  (an explicit "out of assigned work" outcome; switches reconstructed by the
+  retrospective instead of logged by hand).
+
+First step: one week by hand (keep the morning session as the journal, notes in
+plain words) and count the notes before building anything.
+
 ## Dropped (2026-11-16)
 
 - **Linux and Windows support:** Deskmate is a personal macOS tool. Reopen if
