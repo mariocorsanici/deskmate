@@ -5,13 +5,7 @@ Next steps in priority order. Release rules and checklists are in
 
 ## Next
 
-### 1. Run the tests in CI
-Run the complete suite on pushes and pull requests (GitHub Actions, macOS
-runner, Python 3.14 and the system Python), with ResourceWarnings as errors.
-Branch protection and mandatory pull requests are not planned: for a single
-maintainer they add friction without adding checks.
-
-### 2. Install separately from the development checkout
+### 1. Install separately from the development checkout
 Today the installed copy is the repository in `~/Dev/mc_dev/deskmate`, with
 personal data inside it. Install from a clone pinned to a release tag, with
 the data in its own folder, so deploy and rollback become "move to tag, rerun
@@ -112,7 +106,8 @@ plain words) and count the notes before building anything.
   a webhook message cannot, and the Slack app may need admin approval.
 - **Renaming commands** (`/call-it-a-day`): the names are habits now, and
   renaming after Codex support would touch both Providers.
-- **Branch protection and mandatory pull requests:** only CI is kept (step 1).
+- **Branch protection and mandatory pull requests:** only CI is kept
+  (`.github/workflows/tests.yml`, since 2026-11-23).
 - **Versioning the project cards with a local git repo:** Codex support adds card
   revisions and a backup on every overwrite. If card history is still missing
   after that, design it again on the shared cards.
