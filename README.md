@@ -119,6 +119,7 @@ tools/
   session_stats.py       data for the resume-or-new-session experiment
   open_tab.sh            opens a session in a titled iTerm tab, or brings it to the front if already running
 install.sh               install, update, remove
+tests/                   unittest suite, run by .github/workflows/tests.yml on every push and pull request
 data/                    personal files, not in git
 ```
 

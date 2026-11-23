@@ -1,0 +1,36 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }}
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.14', system]
+    env:
+      PYTHONWARNINGS: error::ResourceWarning
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - if: matrix.python != 'system'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      # The shell scripts call `python3` from PATH: make it /usr/bin/python3 too.
+      - if: matrix.python == 'system'
+        run: echo /usr/bin >> "$GITHUB_PATH"
+      # zsh, jq and git ship with the runner; the tests use temporary data
+      # (DESKMATE_DATA_DIR), never data/.
+      # A ResourceWarning raised while finalizing an object is only printed
+      # ("Exception ignored ..."), so the log is checked as well.
+      - name: Run the tests
+        shell: bash  # adds pipefail
+        run: |
+          python3 --version
+          python3 -m unittest discover -s tests -v 2>&1 | tee "$RUNNER_TEMP/tests.log"
+          ! grep -n ResourceWarning "$RUNNER_TEMP/tests.log"
