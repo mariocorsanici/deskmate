@@ -1,9 +1,16 @@
 # Releases, deploy and rollback
 
 How the installed Deskmate is kept separate from development work, and how a
-release reaches it. Branch roles (`main`, `develop`, `feature/*`) are in
-`development-workflow.md`, which exists only on the Codex branch
-(dropped, see `ROADMAP.md`).
+release reaches it.
+
+## Branches
+
+- `main`: the released line. A release reaches it only after a stable period
+  on `develop`, and is tagged there.
+- `develop`: integration and trial; the installed copy follows it.
+- `feature/…`, `fix/…`, `docs/…`, `hotfix/…`: one coherent effort each.
+  Dependent changes that are not releasable on their own stay on one branch,
+  and it is merged into `develop` only when the whole effort is done.
 
 ## Rules
 
@@ -39,45 +46,15 @@ The installed copy follows the line under trial (today `develop`).
 |---|---|---|
 | `v0.1.0` (2026-11-16) | Claude-only Daily loop, standby, check fetch, L09 hotfix | in place, symlinks to the installed copy |
 | `v0.2.0` (2026-11-23) | Agenda, Daily-loop tuning and follow-ups, after one week of use | unchanged: fast-forward `main`, no upgrade step |
-| not assigned | Codex CLI support (`feature/codex-cli-support`), dropped (see `ROADMAP.md`) | **changes**: requires `deskmate setup` (upgrade checklist below) |
+| `v0.3.0` (not tagged yet) | Calendar and Slack reminder channels removed; CI | unchanged, but `data/config.json` may only list the `mac` channel: `./install.sh` refuses any other |
 
-One risky change per release: the release that brings Codex support carries
-nothing else, so if it misbehaves the cause is the migration or Codex.
-
-## Codex upgrade checklist
-
-Run once, at the end of a working day, after `/call-it-a-day`.
-
-1. **Before merging.** Merge `develop` into the feature again, port any fixes
-   made since (skills there call `deskmate …` instead of tool paths), run the
-   full suite on Python 3.14 and the macOS system Python, and rehearse steps
-   3–5 and the rollback in an isolated `HOME`.
-2. **Back up.** Copy `data/`, `~/.claude/settings.json`,
-   `~/Library/LaunchAgents/com.deskmate.*.plist` and every
-   `~/.claude/projects/*/memory/project-card.md` (with their folder keys)
-   outside the repo. Setup turns those cards into symlinks to `data/projects/`.
-3. **Merge and tag** the feature into `develop`.
-4. **Set up from the installed copy:**
-   `cd ~/Dev/mc_dev/deskmate && bin/deskmate setup`. Hooks are written with the
-   absolute path of the checkout that runs setup; running it from a worktree
-   would move the installation there. Setup installs `~/.local/bin/deskmate`,
-   replaces the hooks, moves the project cards to `data/projects/` (symlinks
-   left in `~/.claude/projects/*/memory/`), migrates `log.csv` with a backup,
-   rewrites the reminders and links the skills for Codex if chosen.
-5. **Verify** the next morning: `/whats-on-today` in Claude and
-   `$whats-on-today` in Codex each add one row to `data/log.csv` with their
-   provider; `deskmate check` lists every card; both reminders are loaded
-   (`launchctl print gui/$(id -u)/com.deskmate.morning`).
-6. **Rollback, if needed:** `deskmate remove` (keeps data), restore the step 2
-   copies (replacing the card symlinks with the saved files),
-   `git switch --detach <previous tag>`, `./install.sh`. Cards written after the
-   upgrade exist only in `data/projects/`: copy their current text over the
-   saved ones first.
-7. Promote to `main` with the tag after a stable period.
+One risky change per release: a release that changes the installation (such
+as ROADMAP item 3) carries nothing else, so if it misbehaves the cause is the
+migration.
 
 ## Deferred
 
-Moving the installed copy and the data out of `~/Dev` (for example a clone
-pinned to a tag, with data elsewhere) is not supported end to end yet:
-reminders receive `DESKMATE_DATA_DIR`, but the hooks use
-`<repo>/data`. See `ROADMAP.md`.
+Moving the installed copy and the data out of `~/Dev` is not supported yet:
+the skills name `~/Dev/mc_dev/deskmate` directly, and the hooks do not receive
+`DESKMATE_DATA_DIR`. See `ROADMAP.md`, items 2 and 3. The checklist for the
+dropped Codex release is in this file as of `35ce1ef`.

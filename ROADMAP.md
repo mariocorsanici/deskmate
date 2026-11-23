@@ -5,26 +5,42 @@ Next steps in priority order. Release rules and checklists are in
 
 ## Next
 
-### 1. Install separately from the development checkout
-Today the installed copy is the repository in `~/Dev/mc_dev/deskmate`, with
-personal data inside it. Install from a clone pinned to a release tag, with
-the data in its own folder, so deploy and rollback become "move to tag, rerun
-the installer" (`./install.sh`).
-- The hooks must receive `DESKMATE_DATA_DIR` too; today only the reminders
-  receive it, and hooks fall back to `<repo>/data`.
+### 1. Try the daily journal by hand for one week
+No code. The first step of the journal draft below: keep the morning session
+as the journal, write notes in plain words, and count them at the end of the
+week. It targets the problems of the trial week (switches never logged, goal of
+the day often missing, unfinished evening closes), which matter more day to
+day than the installation layout.
+
+### 2. One way to find the code and the data
+A prerequisite for installing anywhere else, whichever way is chosen in item 3.
+Today the location is written in many places:
+
+- The skills name `~/Dev/mc_dev/deskmate/...` about fifty times (`tools/` and
+  `data/` paths).
+- `tools/agenda.py` fixes `DATA` to `<repo>/data`; `retro_due.py` overrides it
+  from outside. `usage_log.data_root()` already honours `DESKMATE_DATA_DIR`.
+- The hooks honour `DESKMATE_DATA_DIR` (through `usage_log.py`), but
+  `install.sh` does not pass it to them; only the reminders receive it, so
+  hooks fall back to `<repo>/data`.
+- `install.sh` writes into `$root/data` and warns when the repo is not in
+  `~/Dev/mc_dev/deskmate`.
+
+Goal: every tool resolves the data through `data_root()`, and the skills call
+the tools without knowing where the repository is. Behaviour stays the same
+with the current layout.
+
+### 3. Install separately from the development checkout
+Install from a copy pinned to a release tag, with the data in its own folder,
+so deploy and rollback become "move to tag, rerun the installer".
+- Decide first: the data folder (proposal: `~/Library/Application
+  Support/deskmate`) and the installed copy (a separate clone outside `~/Dev`,
+  or `~/Dev/mc_dev/deskmate` pinned to a tag with only the data moved).
+- Compare a Claude Code plugin with the installer: the plugin gives pinned,
+  versioned copies for free. It was set aside only because Codex needed its
+  own install path.
 - Moving existing data is a setup migration with a backup, like the card and
   log migrations.
-- Distribution as a Claude Code plugin was set aside because Codex needed its
-  own install path. With Codex dropped, compare the plugin with the installer
-  before starting: it gives pinned, versioned copies for free.
-
-## Later
-
-### Structured project checks
-`## Checks` holds free shell commands, protected only by the read-only
-convention, the Provider sandbox and a timeout. Replace or complement them with
-structured check types and an allowlist, so Deskmate enforces non-mutating
-checks instead of trusting arbitrary shell text.
 
 ## Ideas to explore (drafts)
 
@@ -70,10 +86,17 @@ plain words) and count the notes before building anything.
 
 2026-11-23:
 
+- **Structured project checks:** `## Checks` stays free shell text, protected
+  by the read-only convention and a timeout. The risk came from running checks
+  under a second Provider; with Claude Code only and checks written by the
+  user, an allowlist is not worth it.
+- **Calendar reminder channel:** never tested with a real calendar; the `mac`
+  channel covers daily use.
+- **Secret scanning for Provider switches:** depended on Codex support.
 - **Codex CLI support:** Deskmate stays a Claude Code tool. The work is parked
   on `feature/codex-cli-support` at `dada99a` (suite green, contains `develop`
   up to `74f713c`); to reopen it, merge the `develop` of that time and follow
-  the Codex upgrade checklist in `docs/agents/release.md`.
+  the Codex upgrade checklist in `docs/agents/release.md` as of `35ce1ef`.
 - **Cross-provider analytics:** depended on Codex support.
 
 2026-11-16:
