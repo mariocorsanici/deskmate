@@ -17,7 +17,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
-CHANNELS = {"mac", "slack"}
+CHANNELS = {"mac"}
 DEFAULTS = {"morning": "09:00", "evening": "17:00",
             "days": ["mon", "tue", "wed", "thu", "fri"], "channels": ["mac"]}
 

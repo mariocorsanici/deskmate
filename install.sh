@@ -144,6 +144,5 @@ else
   remove_agents
   ok "mac: alerts off"
 fi
-[[ " $channels " == *" slack "* ]] && warn "slack: not available yet, see ROADMAP.md"
 
 print "\nDeskmate is ready. Claude Code sessions already running see the hooks after a restart (or after opening /hooks)."

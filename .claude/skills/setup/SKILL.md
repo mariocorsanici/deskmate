@@ -17,9 +17,8 @@ Prepares the Mac for the deskmate skills, or runs a health check if it is alread
    - `language`: for replies, handoffs, lessons and reminders (`en` or `it`; any other language works for Claude's replies, while the reminder texts fall back to English);
    - `reminders.morning` / `reminders.evening`: times as `HH:MM` (default `09:00` and `17:00`);
    - `reminders.days`: any of `mon`…`sun` (default Monday to Friday);
-   - `reminders.channels`, one or more:
+   - `reminders.channels`: `["mac"]` or `[]` for no reminders.
      - `mac`: an alert on the Mac; it records the answer, which feeds the *Rhythm* lens of `/how-did-it-go`, but needs the Mac awake;
-     - `slack`: not available yet (see `ROADMAP.md`).
    Write the answers with `jq` into `data/config.json` (create it as `{}` if missing) and keep any other keys.
 
 3. **Install.** Run `./install.sh` from the repo root and read the output. Every `✗` blocks: explain what is missing and how to install it (for example `brew install jq`), then run it again. Every `!` is a warning: report it with one sentence on what it means.

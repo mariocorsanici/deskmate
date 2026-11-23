@@ -84,9 +84,8 @@ All preferences live in `data/config.json`, written by `/setup` (or by hand) and
 ```
 
 - `name`: how Claude addresses you. `language`: for Claude's replies, the handoff, the lessons and the reminders (reminder texts exist in `en` and `it`, other languages fall back to English).
-- `channels`:
+- `channels`: `["mac"]`, or `[]` for no reminders.
   - `mac`: an alert on the Mac that records your answer (used by `/how-did-it-go`). If the Mac is asleep at reminder time, the alert shows up on wake while it still makes sense (morning: up to 3 hours later; evening: from 1 hour before to 4 hours after); if the Mac is off, it is skipped.
-  - `slack`: planned, see [ROADMAP.md](ROADMAP.md).
 
 ## What gets installed
 
