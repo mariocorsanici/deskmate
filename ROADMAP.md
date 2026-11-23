@@ -112,7 +112,7 @@ plain words) and count the notes before building anything.
   a webhook message cannot, and the Slack app may need admin approval.
 - **Renaming commands** (`/call-it-a-day`): the names are habits now, and
   renaming after Codex support would touch both Providers.
-- **Branch protection and mandatory pull requests:** only CI is kept (step 3).
+- **Branch protection and mandatory pull requests:** only CI is kept (step 1).
 - **Versioning the project cards with a local git repo:** Codex support adds card
   revisions and a backup on every overwrite. If card history is still missing
   after that, design it again on the shared cards.
