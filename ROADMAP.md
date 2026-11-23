@@ -44,6 +44,11 @@ so deploy and rollback become "move to tag, rerun the installer".
 
 ## Ideas to explore (drafts)
 
+Ideas from conversations and the four development themes they form (project
+history, daily journal, roles of sessions and cards, PR review sessions) are in
+[DEVELOPMENT-THEMES.md](DEVELOPMENT-THEMES.md). They move here as drafts when
+they are ready to explore.
+
 ### Daily journal (draft, 2026-11-23)
 Not designed yet: an idea from the first trial week, to explore before any
 implementation. Evidence from that week: the morning session was reused all
