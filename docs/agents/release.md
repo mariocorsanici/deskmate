@@ -2,8 +2,8 @@
 
 How the installed Deskmate is kept separate from development work, and how a
 release reaches it. Branch roles (`main`, `develop`, `feature/*`) are in
-`development-workflow.md`, which arrives on `develop` with the Codex branch
-(postponed).
+`development-workflow.md`, which exists only on the Codex branch
+(dropped, see `ROADMAP.md`).
 
 ## Rules
 
@@ -39,7 +39,7 @@ The installed copy follows the line under trial (today `develop`).
 |---|---|---|
 | `v0.1.0` (2026-11-16) | Claude-only Daily loop, standby, check fetch, L09 hotfix | in place, symlinks to the installed copy |
 | `v0.2.0` (2026-11-23) | Agenda, Daily-loop tuning and follow-ups, after one week of use | unchanged: fast-forward `main`, no upgrade step |
-| not assigned | Codex CLI support (`feature/codex-cli-support`), postponed | **changes**: requires `deskmate setup` (upgrade checklist below) |
+| not assigned | Codex CLI support (`feature/codex-cli-support`), dropped (see `ROADMAP.md`) | **changes**: requires `deskmate setup` (upgrade checklist below) |
 
 One risky change per release: the release that brings Codex support carries
 nothing else, so if it misbehaves the cause is the migration or Codex.
@@ -79,5 +79,5 @@ Run once, at the end of a working day, after `/call-it-a-day`.
 
 Moving the installed copy and the data out of `~/Dev` (for example a clone
 pinned to a tag, with data elsewhere) is not supported end to end yet:
-reminders receive `DESKMATE_DATA_DIR`, but the Claude and Codex hooks use
+reminders receive `DESKMATE_DATA_DIR`, but the hooks use
 `<repo>/data`. See `ROADMAP.md`.

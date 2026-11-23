@@ -144,13 +144,6 @@ else
   remove_agents
   ok "mac: alerts off"
 fi
-if [[ " $channels " == *" calendar "* ]]; then
-  if [[ $(python3 -I $root/tools/reminders.py ics) == changed ]]; then
-    warn "calendar: new events in data/deskmate-reminders.ics, open it to import them (open data/deskmate-reminders.ics)"
-  else
-    ok "calendar: events unchanged"
-  fi
-fi
 [[ " $channels " == *" slack "* ]] && warn "slack: not available yet, see ROADMAP.md"
 
 print "\nDeskmate is ready. Claude Code sessions already running see the hooks after a restart (or after opening /hooks)."

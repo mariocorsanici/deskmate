@@ -9,54 +9,22 @@ Next steps in priority order. Release rules and checklists are in
 Today the installed copy is the repository in `~/Dev/mc_dev/deskmate`, with
 personal data inside it. Install from a clone pinned to a release tag, with
 the data in its own folder, so deploy and rollback become "move to tag, rerun
-the installer" (`./install.sh` today, `deskmate setup` once Codex support
-ships).
+the installer" (`./install.sh`).
 - The hooks must receive `DESKMATE_DATA_DIR` too; today only the reminders
   receive it, and hooks fall back to `<repo>/data`.
 - Moving existing data is a setup migration with a backup, like the card and
   log migrations.
-- Distribution as a Claude Code plugin was considered: it gives pinned,
-  versioned copies for Claude, but Codex would still need its own install
-  path. One installer stays the single install point for every Provider.
+- Distribution as a Claude Code plugin was set aside because Codex needed its
+  own install path. With Codex dropped, compare the plugin with the installer
+  before starting: it gives pinned, versioned copies for free.
 
 ## Later
-
-### Codex CLI support (postponed, no version assigned)
-`feature/codex-cli-support`: Claude Code and Codex CLI as equivalent
-Providers through one `deskmate` command. Parked on 2026-11-23 at `dada99a`
-(suite green, contains `develop` up to `74f713c`); no date to resume. Fixes on
-`develop` are no longer listed for porting: on resuming, merge the `develop`
-of that time and port what changed. Follow the Codex upgrade checklist in
-`docs/agents/release.md` and run the integrated skills natively in both
-Providers before tagging.
-
-### Cross-provider analytics
-Only after Codex support ships, and at least a month of use with both
-Providers. Store Claude Code and Codex
-CLI measurements with their Provider identity and analyse them separately
-first. Then define normalized metrics that support combined views and explicit
-comparisons without mixing incompatible raw token, context or compaction values.
 
 ### Structured project checks
 `## Checks` holds free shell commands, protected only by the read-only
 convention, the Provider sandbox and a timeout. Replace or complement them with
 structured check types and an allowlist, so Deskmate enforces non-mutating
 checks instead of trusting arbitrary shell text.
-
-### External secret scanning for Provider switches
-The switch already applies conservative local redaction and reports what it
-removed. As defence in depth, evaluate an optional local scanner that checks
-the temporary transfer bundle before either Provider receives it, keeps
-findings out of the audit log, falls back to built-in redaction when absent,
-and presents findings for explicit review. No scanner can guarantee a bundle
-has no secrets; document that.
-
-### Calendar reminders: test the import
-The `calendar` channel writes `data/deskmate-reminders.ics` but is
-experimental: it has not been imported into a real calendar. Daily use relies
-on the `mac` channel. To verify it: import into Google and Apple Calendar,
-check that event notifications survive the import, and document what a second
-import does after times or days change.
 
 ## Ideas to explore (drafts)
 
@@ -98,7 +66,17 @@ Open questions:
 First step: one week by hand (keep the morning session as the journal, notes in
 plain words) and count the notes before building anything.
 
-## Dropped (2026-11-16)
+## Dropped
+
+2026-11-23:
+
+- **Codex CLI support:** Deskmate stays a Claude Code tool. The work is parked
+  on `feature/codex-cli-support` at `dada99a` (suite green, contains `develop`
+  up to `74f713c`); to reopen it, merge the `develop` of that time and follow
+  the Codex upgrade checklist in `docs/agents/release.md`.
+- **Cross-provider analytics:** depended on Codex support.
+
+2026-11-16:
 
 - **Linux and Windows support:** Deskmate is a personal macOS tool. Reopen if
   someone else adopts it.
@@ -108,6 +86,6 @@ plain words) and count the notes before building anything.
   renaming after Codex support would touch both Providers.
 - **Branch protection and mandatory pull requests:** only CI is kept
   (`.github/workflows/tests.yml`, since 2026-11-23).
-- **Versioning the project cards with a local git repo:** Codex support adds card
-  revisions and a backup on every overwrite. If card history is still missing
-  after that, design it again on the shared cards.
+- **Versioning the project cards with a local git repo:** it was left to the
+  card revisions and backups of Codex support, now dropped too. Design it again
+  if card history is missed.

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Reminders driven by data/config.json: texts, time windows, LaunchAgents, calendar file.
+"""Reminders driven by data/config.json: texts, time windows, LaunchAgents.
 
 Usage:
   reminders.py check                     validates the reminders section of config.json
   reminders.py text <morning|evening>    title on the first line, then the alert message
   reminders.py window <morning|evening>  exit 0 if now is a good time to show the alert
   reminders.py plist <morning|evening>   LaunchAgent for the mac channel, on stdout
-  reminders.py ics                       writes data/deskmate-reminders.ics, prints "changed" or "unchanged"
 """
 import datetime as dt
 import json
@@ -17,9 +16,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-ICS = DATA / "deskmate-reminders.ics"
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
-CHANNELS = {"mac", "calendar", "slack"}
+CHANNELS = {"mac", "slack"}
 DEFAULTS = {"morning": "09:00", "evening": "17:00",
             "days": ["mon", "tue", "wed", "thu", "fri"], "channels": ["mac"]}
 
@@ -33,7 +31,6 @@ TEXTS = {
         "checkpoint": "/checkpoint in each work session: saves where the project stands in its project card.",
         "close": "/call-it-a-day: snapshots the open sessions, writes tomorrow's handoff and suggests topics to study.",
         "after": "After closing: study ({n} topics to study) or admin work.",
-        "after_static": "After closing: study the topics you set aside, or admin work.",
         "morning_button": "Ok, let's go", "snooze": "In 30 minutes", "done": "Ok, closing",
     },
     "it": {
@@ -45,7 +42,6 @@ TEXTS = {
         "checkpoint": "/checkpoint in ogni sessione di lavoro: salva lo stato del progetto nella sua scheda.",
         "close": "/call-it-a-day: fotografa le sessioni aperte, scrive le consegne per domani e propone argomenti da approfondire.",
         "after": "Dopo la chiusura: studio ({n} argomenti da approfondire) o amministrazione.",
-        "after_static": "Dopo la chiusura: studio degli argomenti messi da parte, o amministrazione.",
         "morning_button": "Ok, si parte", "snooze": "Tra 30 minuti", "done": "Ok, chiudo",
     },
 }
@@ -68,7 +64,7 @@ def hour_minute(value):
     return h, m
 
 
-def lines(kind, t, static=False):
+def lines(kind, t):
     if kind == "morning":
         return t["morning"]
     open_topics = 0
@@ -76,25 +72,11 @@ def lines(kind, t, static=False):
         open_topics = sum(l.startswith("- [ ]") for l in (DATA / "study-later.md").read_text().splitlines())
     except FileNotFoundError:
         pass
-    after = t["after_static"] if static else t["after"].format(n=open_topics)
-    return [t["checkpoint"], t["close"], after]
+    return [t["checkpoint"], t["close"], t["after"].format(n=open_topics)]
 
 
 def numbered(items, sep):
     return sep.join(f"{i}. {x}" for i, x in enumerate(items, 1))
-
-
-def fold(line):
-    """Splits a calendar line into 75-byte chunks, as the iCalendar format requires."""
-    raw, out = line.encode(), []
-    while len(raw) > 75:
-        cut = 75 if not out else 74
-        while raw[cut] & 0xC0 == 0x80:  # don't split a UTF-8 character
-            cut -= 1
-        out.append(raw[:cut].decode())
-        raw = raw[cut:]
-    out.append(raw.decode())
-    return "\r\n ".join(out)
 
 
 def check(r):
@@ -146,34 +128,6 @@ def main():
             "ProgramArguments": [str(ROOT / "tools" / f"{kind}_reminder.sh")],
             "StartCalendarInterval": [{"Weekday": d % 7, "Hour": h, "Minute": m} for d in weekdays],
         }).decode())
-
-    elif cmd == "ics":
-        byday = ",".join(d[:2].upper() for d in r["days"])
-        # first occurrence on one of the chosen days, otherwise some calendars show an extra event on DTSTART
-        first = dt.date.today()
-        while DAYS[first.weekday()] not in r["days"]:
-            first += dt.timedelta(days=1)
-        start = first.strftime("%Y%m%d")
-        events = []
-        for k in ("morning", "evening"):
-            h, m = hour_minute(r[k])
-            body = numbered(lines(k, t, static=True), "\\n").replace(",", "\\,").replace(";", "\\;")
-            events += ["BEGIN:VEVENT", f"UID:deskmate-{k}@deskmate", f"DTSTAMP:{start}T000000Z",
-                       f"DTSTART:{start}T{h:02d}{m:02d}00", "DURATION:PT15M",
-                       f"RRULE:FREQ=WEEKLY;BYDAY={byday}", f"SUMMARY:deskmate · {t[k + '_title']}",
-                       f"DESCRIPTION:{body}", "TRANSP:TRANSPARENT",
-                       "BEGIN:VALARM", "ACTION:DISPLAY", f"DESCRIPTION:{t[k + '_title']}", "TRIGGER:PT0M", "END:VALARM",
-                       "END:VEVENT"]
-        content = "\r\n".join(fold(l) for l in ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//deskmate//reminders//EN",
-                               "CALSCALE:GREGORIAN", *events, "END:VCALENDAR"]) + "\r\n"
-        # the dates in DTSTAMP and DTSTART change daily: compare without them, keeping the start time
-        strip = lambda s: re.sub(r"DTSTAMP:\S+|DTSTART:\d{8}", "", s)
-        old = ICS.read_bytes().decode() if ICS.exists() else ""  # bytes: keep the \r\n line endings
-        if strip(old) == strip(content):
-            print("unchanged")
-        else:
-            ICS.write_bytes(content.encode())
-            print("changed")
 
 
 if __name__ == "__main__":
