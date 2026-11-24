@@ -23,6 +23,7 @@ This file collects them all, with their origin.
 | 2026-11-19 | `7bf85f95` | `/checkpoint` measures the session's weight and suggests whether and where to `/clear`, with the files to resume from and the restart prompt; the same for planning and brainstorming sessions | Never written in the repository |
 | 2026-11-23 | `d9593dbe` | The first session of the day as a journal | In ROADMAP as a draft ("Daily journal") |
 | 2026-11-24 | `475da0f3` | The topic as the unit: a larger object (a PR, a task, a study) that holds its sessions and tabs, so that the sessions created by `/clear` trace back to the same topic; for PR sessions and development sessions alike | Open question in ROADMAP item 1; themes 3 and 4 |
+| 2026-11-24 | `475da0f3` | Study streams managed like projects: a card per stream (e.g. domyn-agents) recording progress, notes written and next steps, read by `/whats-on-today` and updated by `/checkpoint`; today study is planned less rigorously than development and gets postponed | Theme 1 |
 
 ## The four themes (2026-11-23)
 
@@ -30,7 +31,11 @@ This file collects them all, with their origin.
    the developments of each project, lets them be analysed, and produces a
    document showing the contribution made. Takes up the 2026-11-18 idea:
    projects made of several sessions, each feeding a project status file;
-   sessions listable from it and searchable by title.
+   sessions listable from it and searchable by title. Includes study streams
+   (2026-11-24): each stream gets a card like a project, with its progress,
+   so study is planned and tracked like development instead of being
+   postponed. To decide: how a stream card relates to `study-later.md` (a
+   topic there could graduate into a stream) and to the project it serves.
 2. **Daily journal.** Use a Deskmate session as a journal, to keep better track
    of project management, problems and secondary tasks. Extends the "Daily
    journal" draft and includes the length of the handoff (2026-11-17).
