@@ -24,6 +24,8 @@ This file collects them all, with their origin.
 | 2026-11-23 | `d9593dbe` | The first session of the day as a journal | In ROADMAP as a draft ("Daily journal") |
 | 2026-11-24 | `475da0f3` | The topic as the unit: a larger object (a PR, a task, a study) that holds its sessions and tabs, so that the sessions created by `/clear` trace back to the same topic; for PR sessions and development sessions alike | Open question in ROADMAP item 1; themes 3 and 4 |
 | 2026-11-24 | `475da0f3` | Study streams managed like projects: a card per stream (e.g. domyn-agents) recording progress, notes written and next steps, read by `/whats-on-today` and updated by `/checkpoint`; today study is planned less rigorously than development and gets postponed | Theme 1 |
+| 2026-11-24 | `475da0f3` | `open_tab.sh` should not bring the new tab to the front: today iTerm switches to it by itself. Make focus configurable in `config.json`, off by default | Not assigned to a theme |
+| 2026-11-24 | `475da0f3` | A notification, like the Deskmate reminders, when a session opened by `open_tab.sh` is ready (start-up done, waiting for input); configurable, together with the focus option above | Not assigned to a theme |
 
 ## The four themes (2026-11-23)
 
