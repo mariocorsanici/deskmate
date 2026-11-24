@@ -48,6 +48,20 @@ so deploy and rollback become "move to tag, rerun the installer".
 - Moving existing data is a setup migration with a backup, like the card and
   log migrations.
 
+### 4. Open sessions deterministically
+`tools/open_tab.sh` types the launch command into the new iTerm tab with
+`write text`. While the shell is still starting, macOS keeps at most 1024 bytes
+of a typed line (`MAX_CANON`): a longer command is cut and its newline is lost,
+so the session never starts. Seen on 2026-11-24 with a `--new` prompt of 1230
+bytes (session `475da0f3`); a shorter prompt in the same call worked.
+
+Goal: a session either opens with its full prompt or the script fails with a
+clear error, whatever the prompt length and shell start-up time. Candidate fix:
+write the prompt and the launch command to a temporary file and have the tab
+run that file, instead of typing them. Add a test with a prompt over 1024 bytes.
+Related ideas (tab focus off by default, a "session ready" notification) are in
+[DEVELOPMENT-THEMES.md](DEVELOPMENT-THEMES.md).
+
 ## Ideas to explore (drafts)
 
 Ideas from conversations and the four development themes they form (project
