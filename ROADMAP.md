@@ -62,6 +62,19 @@ run that file, instead of typing them. Add a test with a prompt over 1024 bytes.
 Related ideas (tab focus off by default, a "session ready" notification) are in
 [DEVELOPMENT-THEMES.md](DEVELOPMENT-THEMES.md).
 
+### 5. Guided first setup and a safe reset (low priority)
+Added on 2026-11-24. Today `install.sh` and the `setup` skill install or
+health-check Deskmate, but assume a user who already knows its files.
+- **Guided first setup:** for someone starting from zero, a step-by-step
+  walk-through that asks for name, language and reminder times, creates the
+  first project cards and explains the typical day.
+- **Reset:** run the guided setup again from scratch without losing earlier
+  data. The current data (`config.json`, cards, log, handoffs, lessons, agenda,
+  journal) is moved to a dated backup first, and the reset says where.
+
+Depends on item 2 (one way to find the data): the reset must know where the
+data lives.
+
 ## Ideas to explore (drafts)
 
 Ideas from conversations and the four development themes they form (project
