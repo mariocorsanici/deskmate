@@ -22,6 +22,7 @@ This file collects them all, with their origin.
 | 2026-11-18 | `22485f64` | Task–session pair: one session per task, a check on the task's scope, a closing skill with a checkpoint; projects made of sessions that update a status file; sessions listable and searchable by title; evidence of the work done | Never written in the repository (lost from the card) |
 | 2026-11-19 | `7bf85f95` | `/checkpoint` measures the session's weight and suggests whether and where to `/clear`, with the files to resume from and the restart prompt; the same for planning and brainstorming sessions | Never written in the repository |
 | 2026-11-23 | `d9593dbe` | The first session of the day as a journal | In ROADMAP as a draft ("Daily journal") |
+| 2026-11-24 | `475da0f3` | The topic as the unit: a larger object (a PR, a task, a study) that holds its sessions and tabs, so that the sessions created by `/clear` trace back to the same topic; for PR sessions and development sessions alike | Open question in ROADMAP item 1; themes 3 and 4 |
 
 ## The four themes (2026-11-23)
 
@@ -37,7 +38,18 @@ This file collects them all, with their origin.
    - reset sessions without losing context;
    - plan the day's activities per session;
    - plan when to use more or less capable models and agents;
-   - use `/clear` strategically.
+   - use `/clear` strategically;
+   - trace the sessions created by `/clear` back to their topic (2026-11-24).
+     After `/clear` Claude Code starts a new session ID in the same tab, so
+     Deskmate counts it as a separate session. Two candidate designs:
+     - **The tab as the thread:** the session-start hook also logs the tab's
+       identity, and the tab title set by `open_tab.sh` names the topic.
+       Simplest; first verify that the tab identity reaches the hook (Deskmate
+       does not use it anywhere today).
+     - **The topic as an object:** a PR, task or study with its own card or
+       section that holds its sessions and tabs; `/checkpoint` and
+       `/call-it-a-day` reason per topic. A topic may span tabs and a tab may
+       change topic, so it needs design.
 
    Takes up the task–session pair (2026-11-18), the session weight at
    `/checkpoint` (2026-11-19) and the 30-prompt cap experiment in
@@ -47,12 +59,16 @@ This file collects them all, with their origin.
    the evidence in `data/lessons.md`:
    - PRs checked from up to three sessions a day (2026-11-19 and 20);
    - a PR session that is always resumed accumulates useless context;
-   - current experiment: one new PR session a day, its state in the card,
-     long PRs read by a subagent.
+   - PRs checked from three sessions on 2026-11-23, partly `/clear` in the same
+     tab; the agent must reread reviewers' replies to answer or review, so
+     rereading PR state is legitimate;
+   - current experiment (from 2026-11-24): one PR tab a day, `/clear` inside it
+     allowed, no PR questions from other sessions.
 
 **Order:** decided by the open question "the day as the frame, or the session
-as the unit".
+as the unit". A third answer emerged on 2026-11-24: **the topic as the unit,
+inside the day**.
 - Theme 2 is the day as the frame.
-- Theme 3 is the session as the unit.
+- Theme 3 is the session (or the topic) as the unit.
 - Theme 1 depends on both.
 - Theme 4 is a concrete case of theme 3.

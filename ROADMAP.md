@@ -12,6 +12,12 @@ week. It targets the problems of the trial week (switches never logged, goal of
 the day often missing, unfinished evening closes), which matter more day to
 day than the installation layout.
 
+Open question to analyse during the week: the day as the frame, the session
+as the unit, or **the topic as the unit inside the day** (2026-11-24). A topic
+(a PR, a task, a study) groups the sessions that `/clear` creates in the same
+tab, for PR and development sessions alike. Candidate designs are in
+[DEVELOPMENT-THEMES.md](DEVELOPMENT-THEMES.md), theme 3.
+
 ### 2. One way to find the code and the data
 A prerequisite for installing anywhere else, whichever way is chosen in item 3.
 Today the location is written in many places:
