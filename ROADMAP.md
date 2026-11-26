@@ -75,6 +75,20 @@ health-check Deskmate, but assume a user who already knows its files.
 Depends on item 2 (one way to find the data): the reset must know where the
 data lives.
 
+### 6. Review the CI pipeline (disabled)
+The `tests` workflow (`.github/workflows/`) was disabled on GitHub on
+2026-11-26 (`gh workflow disable tests`). On 2026-11-23 and 2026-11-26 runs
+failed without running any test: the `macos-15` (arm64) jobs waited 15 minutes
+for a hosted runner and were cancelled ("not acquired by Runner ... capacity
+constraints").
+
+To decide before turning it back on (`gh workflow enable tests`):
+- Runner: `macos-15-intel`, `ubuntu-latest` (if the tests do not need macOS;
+  zsh and jq can be installed), or one macOS job instead of two.
+- A `timeout-minutes` and a trigger that does not run twice on push and PR.
+- Meanwhile, run the tests locally before pushing:
+  `python3 -m unittest discover -s tests`.
+
 ## Ideas to explore (drafts)
 
 Ideas from conversations and the four development themes they form (project
